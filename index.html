@@ -1513,6 +1513,94 @@ function handleCTA(btn){
     btn.style.background='';
   },2500);
 }
+
+function startMiniGameFlow(){
+  showScreen('screen-minigame');
+  initMiniGame();
+}
+
+function startMainGame(){
+  gotoRole();
+}
+
+// ======================
+// MINI GAME CORE
+// ======================
+
+let miniPlayerY, miniVelocity, miniItems, miniScore, miniHP, miniRunning;
+
+function initMiniGame(){
+
+  const canvas=document.getElementById("miniCanvas");
+  const ctx=canvas.getContext("2d");
+
+  miniPlayerY=300;
+  miniVelocity=0;
+  miniItems=[];
+  miniScore=0;
+  miniHP=100;
+  miniRunning=true;
+
+  document.onkeydown=()=>miniVelocity=-9;
+  canvas.onclick=()=>miniVelocity=-9;
+
+  function spawn(){
+    miniItems.push({
+      x:400,
+      y:Math.random()*500,
+      type:Math.random()>0.5?"good":"bad"
+    });
+  }
+
+  setInterval(spawn,1200);
+
+  function loop(){
+    if(!miniRunning)return;
+
+    ctx.fillStyle="#020617";
+    ctx.fillRect(0,0,400,600);
+
+    // player
+    miniVelocity+=0.6;
+    miniPlayerY+=miniVelocity;
+
+    ctx.fillStyle="#00e5ff";
+    ctx.fillRect(180,miniPlayerY,20,20);
+
+    // items
+    miniItems.forEach((item,i)=>{
+      item.x-=3;
+
+      ctx.fillStyle=item.type==="good"?"#39ff14":"#ff2244";
+      ctx.fillRect(item.x,item.y,20,20);
+
+      // collision
+      if(item.x<200 && item.x>160 && item.y<miniPlayerY+20 && item.y+20>miniPlayerY){
+
+        if(item.type==="good"){
+          miniScore+=10;
+        }else{
+          miniHP-=20;
+        }
+
+        miniItems.splice(i,1);
+      }
+    });
+
+    document.getElementById("miniScore").innerText="Score: "+miniScore;
+    document.getElementById("miniHP").innerText="HP: "+miniHP;
+
+    if(miniHP<=0){
+      miniRunning=false;
+      setTimeout(()=>startMainGame(),800);
+      return;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+}  
 </script>
 </body>
 </html>
