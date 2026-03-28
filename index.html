@@ -790,7 +790,29 @@ body::after{
     <canvas id="mini-game-canvas" width="400" height="600"></canvas>
     <button onclick="startMainGame()">Continue →</button>
   </div>
+  <div id="screen-minigame" class="screen">
+  <div class="section-tag">// Mini Game</div>
 
+  <h2 style="color:#00e5ff;">AI SKILL RUSH</h2>
+
+  <p style="color:#aaa;font-size:14px;">
+    Jump to collect AI tools. Avoid obsolete skills.<br>
+    Press SPACE or TAP to jump.
+  </p>
+
+  <canvas id="miniCanvas" width="400" height="600"></canvas>
+
+  <div style="margin-top:10px;">
+    <span id="miniScore">Score: 0</span>
+    &nbsp; | &nbsp;
+    <span id="miniHP">HP: 100</span>
+  </div>
+
+  <button onclick="startMainGame()" class="btn btn-primary" style="margin-top:20px;">
+    Continue →
+  </button>
+</div>
+  
   <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen"></div>
 
