@@ -4,1400 +4,1208 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Survival Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #070a0f;
-    --surface: #0d1117;
-    --surface2: #161b22;
-    --border: #21262d;
-    --accent: #00ff88;
-    --accent2: #ff4d6d;
-    --accent3: #ffbe0b;
-    --warn: #ff6b35;
-    --text: #e6edf3;
-    --muted: #7d8590;
-    --safe: #00ff88;
-    --risk: #ffbe0b;
-    --dead: #ff4d6d;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(0,255,136,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(255,77,109,0.05) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .grid-bg {
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  #app {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .screen {
-    display: none;
-    width: 100%;
-    max-width: 680px;
-    animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  .screen.active { display: block; }
-
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeSlideOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-24px); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  @keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
-  }
-
-  @keyframes glitch {
-    0%, 94%, 100% { transform: translateX(0); }
-    95% { transform: translateX(-3px); clip-path: inset(20% 0 40% 0); }
-    97% { transform: translateX(3px); clip-path: inset(60% 0 10% 0); }
-  }
-
-  @keyframes countUp {
-    from { opacity: 0; transform: scale(0.5); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes barFill {
-    from { width: 0%; }
-  }
-
-  @keyframes eventPop {
-    0% { transform: scale(0.8) translateY(10px); opacity: 0; }
-    60% { transform: scale(1.02) translateY(-2px); opacity: 1; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
-
-  /* ===== INTRO SCREEN ===== */
-  .intro-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,255,136,0.08);
-    border: 1px solid rgba(0,255,136,0.2);
-    padding: 6px 14px;
-    border-radius: 100px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-
-  .intro-badge span {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-  }
-
-  .intro-title {
-    font-size: clamp(36px, 8vw, 64px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-  }
-
-  .intro-title .line2 {
-    color: var(--accent);
-    display: block;
-  }
-
-  .intro-sub {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 40px;
-    max-width: 440px;
-  }
-
-  .stat-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-
-  .stat-chip {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 12px 18px;
-    border-radius: 12px;
-    flex: 1;
-    min-width: 120px;
-  }
-
-  .stat-chip .val {
-    font-family: 'Space Mono', monospace;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--accent);
-    display: block;
-  }
-
-  .stat-chip .lbl {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 4px;
-  }
-
-  /* ===== ROLE SELECTION ===== */
-  .section-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 20px;
-  }
-
-  .role-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 32px;
-  }
-
-  .role-card {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    padding: 22px 18px;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .role-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--accent), transparent);
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-
-  .role-card:hover {
-    border-color: rgba(0,255,136,0.4);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0,255,136,0.1);
-  }
-
-  .role-card.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(0,255,136,0.2);
-  }
-
-  .role-card.selected::before { opacity: 0.04; }
-
-  .role-emoji { font-size: 32px; margin-bottom: 10px; display: block; }
-  .role-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-  .role-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  
-  .role-risk {
-    margin-top: 12px;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--warn);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  /* ===== GAME SCREEN ===== */
-  .hud {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
-
-  .hud-stat {
-    flex: 1;
-    min-width: 100px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-  }
-
-  .hud-label {
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-family: 'Space Mono', monospace;
-    margin-bottom: 6px;
-  }
-
-  .hud-bar-track {
-    height: 5px;
-    background: var(--border);
-    border-radius: 100px;
-    overflow: hidden;
-  }
-
-  .hud-bar-fill {
-    height: 100%;
-    border-radius: 100px;
-    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .hud-val {
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    margin-top: 4px;
-  }
-
-  .turn-indicator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .turn-dots { display: flex; gap: 6px; }
-  .turn-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--border);
-    transition: all 0.3s;
-  }
-  .turn-dot.done { background: var(--accent); }
-  .turn-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1s infinite; }
-
-  /* EVENT CARD */
-  .event-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px 22px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .event-card.danger { border-color: rgba(255,77,109,0.4); }
-  .event-card.danger::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,77,109,0.06), transparent);
-    pointer-events: none;
-  }
-
-  .event-card.opportunity { border-color: rgba(0,255,136,0.3); }
-  .event-card.opportunity::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,255,136,0.05), transparent);
-    pointer-events: none;
-  }
-
-  .event-card.neutral { border-color: rgba(255,190,11,0.3); }
-
-  .event-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  .event-icon {
-    font-size: 28px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .event-type {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 5px;
-  }
-
-  .event-type.danger { color: var(--dead); }
-  .event-type.opportunity { color: var(--safe); }
-  .event-type.neutral { color: var(--risk); }
-
-  .event-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
-  .event-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 4px; }
-
-  .choice-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .choice-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .choice-btn::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .choice-btn:hover {
-    border-color: rgba(0,255,136,0.3);
-    background: rgba(0,255,136,0.05);
-    transform: translateX(4px);
-  }
-
-  .choice-btn:hover::before { opacity: 1; }
-
-  .choice-icon { font-size: 20px; flex-shrink: 0; }
-  .choice-text { flex: 1; }
-  .choice-hint { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; }
-  .choice-arrow { color: var(--muted); font-size: 14px; }
-
-  /* RESULT FEEDBACK */
-  .feedback-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .feedback-toast {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px 24px;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    animation: eventPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    opacity: 0;
-  }
-
-  .feedback-toast.pos { border-color: rgba(0,255,136,0.3); color: var(--safe); }
-  .feedback-toast.neg { border-color: rgba(255,77,109,0.3); color: var(--dead); animation: shake 0.5s, eventPop 0.4s forwards; }
-  .feedback-toast.neu { border-color: rgba(255,190,11,0.3); color: var(--risk); }
-
-  /* ===== RESULT SCREEN ===== */
-  .result-header { text-align: center; margin-bottom: 36px; }
-
-  .survival-ring {
-    width: 160px; height: 160px;
-    margin: 0 auto 24px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .survival-ring svg {
-    position: absolute;
-    inset: 0;
-    transform: rotate(-90deg);
-  }
-
-  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
-  .ring-fill {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .ring-score {
-    font-family: 'Space Mono', monospace;
-    font-size: 36px;
-    font-weight: 700;
-    z-index: 1;
-    animation: countUp 0.8s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .position-badge {
-    display: inline-block;
-    padding: 8px 24px;
-    border-radius: 100px;
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .pos-safe { background: rgba(0,255,136,0.12); color: var(--safe); border: 1px solid rgba(0,255,136,0.3); }
-  .pos-risk { background: rgba(255,190,11,0.12); color: var(--risk); border: 1px solid rgba(255,190,11,0.3); }
-  .pos-dead { background: rgba(255,77,109,0.12); color: var(--dead); border: 1px solid rgba(255,77,109,0.3); }
-
-  .result-explanation {
-    font-size: 15px;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 480px;
-    margin: 0 auto 8px;
-    text-align: center;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-  }
-
-  .stat-card .s-val {
-    font-family: 'Space Mono', monospace;
-    font-size: 24px;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  .stat-card .s-lbl {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  /* MONETIZATION */
-  .mono-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .mono-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-  }
-
-  .mono-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 6px;
-  }
-
-  .mono-sub {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-
-  .strategy-list { display: flex; flex-direction: column; gap: 12px; }
-
-  .strategy-item {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .strategy-item.unlocked {
-    border-color: rgba(0,255,136,0.25);
-  }
-
-  .strategy-item.locked {
-    filter: blur(0);
-  }
-
-  .strategy-item.locked .strategy-content {
-    filter: blur(5px);
-    user-select: none;
-    pointer-events: none;
-  }
-
-  .strategy-item.locked::after {
-    content: '🔒 Unlock to reveal';
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(13,17,23,0.7);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    backdrop-filter: blur(2px);
-    border-radius: 11px;
-  }
-
-  .strategy-num {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .strategy-num.n1 { background: rgba(0,255,136,0.12); color: var(--accent); }
-  .strategy-num.n2 { background: rgba(255,190,11,0.12); color: var(--risk); }
-  .strategy-num.n3 { background: rgba(255,77,109,0.12); color: var(--dead); }
-
-  .strategy-content { flex: 1; }
-  .strategy-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-  .strategy-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
-  .strategy-income { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 700; }
-
-  .cta-block {
-    background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(255,77,109,0.06));
-    border: 1px solid rgba(0,255,136,0.2);
-    border-radius: 20px;
-    padding: 28px;
-    text-align: center;
-  }
-
-  .cta-headline { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-  .cta-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
-
-  .cta-features {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 24px;
-    text-align: left;
-  }
-
-  .cta-feat {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .cta-feat span { color: var(--accent); font-size: 14px; }
-
-  .cta-btn {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 16px 40px;
-    border-radius: 14px;
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.02em;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(0,255,136,0.3);
-  }
-
-  .price-tag {
-    background: rgba(0,0,0,0.2);
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 14px;
-  }
-
-  .replay-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 12px 28px;
-    border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    margin-top: 12px;
-  }
-
-  .replay-btn:hover {
-    border-color: var(--muted);
-    color: var(--text);
-  }
-
-  /* ===== BUTTONS ===== */
-  .btn-primary {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 16px 36px;
-    border-radius: 14px;
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 36px rgba(0,255,136,0.3);
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* ===== LOADING ===== */
-  .loading-dots {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    margin-top: 20px;
-  }
-
-  .loading-dots span {
-    width: 8px; height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: pulse 1s infinite;
-  }
-
-  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-  /* ===== HEADING ===== */
-  h2 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    margin-bottom: 8px;
-  }
-
-  h3 { font-size: 20px; font-weight: 700; }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 480px) {
-    .role-grid { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .hud { gap: 8px; }
-    .stat-row { gap: 10px; }
-  }
-
-  /* Scanline effect on transitions */
-  .scanline {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: rgba(0,255,136,0.3);
-    pointer-events: none;
-    z-index: 200;
-    animation: scanline 0.6s linear forwards;
-    opacity: 0;
-  }
-
-  .result-title {
-    font-size: clamp(24px, 5vw, 34px);
-    font-weight: 800;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 28px 0;
-  }
+:root {
+  --bg:       #04070d;
+  --panel:    #080d14;
+  --card:     #0b1120;
+  --border:   #1a2535;
+  --border2:  #243248;
+  --hp:       #00e5ff;
+  --good:     #39ff14;
+  --warn:     #ffaa00;
+  --bad:      #ff2244;
+  --muted:    #4a6080;
+  --text:     #c8ddf0;
+  --bright:   #e8f4ff;
+  --glow-hp:  0 0 20px rgba(0,229,255,0.5);
+  --glow-good:0 0 20px rgba(57,255,20,0.5);
+  --glow-bad: 0 0 20px rgba(255,34,68,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+  width:100%;min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Exo 2',sans-serif;
+  overflow-x:hidden;
+}
+
+/* ── BACKGROUND ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.vignette{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, rgba(4,7,13,.9) 100%);
+}
+
+/* ── LAYOUT ── */
+#app{
+  position:relative;z-index:2;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+}
+.screen{display:none;width:100%;max-width:700px;}
+.screen.active{display:block;animation:screenIn .5s cubic-bezier(.16,1,.3,1) both;}
+
+@keyframes screenIn{from{opacity:0;transform:translateY(30px) scale(.97);}to{opacity:1;transform:none;}}
+@keyframes screenOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-20px) scale(.97);}}
+
+/* ── MONO FONT ── */
+.mono{font-family:'Share Tech Mono',monospace;}
+
+/* ── SCANLINE OVERLAY ── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+}
+
+/* ═══════════════════════════════════════
+   INTRO
+═══════════════════════════════════════ */
+.intro-wrap{padding:20px 0;}
+.intro-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--hp);padding:5px 14px;border-radius:2px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--hp);
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:24px;
+  box-shadow:var(--glow-hp);
+}
+.intro-eyebrow i{width:6px;height:6px;background:var(--hp);border-radius:50%;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.intro-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(48px,10vw,88px);
+  font-weight:700;line-height:.95;
+  letter-spacing:-.02em;
+  margin-bottom:6px;
+}
+.intro-title .t1{color:var(--bright);display:block;}
+.intro-title .t2{
+  color:var(--bad);display:block;
+  text-shadow:0 0 40px rgba(255,34,68,.6),0 0 80px rgba(255,34,68,.3);
+  animation:glitch 5s infinite;
+}
+@keyframes glitch{
+  0%,90%,100%{transform:none;clip-path:none;}
+  91%{transform:translateX(-4px);clip-path:inset(30% 0 50% 0);}
+  93%{transform:translateX(4px);clip-path:inset(60% 0 10% 0);}
+  95%{transform:translateX(-2px);clip-path:inset(10% 0 70% 0);}
+}
+
+.intro-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:480px;margin-bottom:36px;font-weight:300;}
+
+.intro-stats{display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap;}
+.i-stat{
+  flex:1;min-width:110px;
+  background:var(--panel);border:1px solid var(--border);
+  padding:14px 16px;border-radius:4px;
+}
+.i-stat .v{font-family:'Share Tech Mono',monospace;font-size:26px;color:var(--hp);display:block;}
+.i-stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+
+/* ── BUTTON ── */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;border:none;border-radius:3px;
+  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+  cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.btn-primary{
+  background:var(--hp);color:#04070d;
+  box-shadow:0 0 30px rgba(0,229,255,.4);
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,229,255,.6);}
+.btn-primary:disabled{opacity:.3;transform:none;box-shadow:none;cursor:not-allowed;}
+.btn-ghost{
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border);font-size:15px;padding:12px 28px;
+}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+
+/* ═══════════════════════════════════════
+   ROLE SELECT
+═══════════════════════════════════════ */
+.section-tag{
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--hp);letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:16px;opacity:.8;
+}
+.screen-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(28px,5vw,40px);font-weight:700;
+  color:var(--bright);margin-bottom:6px;letter-spacing:-.01em;
+}
+.screen-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;}
+.role-card{
+  background:var(--panel);border:2px solid var(--border);
+  border-radius:6px;padding:22px 18px;cursor:pointer;
+  transition:all .25s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
+}
+.role-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,229,255,.06),transparent);
+  opacity:0;transition:opacity .25s;
+}
+.role-card:hover{border-color:rgba(0,229,255,.4);transform:translateY(-2px);}
+.role-card:hover::before{opacity:1;}
+.role-card.sel{
+  border-color:var(--hp);
+  box-shadow:0 0 0 1px var(--hp),inset 0 0 20px rgba(0,229,255,.05),var(--glow-hp);
+}
+.role-card.sel::before{opacity:1;}
+.role-em{font-size:30px;margin-bottom:10px;display:block;}
+.role-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--bright);margin-bottom:5px;}
+.role-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.role-stats{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.rs-chip{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:3px 8px;border-radius:2px;border:1px solid;
+}
+.rs-hp{color:var(--hp);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.06);}
+.rs-inc{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.06);}
+.rs-adp{color:var(--warn);border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.06);}
+
+/* ═══════════════════════════════════════
+   GAME HUD
+═══════════════════════════════════════ */
+.hud{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px 6px 0 0;border-bottom:none;
+  padding:14px 18px;display:flex;align-items:center;gap:16px;
+  flex-wrap:wrap;position:relative;overflow:hidden;
+}
+.hud::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--hp),transparent);
+  opacity:.5;
+}
+
+/* HP BAR */
+.hp-section{flex:2;min-width:200px;}
+.hp-label{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:6px;
+}
+.hp-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em;}
+.hp-val{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:bold;}
+.hp-track{height:10px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;position:relative;}
+.hp-fill{
+  height:100%;border-radius:2px;
+  transition:width .7s cubic-bezier(.16,1,.3,1);
+  position:relative;
+}
+.hp-fill::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:3px;
+  background:rgba(255,255,255,.6);filter:blur(2px);
+}
+
+.hp-high  .hp-fill{background:linear-gradient(90deg,#00b4cc,var(--hp));box-shadow:0 0 10px rgba(0,229,255,.5);}
+.hp-med   .hp-fill{background:linear-gradient(90deg,#cc6600,var(--warn));box-shadow:0 0 10px rgba(255,170,0,.5);}
+.hp-low   .hp-fill{background:linear-gradient(90deg,#880011,var(--bad));box-shadow:0 0 10px rgba(255,34,68,.6);animation:hpCrit 1s infinite;}
+@keyframes hpCrit{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+/* MINI STATS */
+.hud-stats{display:flex;gap:10px;flex:1;}
+.hud-s{
+  flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:4px;padding:8px 10px;text-align:center;min-width:70px;
+}
+.hud-s .sv{font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:bold;display:block;}
+.hud-s .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+
+/* TURN INDICATOR */
+.turn-hud{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 18px;
+  background:var(--panel);border:1px solid var(--border);
+  border-top:none;border-bottom:none;
+}
+.turn-pips{display:flex;gap:5px;}
+.t-pip{
+  width:22px;height:5px;border-radius:2px;
+  background:var(--border2);transition:all .4s;
+}
+.t-pip.done{background:var(--hp);box-shadow:0 0 6px rgba(0,229,255,.5);}
+.t-pip.active{background:var(--hp);animation:pipPulse 1s infinite;}
+@keyframes pipPulse{0%,100%{box-shadow:0 0 6px rgba(0,229,255,.5);}50%{box-shadow:0 0 14px rgba(0,229,255,.9);}}
+.turn-txt{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto;}
+
+/* ═══════════════════════════════════════
+   EVENT CARD
+═══════════════════════════════════════ */
+.game-body{
+  background:var(--panel);border:1px solid var(--border);
+  border-top:none;border-radius:0 0 6px 6px;
+  padding:22px;
+}
+
+.event-card{
+  border-radius:6px;padding:20px 22px;margin-bottom:18px;
+  position:relative;overflow:hidden;
+  animation:eventAppear .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes eventAppear{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:none;}}
+
+.event-card.ev-crisis{
+  background:rgba(255,34,68,.05);border:1px solid rgba(255,34,68,.3);
+}
+.event-card.ev-opportunity{
+  background:rgba(57,255,20,.04);border:1px solid rgba(57,255,20,.25);
+}
+.event-card.ev-neutral{
+  background:rgba(255,170,0,.04);border:1px solid rgba(255,170,0,.2);
+}
+.event-card.ev-random-crisis{
+  background:rgba(255,34,68,.08);border:2px solid rgba(255,34,68,.5);
+  animation:eventAppear .4s both, shake .5s .1s both;
+}
+.event-card.ev-random-opp{
+  background:rgba(57,255,20,.07);border:2px solid rgba(57,255,20,.4);
+  animation:eventAppear .4s both, glowPulse .6s .1s both;
+}
+@keyframes glowPulse{0%{box-shadow:0 0 0 rgba(57,255,20,0);}50%{box-shadow:0 0 30px rgba(57,255,20,.3);}100%{box-shadow:0 0 8px rgba(57,255,20,.1);}}
+@keyframes shake{0%,100%{transform:none;}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(3px);}}
+
+.ev-accent{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.ev-accent::before{content:'';flex:1;height:1px;}
+.ev-crisis   .ev-accent{color:var(--bad);}
+.ev-crisis   .ev-accent::before{background:rgba(255,34,68,.3);}
+.ev-opportunity .ev-accent{color:var(--good);}
+.ev-opportunity .ev-accent::before{background:rgba(57,255,20,.3);}
+.ev-neutral  .ev-accent{color:var(--warn);}
+.ev-neutral  .ev-accent::before{background:rgba(255,170,0,.3);}
+.ev-random-crisis .ev-accent{color:var(--bad);}
+.ev-random-crisis .ev-accent::before{background:rgba(255,34,68,.4);}
+.ev-random-opp  .ev-accent{color:var(--good);}
+.ev-random-opp  .ev-accent::before{background:rgba(57,255,20,.4);}
+
+.ev-icon{font-size:32px;margin-bottom:10px;display:block;}
+.ev-title{
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  color:var(--bright);margin-bottom:6px;line-height:1.2;
+}
+.ev-desc{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* RANDOM EVENT BANNER */
+.rand-banner{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:4px;margin-bottom:14px;
+  font-size:13px;font-weight:600;
+  animation:bannerIn .4s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes bannerIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
+.rand-banner.rb-bad{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.3);color:var(--bad);}
+.rand-banner.rb-good{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--good);}
+.rand-banner .rb-icon{font-size:20px;}
+
+/* ═══════════════════════════════════════
+   CHOICES
+═══════════════════════════════════════ */
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice-btn{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:5px;padding:16px 18px;cursor:pointer;
+  text-align:left;color:var(--text);
+  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:14px;
+  transition:all .2s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
+  animation:choiceIn .4s both;
+}
+.choice-btn:nth-child(1){animation-delay:.05s;}
+.choice-btn:nth-child(2){animation-delay:.12s;}
+.choice-btn:nth-child(3){animation-delay:.19s;}
+@keyframes choiceIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:none;}}
+
+.choice-btn::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:0;
+  background:linear-gradient(90deg,rgba(0,229,255,.08),transparent);
+  transition:width .3s;
+}
+.choice-btn:hover{border-color:rgba(0,229,255,.3);transform:translateX(5px);}
+.choice-btn:hover::after{width:100%;}
+.choice-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+.c-icon{font-size:22px;flex-shrink:0;z-index:1;}
+.c-body{flex:1;z-index:1;}
+.c-text{display:block;margin-bottom:2px;}
+.c-hint{font-size:11px;color:var(--muted);font-weight:400;}
+.c-costs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.c-cost{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:2px 7px;border-radius:2px;border:1px solid;
+}
+.cost-hp-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.06);}
+.cost-hp-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.06);}
+.cost-inc-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.06);}
+.cost-inc-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.06);}
+.cost-adp{color:var(--warn);border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.06);}
+.c-arrow{color:var(--muted);font-size:16px;z-index:1;transition:transform .2s;}
+.choice-btn:hover .c-arrow{transform:translateX(3px);color:var(--hp);}
+
+/* ═══════════════════════════════════════
+   FLOATING DAMAGE NUMBERS
+═══════════════════════════════════════ */
+.float-num{
+  position:fixed;pointer-events:none;z-index:9999;
+  font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:bold;
+  animation:floatUp .9s cubic-bezier(.16,1,.3,1) both;
+  text-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+@keyframes floatUp{
+  0%{opacity:1;transform:translateY(0) scale(1);}
+  30%{transform:translateY(-20px) scale(1.2);}
+  100%{opacity:0;transform:translateY(-60px) scale(.8);}
+}
+
+/* ═══════════════════════════════════════
+   SCREEN FLASH
+═══════════════════════════════════════ */
+.screen-flash{
+  position:fixed;inset:0;z-index:1000;pointer-events:none;
+  animation:flash .4s ease-out both;
+}
+@keyframes flash{0%{opacity:.6;}100%{opacity:0;}}
+
+/* ═══════════════════════════════════════
+   GAME OVER
+═══════════════════════════════════════ */
+#screen-gameover{text-align:center;padding:40px 20px;}
+.go-skull{font-size:80px;margin-bottom:24px;display:block;animation:skullIn .8s cubic-bezier(.16,1,.3,1) both;}
+@keyframes skullIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}70%{transform:scale(1.1) rotate(5deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.go-title{
+  font-family:'Rajdhani',sans-serif;font-size:56px;font-weight:700;
+  color:var(--bad);letter-spacing:-.02em;margin-bottom:8px;
+  text-shadow:0 0 40px rgba(255,34,68,.6);
+}
+.go-sub{font-size:16px;color:var(--muted);max-width:400px;margin:0 auto 36px;line-height:1.7;}
+.go-epitaph{
+  background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);
+  border-radius:6px;padding:20px 24px;margin:0 auto 32px;max-width:440px;
+  font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--bad);
+  line-height:1.7;font-style:italic;
+}
+
+/* ═══════════════════════════════════════
+   RESULTS SCREEN
+═══════════════════════════════════════ */
+#screen-result{padding:4px 0 40px;}
+
+.result-header{text-align:center;padding:32px 20px 28px;position:relative;}
+
+/* Survival ring */
+.ring-wrap{width:180px;height:180px;margin:0 auto 20px;position:relative;}
+.ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--border2);stroke-width:10;}
+.ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);}
+.ring-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.ring-score{font-family:'Share Tech Mono',monospace;font-size:38px;font-weight:bold;line-height:1;}
+.ring-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;}
+
+.ending-badge{
+  display:inline-block;padding:8px 28px;border-radius:3px;
+  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;
+}
+.end-replaced{background:rgba(255,34,68,.12);color:var(--bad);border:1px solid rgba(255,34,68,.3);box-shadow:var(--glow-bad);}
+.end-surviving{background:rgba(255,170,0,.12);color:var(--warn);border:1px solid rgba(255,170,0,.3);box-shadow:0 0 20px rgba(255,170,0,.3);}
+.end-thriving{background:rgba(57,255,20,.1);color:var(--good);border:1px solid rgba(57,255,20,.3);box-shadow:var(--glow-good);}
+
+.result-title{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(26px,5vw,38px);
+  font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:-.01em;
+}
+.result-expl{font-size:14px;color:var(--muted);max-width:500px;margin:0 auto;line-height:1.75;}
+
+.final-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin:24px 0;
+}
+.fs-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:16px;text-align:center;
+}
+.fs-val{font-family:'Share Tech Mono',monospace;font-size:28px;display:block;margin-bottom:4px;}
+.fs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+
+.divider{height:1px;background:var(--border);margin:24px 0;}
+
+/* ═══════════════════════════════════════
+   MONETIZATION
+═══════════════════════════════════════ */
+.mono-panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:26px;margin-bottom:16px;position:relative;overflow:hidden;
+}
+.mono-panel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--hp),var(--good),var(--warn));
+}
+.mono-panel-title{
+  font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;
+  color:var(--bright);margin-bottom:4px;
+}
+.mono-panel-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+.strat-list{display:flex;flex-direction:column;gap:10px;}
+.strat-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:14px 16px;display:flex;
+  align-items:center;gap:14px;position:relative;overflow:hidden;
+}
+.strat-item.s-unlocked{border-color:rgba(0,229,255,.2);}
+.strat-item.s-locked .strat-body{filter:blur(5px);user-select:none;}
+.strat-item.s-locked::after{
+  content:'🔒  Locked — Unlock to reveal';
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(8,13,20,.75);backdrop-filter:blur(2px);
+  font-size:13px;font-weight:700;color:var(--muted);border-radius:5px;
+}
+.strat-num{
+  width:34px;height:34px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:bold;flex-shrink:0;
+}
+.n1{background:rgba(0,229,255,.1);color:var(--hp);}
+.n2{background:rgba(57,255,20,.08);color:var(--good);}
+.n3{background:rgba(255,170,0,.1);color:var(--warn);}
+.strat-name{font-size:14px;font-weight:700;color:var(--bright);margin-bottom:3px;}
+.strat-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+.strat-inc{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:var(--good);margin-top:5px;
+}
+
+.cta-panel{
+  background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(57,255,20,.04));
+  border:1px solid rgba(0,229,255,.2);border-radius:8px;
+  padding:28px;text-align:center;
+}
+.cta-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--bright);margin-bottom:8px;}
+.cta-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 22px;line-height:1.65;}
+.cta-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;}
+.cta-feat{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+.cta-feat span{color:var(--hp);font-size:15px;}
+.cta-buy{
+  background:linear-gradient(135deg,var(--hp),#0099cc);
+  color:#04070d;border:none;border-radius:4px;
+  padding:18px 0;width:100%;
+  font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.cta-buy:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,.4);}
+.price-pill{
+  background:rgba(0,0,0,.25);padding:4px 14px;
+  border-radius:100px;font-size:15px;
+}
+.replay-btn{
+  width:100%;background:transparent;border:1px solid var(--border);
+  color:var(--muted);border-radius:4px;padding:12px;margin-top:10px;
+  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.replay-btn:hover{border-color:var(--border2);color:var(--text);}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:480px){
+  .role-grid{grid-template-columns:1fr;}
+  .final-stats{grid-template-columns:1fr 1fr;}
+  .hud-stats{gap:6px;}
+  .hud{gap:10px;}
+}
 </style>
 </head>
 <body>
-<div class="grid-bg"></div>
+
+<canvas id="bg-canvas"></canvas>
+<div class="vignette"></div>
+
 <div id="app">
 
-  <!-- INTRO SCREEN -->
+  <!-- ══════════ INTRO ══════════ -->
   <div id="screen-intro" class="screen active">
-    <div class="intro-badge">
-      <span></span>
-      Live Simulation
+    <div class="intro-wrap">
+      <div class="intro-eyebrow"><i></i> 2026 Career Simulation</div>
+      <h1 class="intro-title">
+        <span class="t1">AI SURVIVAL</span>
+        <span class="t2">SIMULATOR</span>
+      </h1>
+      <p class="intro-sub">
+        100 HP. 6 turns. Dozens of random events. One brutal question:<br>
+        <strong style="color:var(--text)">Will AI end your career — or make you rich?</strong>
+      </p>
+      <div class="intro-stats">
+        <div class="i-stat"><span class="v">100</span><span class="l">Starting HP</span></div>
+        <div class="i-stat"><span class="v">6</span><span class="l">Turns</span></div>
+        <div class="i-stat"><span class="v">3</span><span class="l">Endings</span></div>
+        <div class="i-stat"><span class="v">38%</span><span class="l">Avg Survival</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="gotoRole()">LAUNCH SIMULATION →</button>
     </div>
-    <h1 class="intro-title">
-      AI Survival
-      <span class="line2">Simulator</span>
-    </h1>
-    <p class="intro-sub">
-      Will AI replace you — or make you irreplaceable? Play through 6 turns to discover your career survival score.
-    </p>
-    <div class="stat-row">
-      <div class="stat-chip">
-        <span class="val">4,200+</span>
-        <span class="lbl">Simulations Run</span>
-      </div>
-      <div class="stat-chip">
-        <span class="val">38%</span>
-        <span class="lbl">Avg Survival Rate</span>
-      </div>
-      <div class="stat-chip">
-        <span class="val">$47k</span>
-        <span class="lbl">Avg Income Gain</span>
-      </div>
-    </div>
-    <button class="btn-primary" onclick="startGame()">
-      Begin Simulation →
-    </button>
   </div>
 
-  <!-- ROLE SELECT SCREEN -->
+  <!-- ══════════ ROLE SELECT ══════════ -->
   <div id="screen-role" class="screen">
-    <div class="section-label">Step 01 — Choose Your Role</div>
-    <h2>Who are you<br>in the workforce?</h2>
-    <p style="color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6;">Your starting stats and risk profile depend on this choice.</p>
-
-    <div class="role-grid">
-      <div class="role-card" onclick="selectRole('office')" id="role-office">
-        <span class="role-emoji">🏢</span>
-        <div class="role-name">Office Worker</div>
-        <div class="role-desc">Admin, HR, marketing, management. Lots of routine work AI loves to automate.</div>
-        <div class="role-risk">⚠ High Risk</div>
-      </div>
-      <div class="role-card" onclick="selectRole('engineer')" id="role-engineer">
-        <span class="role-emoji">⚙️</span>
-        <div class="role-name">Engineer</div>
-        <div class="role-desc">Developer, data analyst, or technical role. AI is both your tool and your rival.</div>
-        <div class="role-risk">⚡ Medium Risk</div>
-      </div>
-      <div class="role-card" onclick="selectRole('creator')" id="role-creator">
-        <span class="role-emoji">🎨</span>
-        <div class="role-name">Creator</div>
-        <div class="role-desc">Freelancer, artist, writer, or designer. Adaptability is your superpower.</div>
-        <div class="role-risk">🎯 Variable Risk</div>
-      </div>
-      <div class="role-card" onclick="selectRole('unemployed')" id="role-unemployed">
-        <span class="role-emoji">🔍</span>
-        <div class="role-name">Unemployed</div>
-        <div class="role-desc">Between jobs. Clean slate — but the job market is flooded with AI-native candidates.</div>
-        <div class="role-risk">🚨 Critical Risk</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" id="role-btn" onclick="confirmRole()" disabled>
-      Start Simulation →
-    </button>
+    <div class="section-tag">// Step 01 — Identity</div>
+    <div class="screen-title">Choose Your Role</div>
+    <div class="screen-sub">Your career identity sets your starting stats and risk profile.</div>
+    <div class="role-grid" id="role-grid"></div>
+    <button class="btn btn-primary" id="role-btn" onclick="confirmRole()" disabled>ENTER SIMULATION →</button>
   </div>
 
-  <!-- GAME SCREEN -->
+  <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
-    <!-- HUD -->
-    <div class="hud" id="hud"></div>
-
-    <!-- Turn indicator -->
-    <div class="turn-indicator">
-      <span>Turn</span>
-      <div class="turn-dots" id="turn-dots"></div>
-      <span id="turn-label">1 / 6</span>
+    <div class="hud" id="hud">
+      <div class="hp-section" id="hp-section">
+        <div class="hp-label">
+          <span class="hp-text mono">// SURVIVAL HP</span>
+          <span class="hp-val mono" id="hp-val">100</span>
+        </div>
+        <div class="hp-track"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
+      </div>
+      <div class="hud-stats">
+        <div class="hud-s"><span class="sv mono" id="stat-inc" style="color:var(--good)">50</span><span class="sl">Income</span></div>
+        <div class="hud-s"><span class="sv mono" id="stat-adp" style="color:var(--warn)">50</span><span class="sl">Adapt.</span></div>
+        <div class="hud-s"><span class="sv mono" id="stat-res" style="color:var(--bad)">50</span><span class="sl">Resist.</span></div>
+      </div>
     </div>
-
-    <!-- Event card -->
-    <div id="event-area"></div>
-
-    <!-- Choices -->
-    <div class="choice-list" id="choices"></div>
+    <div class="turn-hud">
+      <div class="turn-pips" id="turn-pips"></div>
+      <div class="turn-txt mono" id="turn-txt">TURN 1 / 6</div>
+    </div>
+    <div class="game-body" id="game-body">
+      <div id="rand-banner-area"></div>
+      <div id="event-area"></div>
+      <div class="choices" id="choices"></div>
+    </div>
   </div>
 
-  <!-- RESULT SCREEN -->
+  <!-- ══════════ GAME OVER ══════════ -->
+  <div id="screen-gameover" class="screen">
+    <span class="go-skull">💀</span>
+    <div class="go-title">ELIMINATED</div>
+    <p class="go-sub">Your HP hit zero. The AI economy swept you aside before you could adapt.</p>
+    <div class="go-epitaph" id="go-epitaph">Loading epitaph...</div>
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:340px;margin:0 auto;">
+      <button class="btn btn-primary" style="justify-content:center;width:100%;" onclick="replayGame()">TRY AGAIN →</button>
+      <button class="btn btn-ghost" style="justify-content:center;" onclick="gotoRole()">CHANGE ROLE</button>
+    </div>
+  </div>
+
+  <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen"></div>
 
 </div>
 
-<!-- Feedback overlay -->
-<div class="feedback-overlay" id="feedback-overlay" style="display:none;"></div>
-
 <script>
-// =============== GAME DATA ===============
-
-const ROLES = {
-  office: {
-    name: 'Office Worker', emoji: '🏢',
-    stats: { resistance: 60, income: 30, adaptability: 40 }
-  },
-  engineer: {
-    name: 'Engineer', emoji: '⚙️',
-    stats: { resistance: 45, income: 60, adaptability: 65 }
-  },
-  creator: {
-    name: 'Creator', emoji: '🎨',
-    stats: { resistance: 40, income: 45, adaptability: 80 }
-  },
-  unemployed: {
-    name: 'Unemployed', emoji: '🔍',
-    stats: { resistance: 25, income: 10, adaptability: 55 }
+// ════════════════════════════════════════════
+// BACKGROUND PARTICLE CANVAS
+// ════════════════════════════════════════════
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++){
+    pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*1.5+.3,op:Math.random()*.4+.1});
   }
-};
-
-const TURNS = [
-  {
-    event: {
-      type: 'neutral',
-      icon: '📊',
-      title: 'AI tools are flooding your industry',
-      desc: 'ChatGPT, Copilot, Midjourney — every company is evaluating AI. What\'s your move?'
-    },
-    choices: [
-      { icon: '🎓', text: 'Learn AI tools', hint: 'Enroll in a free AI certification course', effects: { resistance: -8, income: +12, adaptability: +18 } },
-      { icon: '💼', text: 'Continue routine work', hint: 'Stay in your lane and hope it blows over', effects: { resistance: +5, income: +3, adaptability: -5 } },
-      { icon: '🚀', text: 'Start a side hustle using AI', hint: 'Launch a small AI-powered service', effects: { resistance: -5, income: +20, adaptability: +10 } }
-    ]
-  },
-  {
-    event: {
-      type: 'danger',
-      icon: '⚡',
-      title: 'Your company announces layoffs',
-      desc: '15% of the workforce will be cut. AI-literate employees are safe. Who are you?'
-    },
-    choices: [
-      { icon: '🤖', text: 'Volunteer to lead AI adoption', hint: 'Become the AI champion on your team', effects: { resistance: -15, income: +8, adaptability: +20 } },
-      { icon: '🤫', text: 'Keep your head down', hint: 'Hope you\'re not on the list', effects: { resistance: +10, income: -5, adaptability: -10 } },
-      { icon: '📝', text: 'Update resume & network', hint: 'Prepare for the worst, aim for the best', effects: { resistance: -5, income: +5, adaptability: +8 } }
-    ]
-  },
-  {
-    event: {
-      type: 'opportunity',
-      icon: '💡',
-      title: 'AI-skilled workers get promoted',
-      desc: 'Your colleague who learned Cursor just got a 40% raise. The opportunity window is open.'
-    },
-    choices: [
-      { icon: '📚', text: 'Deep-dive into AI prompting', hint: 'Spend weekends mastering advanced techniques', effects: { resistance: -12, income: +15, adaptability: +15 } },
-      { icon: '💰', text: 'Sell AI-enhanced freelance work', hint: 'Charge 3x more with AI-assisted output', effects: { resistance: -8, income: +25, adaptability: +5 } },
-      { icon: '😴', text: 'Do nothing', hint: 'It\'ll probably sort itself out', effects: { resistance: +8, income: -8, adaptability: -12 } }
-    ]
-  },
-  {
-    event: {
-      type: 'danger',
-      icon: '🤖',
-      title: 'AI replaces part of your job',
-      desc: 'An AI model now does 40% of what you used to do. Your role is being "restructured."'
-    },
-    choices: [
-      { icon: '🔄', text: 'Pivot to AI management', hint: 'Manage AI outputs instead of creating manually', effects: { resistance: -20, income: +10, adaptability: +20 } },
-      { icon: '🆕', text: 'Learn a new high-demand skill', hint: 'AI can\'t replace niche expertise yet', effects: { resistance: -10, income: +12, adaptability: +12 } },
-      { icon: '😤', text: 'Resist and fight the change', hint: 'Push back on the automation', effects: { resistance: +15, income: -15, adaptability: -15 } }
-    ]
-  },
-  {
-    event: {
-      type: 'neutral',
-      icon: '🌐',
-      title: 'New AI income opportunities emerge',
-      desc: 'Prompt engineering, AI consulting, and synthetic content are booming markets.'
-    },
-    choices: [
-      { icon: '📈', text: 'Build an AI income stream', hint: 'Create templates, courses, or AI agents to sell', effects: { resistance: -10, income: +30, adaptability: +8 } },
-      { icon: '🤝', text: 'Partner with AI-native companies', hint: 'Get contract work from AI startups', effects: { resistance: -5, income: +18, adaptability: +10 } },
-      { icon: '⏳', text: 'Wait for things to stabilize', hint: 'Too risky right now', effects: { resistance: +5, income: -5, adaptability: -8 } }
-    ]
-  },
-  {
-    event: {
-      type: 'opportunity',
-      icon: '🏆',
-      title: 'Final Test: The AI-first economy is here',
-      desc: 'In 2026, every job listing requires AI fluency. This is your last chance to position yourself.'
-    },
-    choices: [
-      { icon: '🎯', text: 'Launch your AI-powered brand', hint: 'Become a known expert in your field + AI', effects: { resistance: -20, income: +35, adaptability: +15 } },
-      { icon: '🔧', text: 'Specialize in AI tool integration', hint: 'Become the "AI fixer" companies need', effects: { resistance: -15, income: +25, adaptability: +10 } },
-      { icon: '🏳️', text: 'Accept automation defeat', hint: 'Let AI take over and coast', effects: { resistance: +20, income: -20, adaptability: -20 } }
-    ]
-  }
-];
-
-const RANDOM_EVENTS = [
-  { chance: 0.3, type: 'danger', msg: '⚡ RANDOM EVENT: Competitor uses AI to undercut your price!', effects: { income: -8 } },
-  { chance: 0.25, type: 'opportunity', msg: '🌟 RANDOM EVENT: Viral AI demo gets you noticed online!', effects: { income: +10, adaptability: +5 } },
-  { chance: 0.25, type: 'danger', msg: '😰 RANDOM EVENT: Mass layoffs hit your industry!', effects: { resistance: +10, income: -10 } },
-  { chance: 0.2, type: 'opportunity', msg: '🚀 RANDOM EVENT: AI startup offers you a contract!', effects: { income: +15, adaptability: +8 } }
-];
-
-const STRATEGIES = [
-  {
-    name: 'AI-Enhanced Freelancing',
-    desc: 'Use AI tools to deliver 10x faster. Charge premium rates for AI-augmented work.',
-    income: '$4,000–$12,000/mo',
-    icon: '💼'
-  },
-  {
-    name: 'Prompt Engineering & Consulting',
-    desc: 'Teach companies how to use AI tools. High demand, low competition right now.',
-    income: '$6,000–$20,000/mo',
-    icon: '🧠'
-  },
-  {
-    name: 'AI Product Creation',
-    desc: 'Build and sell AI templates, agents, or micro-SaaS tools with no-code platforms.',
-    income: '$2,000–$50,000/mo',
-    icon: '⚙️'
-  }
-];
-
-// =============== GAME STATE ===============
-
-let state = {
-  role: null,
-  turn: 0,
-  stats: { resistance: 50, income: 50, adaptability: 50 },
-  maxTurns: 6,
-  history: []
-};
-
-// =============== UI HELPERS ===============
-
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-function transition(outId, inId, fn) {
-  const outEl = document.getElementById(outId);
-  outEl.style.animation = 'fadeSlideOut 0.35s cubic-bezier(0.7,0,0.8,1) forwards';
-  
-  const scanline = document.createElement('div');
-  scanline.className = 'scanline';
-  document.body.appendChild(scanline);
-  setTimeout(() => scanline.remove(), 700);
-
-  setTimeout(() => {
-    outEl.classList.remove('active');
-    outEl.style.animation = '';
-    if (fn) fn();
-    const inEl = document.getElementById(inId);
-    inEl.classList.add('active');
-  }, 350);
-}
-
-function showFeedback(msg, type) {
-  const overlay = document.getElementById('feedback-overlay');
-  overlay.style.display = 'flex';
-  overlay.innerHTML = `<div class="feedback-toast ${type}">${msg}</div>`;
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    overlay.innerHTML = '';
-  }, 1800);
-}
-
-// =============== SCREENS ===============
-
-function startGame() {
-  transition('screen-intro', 'screen-role', null);
-}
-
-function selectRole(roleKey) {
-  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('role-' + roleKey).classList.add('selected');
-  state.role = roleKey;
-  document.getElementById('role-btn').disabled = false;
-}
-
-function confirmRole() {
-  if (!state.role) return;
-  const role = ROLES[state.role];
-  state.stats = { ...role.stats };
-  state.turn = 0;
-  transition('screen-role', 'screen-game', renderTurn);
-}
-
-function renderHUD() {
-  const s = state.stats;
-  const hud = document.getElementById('hud');
-  
-  const bars = [
-    { label: 'AI Resistance', val: s.resistance, color: '#ff4d6d', key: 'resistance' },
-    { label: 'Income Potential', val: s.income, color: '#00ff88', key: 'income' },
-    { label: 'Adaptability', val: s.adaptability, color: '#ffbe0b', key: 'adaptability' }
-  ];
-
-  hud.innerHTML = bars.map(b => `
-    <div class="hud-stat">
-      <div class="hud-label">${b.label}</div>
-      <div class="hud-bar-track">
-        <div class="hud-bar-fill" style="width:${clamp(b.val,0,100)}%;background:${b.color};animation:barFill 0.6s ease both;"></div>
-      </div>
-      <div class="hud-val" style="color:${b.color}">${clamp(b.val,0,100)}%</div>
-    </div>
-  `).join('');
-}
-
-function renderTurnDots() {
-  const container = document.getElementById('turn-dots');
-  container.innerHTML = '';
-  for (let i = 0; i < state.maxTurns; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'turn-dot' + (i < state.turn ? ' done' : i === state.turn ? ' active' : '');
-    container.appendChild(dot);
-  }
-  document.getElementById('turn-label').textContent = `${state.turn + 1} / ${state.maxTurns}`;
-}
-
-function renderTurn() {
-  renderHUD();
-  renderTurnDots();
-
-  const turnData = TURNS[state.turn];
-  const ev = turnData.event;
-
-  // Random event overlay
-  const randEv = RANDOM_EVENTS.find(r => Math.random() < r.chance && state.turn > 0);
-
-  const eventArea = document.getElementById('event-area');
-  
-  let randHTML = '';
-  if (randEv) {
-    // Apply random event effects
-    setTimeout(() => {
-      if (randEv.effects) {
-        Object.keys(randEv.effects).forEach(k => {
-          if (state.stats[k] !== undefined) {
-            state.stats[k] = clamp(state.stats[k] + randEv.effects[k], 0, 100);
-          }
-        });
-        renderHUD();
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,229,255,${p.op})`;ctx.fill();
+    });
+    // Draw connecting lines
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+      if(d<120){
+        ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(0,229,255,${.06*(1-d/120)})`;ctx.lineWidth=.5;ctx.stroke();
       }
-      showFeedback(randEv.msg, randEv.type === 'danger' ? 'neg' : 'pos');
-    }, 200);
+    }
+    requestAnimationFrame(draw);
   }
+  draw();
+})();
 
-  eventArea.style.animation = 'eventPop 0.5s cubic-bezier(0.16,1,0.3,1) both';
-  eventArea.innerHTML = `
-    <div class="event-card ${ev.type}">
-      <div class="event-header">
-        <div class="event-icon">${ev.icon}</div>
-        <div>
-          <div class="event-type ${ev.type}">${ev.type === 'danger' ? '⚠ Threat' : ev.type === 'opportunity' ? '✦ Opportunity' : '◈ Situation'}</div>
-          <div class="event-title">${ev.title}</div>
-        </div>
-      </div>
-      <div class="event-desc">${ev.desc}</div>
-    </div>
-  `;
+// ════════════════════════════════════════════
+// GAME DATA
+// ════════════════════════════════════════════
+const ROLES=[
+  {id:'office',emoji:'🏢',name:'Office Worker',
+   desc:'Admin, HR, operations — the automation bullseye.',
+   stats:{hp:100,income:30,adaptability:35,resistance:65},
+   chips:['HP 100','INC 30','ADP 35']},
+  {id:'engineer',emoji:'⚙️',name:'Engineer',
+   desc:'Coder, analyst, builder. AI is tool AND rival.',
+   stats:{hp:100,income:60,adaptability:65,resistance:45},
+   chips:['HP 100','INC 60','ADP 65']},
+  {id:'creator',emoji:'🎨',name:'Creator',
+   desc:'Freelancer, designer, writer. High variance future.',
+   stats:{hp:100,income:45,adaptability:80,resistance:40},
+   chips:['HP 100','INC 45','ADP 80']},
+  {id:'unemployed',emoji:'🔍',name:'Unemployed',
+   desc:'No income, clean slate. Every choice is survival.',
+   stats:{hp:80,income:10,adaptability:55,resistance:25},
+   chips:['HP 80','INC 10','ADP 55']},
+];
 
-  const choicesEl = document.getElementById('choices');
-  choicesEl.innerHTML = '';
-  
-  turnData.choices.forEach((choice, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.style.animationDelay = `${i * 0.08}s`;
-    btn.style.animation = `fadeSlideIn 0.4s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1) both`;
-    btn.innerHTML = `
-      <span class="choice-icon">${choice.icon}</span>
-      <span class="choice-text">
-        ${choice.text}
-        <div class="choice-hint">${choice.hint}</div>
-      </span>
-      <span class="choice-arrow">›</span>
-    `;
-    btn.onclick = () => makeChoice(choice);
-    choicesEl.appendChild(btn);
-  });
-}
+const TURNS=[
+  {
+    ev:{type:'neutral',icon:'📊',
+      title:'AI Tools Flood Your Industry',
+      desc:'ChatGPT, Copilot, Midjourney — every company evaluating AI. Everyone is watching. What\'s your move?'},
+    choices:[
+      {icon:'🎓',text:'Enroll in an AI certification',hint:'6-week course on AI tools & prompting',
+       costs:{hp:+5,income:+14,adaptability:+18,resistance:-10}},
+      {icon:'💼',text:'Continue your normal routine',hint:'Hope the hype dies down',
+       costs:{hp:-8,income:+3,adaptability:-6,resistance:+8}},
+      {icon:'🚀',text:'Launch an AI side hustle',hint:'Build a micro-service using AI tools',
+       costs:{hp:0,income:+20,adaptability:+10,resistance:-8}},
+    ]
+  },
+  {
+    ev:{type:'crisis',icon:'⚡',
+      title:'Company-Wide Layoffs Announced',
+      desc:'15% of staff will be cut. Managers are looking for reasons to keep or cut you. AI-literate employees are the obvious survivors.'},
+    choices:[
+      {icon:'🤖',text:'Volunteer to lead AI transition',hint:'Become the team\'s AI champion',
+       costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
+      {icon:'🤫',text:'Keep your head down',hint:'Stay invisible and hope for the best',
+       costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
+      {icon:'📝',text:'Polish résumé & start networking',hint:'Prepare a safety net while you can',
+       costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
+    ]
+  },
+  {
+    ev:{type:'opportunity',icon:'💡',
+      title:'AI Workers Get 40% Raises',
+      desc:'Your colleague who mastered Cursor just got promoted and a $20k raise. The gap between AI-fluent and AI-ignorant is widening fast.'},
+    choices:[
+      {icon:'📚',text:'Deep-dive into AI prompting',hint:'Spend weekends on advanced techniques',
+       costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
+      {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3x with AI-assisted output',
+       costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
+      {icon:'😴',text:'Ignore it — wait and see',hint:'Maybe the market corrects itself',
+       costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
+    ]
+  },
+  {
+    ev:{type:'crisis',icon:'🤖',
+      title:'AI Replaces 40% of Your Job',
+      desc:'A new model just automated the core of what you do. HR is "reviewing role structures." You have a week to adapt or become redundant.'},
+    choices:[
+      {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Become the human-in-the-loop they need',
+       costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
+      {icon:'🆕',text:'Rapidly reskill into new area',hint:'AI-proof niche skills are rising fast',
+       costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
+      {icon:'😤',text:'Fight automation, file complaints',hint:'Resist the change and push back hard',
+       costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
+    ]
+  },
+  {
+    ev:{type:'opportunity',icon:'🌐',
+      title:'New AI Income Streams Emerge',
+      desc:'Prompt engineering, AI consulting, and synthetic content creation are now $100k+ careers. The gap between movers and waiters is now a chasm.'},
+    choices:[
+      {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, or AI micro-SaaS',
+       costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
+      {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work from frontier companies',
+       costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
+      {icon:'⏳',text:'Wait for the market to stabilize',hint:'Too risky right now',
+       costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
+    ]
+  },
+  {
+    ev:{type:'neutral',icon:'🏆',
+      title:'FINAL TEST: The AI-First Economy',
+      desc:'It\'s 2027. Every job posting requires AI fluency. Every company runs on LLMs. This is your defining moment — how do you position yourself?'},
+    choices:[
+      {icon:'🎯',text:'Launch your AI-powered personal brand',hint:'Become a recognized AI expert in your field',
+       costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
+      {icon:'🔧',text:'Specialize as an AI integration expert',hint:'Companies pay huge to be "AI-fixed"',
+       costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
+      {icon:'🏳️',text:'Accept defeat — let AI take over',hint:'Surrender and coast on basic income',
+       costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
+    ]
+  },
+];
 
-function makeChoice(choice) {
-  // Disable all buttons
-  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
-  
-  // Apply effects
-  const effects = choice.effects;
-  let feedbackParts = [];
-  
-  Object.keys(effects).forEach(k => {
-    const delta = effects[k];
-    if (state.stats[k] !== undefined) {
-      state.stats[k] = clamp(state.stats[k] + delta, 0, 100);
-      if (k === 'income') feedbackParts.push(`Income ${delta > 0 ? '+' : ''}${delta}%`);
-      if (k === 'adaptability') feedbackParts.push(`Adaptability ${delta > 0 ? '+' : ''}${delta}%`);
-      if (k === 'resistance') feedbackParts.push(`Resistance ${delta > 0 ? '+' : ''}${delta}%`);
+// Random events that fire before a turn
+const RANDOM_EVENTS=[
+  {chance:.28,type:'crisis',icon:'📉',
+   title:'CRISIS: Mass industry layoffs hit overnight',
+   desc:'10,000 jobs cut in your sector. Market confidence crashes.',
+   costs:{hp:-15,income:-8}},
+  {chance:.25,type:'crisis',icon:'🦠',
+   title:'CRISIS: Your main client goes bankrupt',
+   desc:'Without warning, your largest income source disappears.',
+   costs:{hp:-12,income:-12}},
+  {chance:.22,type:'opportunity',icon:'🌟',
+   title:'OPPORTUNITY: Your AI demo goes viral',
+   desc:'A post you shared online explodes. Inbound opportunities flood in.',
+   costs:{hp:+8,income:+14,adaptability:+8}},
+  {chance:.20,type:'opportunity',icon:'💼',
+   title:'OPPORTUNITY: Recruiter offers contract work',
+   desc:'An AI-first company wants your skills. Premium rates.',
+   costs:{hp:+5,income:+16}},
+  {chance:.18,type:'crisis',icon:'⚠️',
+   title:'CRISIS: New AI model makes your skill obsolete',
+   desc:'GPT-Next just learned to do what took you years to master.',
+   costs:{hp:-20,resistance:+15}},
+  {chance:.15,type:'opportunity',icon:'🎓',
+   title:'OPPORTUNITY: Free AI bootcamp scholarship',
+   desc:'You get accepted to an elite 2-week AI intensive — at no cost.',
+   costs:{hp:+5,adaptability:+15,resistance:-10}},
+];
+
+const EPITAPHS=[
+  '"They kept saying \'AI is just a tool.\' The tool replaced them."',
+  '"Chose comfort over adaptation. The market chose efficiency."',
+  '"Waited for the dust to settle. The dust was a tornado."',
+  '"Resistant to the end. The AI never noticed."',
+  '"10 years of experience. 0 years of AI. The math was brutal."',
+];
+
+const STRATEGIES=[
+  {name:'AI-Enhanced Freelancing',
+   desc:'Use AI to deliver 10× faster, charge premium rates. Clients pay for results, not hours.',
+   income:'$4,000 – $12,000/mo',icon:'💼'},
+  {name:'Prompt Engineering & Consulting',
+   desc:'Train companies to use AI tools effectively. High demand, almost no certified competition yet.',
+   income:'$6,000 – $20,000/mo',icon:'🧠'},
+  {name:'AI Micro-SaaS / Digital Products',
+   desc:'Build and sell AI templates, agents, or tools with no-code platforms. Passive income at scale.',
+   income:'$2,000 – $50,000/mo',icon:'⚙️'},
+];
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let G={
+  role:null, turn:0, maxTurns:6,
+  hp:100, income:50, adaptability:50, resistance:50,
+  randEventThisTurn:null,
+};
+
+function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+
+// ════════════════════════════════════════════
+// SCREEN TRANSITIONS
+// ════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    if(s.classList.contains('active')){
+      s.style.animation='screenOut .35s ease both';
+      setTimeout(()=>{s.classList.remove('active');s.style.animation='';},340);
     }
   });
-
-  state.history.push({ choice: choice.text, effects });
-
-  const isGood = (effects.income || 0) + (effects.adaptability || 0) > 0;
-  const feedbackMsg = isGood
-    ? `✓ ${feedbackParts.join(' · ')}`
-    : `${feedbackParts.join(' · ')}`;
-
-  showFeedback(feedbackMsg, isGood ? 'pos' : 'neg');
-  renderHUD();
-
-  state.turn++;
-
-  if (state.turn >= state.maxTurns) {
-    setTimeout(() => {
-      transition('screen-game', 'screen-result', renderResult);
-    }, 1000);
-  } else {
-    setTimeout(() => {
-      renderTurn();
-    }, 800);
-  }
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    el.classList.add('active');
+  },360);
+  // Scanline flash
+  const fl=document.createElement('div');
+  fl.className='screen-flash';
+  fl.style.background='rgba(0,229,255,.05)';
+  document.body.appendChild(fl);
+  setTimeout(()=>fl.remove(),500);
 }
 
-function renderResult() {
-  const s = state.stats;
-  
-  // Calculate survival score
-  const survivalScore = Math.round(
-    (s.income * 0.45) +
-    (s.adaptability * 0.35) +
-    (Math.max(0, 100 - s.resistance) * 0.20)
-  );
+// ════════════════════════════════════════════
+// FLOATING NUMBERS
+// ════════════════════════════════════════════
+function spawnFloat(val, color, anchorEl){
+  const rect=anchorEl.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='float-num';
+  el.textContent=(val>0?'+':'')+val;
+  el.style.color=color;
+  el.style.left=(rect.left+rect.width/2-20)+'px';
+  el.style.top=(rect.top-10)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
 
-  const score = clamp(survivalScore, 5, 99);
-  
-  let position, posClass, explanation;
-  
-  if (score >= 68) {
-    position = '🛡 Safe';
-    posClass = 'pos-safe';
-    explanation = `You've successfully adapted to the AI era. Your income potential and adaptability scores put you ahead of 80% of workers. You're not just surviving — you're positioned to thrive as AI eliminates your competition.`;
-  } else if (score >= 40) {
-    position = '⚠ At Risk';
-    posClass = 'pos-risk';
-    explanation = `You've made some smart moves, but your AI resistance is still high. You're in the danger zone — a single major layoff wave could push you out. The window to act is still open, but it's closing fast.`;
-  } else {
-    position = '💀 Replaced';
-    posClass = 'pos-dead';
-    explanation = `Your choices kept you in the comfort zone while AI advanced rapidly. Your income potential has flatlined and your adaptability is critically low. Without urgent action, automation will complete its takeover of your career.`;
+function screenShake(type){
+  const fl=document.createElement('div');
+  fl.className='screen-flash';
+  if(type==='bad') fl.style.background='rgba(255,34,68,.12)';
+  else fl.style.background='rgba(57,255,20,.08)';
+  document.body.appendChild(fl);
+  if(type==='bad'){
+    document.getElementById('screen-game').style.animation='shake .5s both';
+    setTimeout(()=>{document.getElementById('screen-game').style.animation='';},600);
+  }
+  setTimeout(()=>fl.remove(),400);
+}
+
+// ════════════════════════════════════════════
+// HUD UPDATE
+// ════════════════════════════════════════════
+function updateHUD(oldHP, oldInc, oldAdp, oldRes){
+  const hp=G.hp;
+  // HP bar
+  const pct=clamp(hp,0,100);
+  const fill=document.getElementById('hp-fill');
+  const hpVal=document.getElementById('hp-val');
+  const hpSec=document.getElementById('hp-section');
+  fill.style.width=pct+'%';
+  hpVal.textContent=hp;
+  hpSec.className='hp-section '+(hp>55?'hp-high':hp>25?'hp-med':'hp-low');
+
+  // Stats
+  document.getElementById('stat-inc').textContent=clamp(G.income,0,100);
+  document.getElementById('stat-adp').textContent=clamp(G.adaptability,0,100);
+  document.getElementById('stat-res').textContent=clamp(G.resistance,0,100);
+
+  // Floats — anchor to hp-val element
+  const hpAnchor=hpVal;
+  const incAnchor=document.getElementById('stat-inc');
+  const adpAnchor=document.getElementById('stat-adp');
+  const resAnchor=document.getElementById('stat-res');
+
+  const dHP=hp-oldHP, dInc=G.income-oldInc, dAdp=G.adaptability-oldAdp, dRes=G.resistance-oldRes;
+  if(dHP!==0) spawnFloat(dHP, dHP>0?'#00e5ff':'#ff2244', hpAnchor);
+  if(dInc!==0) spawnFloat(dInc, dInc>0?'#39ff14':'#ff2244', incAnchor);
+  if(dAdp!==0) spawnFloat(dAdp, dAdp>0?'#ffaa00':'#ff6600', adpAnchor);
+  if(dRes!==0) spawnFloat(dRes, dRes>0?'#ff2244':'#39ff14', resAnchor);
+
+  // Turn pips
+  const pips=document.getElementById('turn-pips');
+  pips.innerHTML='';
+  for(let i=0;i<G.maxTurns;i++){
+    const d=document.createElement('div');
+    d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');
+    pips.appendChild(d);
+  }
+  document.getElementById('turn-txt').textContent=`TURN ${G.turn+1} / ${G.maxTurns}`;
+}
+
+// ════════════════════════════════════════════
+// ROLE SCREEN
+// ════════════════════════════════════════════
+function gotoRole(){
+  const grid=document.getElementById('role-grid');
+  grid.innerHTML='';
+  ROLES.forEach(r=>{
+    const card=document.createElement('div');
+    card.className='role-card';card.id='rc-'+r.id;
+    card.innerHTML=`
+      <span class="role-em">${r.emoji}</span>
+      <div class="role-name">${r.name}</div>
+      <div class="role-desc">${r.desc}</div>
+      <div class="role-stats">
+        <span class="rs-chip rs-hp">${r.chips[0]}</span>
+        <span class="rs-chip rs-inc">${r.chips[1]}</span>
+        <span class="rs-chip rs-adp">${r.chips[2]}</span>
+      </div>`;
+    card.onclick=()=>selectRole(r.id);
+    grid.appendChild(card);
+  });
+  document.getElementById('role-btn').disabled=true;
+  G.role=null;
+  showScreen('screen-role');
+}
+
+function selectRole(id){
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('rc-'+id).classList.add('sel');
+  G.role=id;
+  document.getElementById('role-btn').disabled=false;
+}
+
+function confirmRole(){
+  if(!G.role)return;
+  const r=ROLES.find(x=>x.id===G.role);
+  G.hp=r.stats.hp; G.income=r.stats.income;
+  G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
+  G.turn=0; G.randEventThisTurn=null;
+  showScreen('screen-game');
+  setTimeout(renderTurn,400);
+}
+
+// ════════════════════════════════════════════
+// RENDER TURN
+// ════════════════════════════════════════════
+function renderTurn(){
+  // Update pips label
+  const pips=document.getElementById('turn-pips');
+  pips.innerHTML='';
+  for(let i=0;i<G.maxTurns;i++){
+    const d=document.createElement('div');
+    d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');
+    pips.appendChild(d);
+  }
+  document.getElementById('turn-txt').textContent=`TURN ${G.turn+1} / ${G.maxTurns}`;
+  document.getElementById('stat-inc').textContent=clamp(G.income,0,100);
+  document.getElementById('stat-adp').textContent=clamp(G.adaptability,0,100);
+  document.getElementById('stat-res').textContent=clamp(G.resistance,0,100);
+  const hpSec=document.getElementById('hp-section');
+  hpSec.className='hp-section '+(G.hp>55?'hp-high':G.hp>25?'hp-med':'hp-low');
+  document.getElementById('hp-fill').style.width=clamp(G.hp,0,100)+'%';
+  document.getElementById('hp-val').textContent=G.hp;
+
+  const td=TURNS[G.turn];
+  const ev=td.ev;
+
+  // Random event check
+  G.randEventThisTurn=null;
+  if(G.turn>0){
+    for(const re of RANDOM_EVENTS){
+      if(Math.random()<re.chance){G.randEventThisTurn=re;break;}
+    }
   }
 
-  const circumference = 2 * Math.PI * 60;
-  const offset = circumference - (score / 100) * circumference;
-  const ringColor = score >= 68 ? '#00ff88' : score >= 40 ? '#ffbe0b' : '#ff4d6d';
+  // Build random banner
+  const rba=document.getElementById('rand-banner-area');
+  if(G.randEventThisTurn){
+    const re=G.randEventThisTurn;
+    rba.innerHTML=`
+      <div class="rand-banner ${re.type==='crisis'?'rb-bad':'rb-good'}">
+        <span class="rb-icon">${re.icon}</span>
+        <div><strong>${re.title}</strong><br><span style="font-weight:400;opacity:.8;">${re.desc}</span></div>
+      </div>`;
+  } else {
+    rba.innerHTML='';
+  }
 
-  const role = ROLES[state.role];
+  // Event card
+  const ea=document.getElementById('event-area');
+  const evClass=ev.type==='crisis'?'ev-crisis':ev.type==='opportunity'?'ev-opportunity':'ev-neutral';
+  const evLabel=ev.type==='crisis'?'⚠ CRISIS EVENT':ev.type==='opportunity'?'✦ OPPORTUNITY':'◈ SITUATION';
+  ea.innerHTML=`
+    <div class="event-card ${evClass}" style="animation-delay:.05s">
+      <div class="ev-accent">${evLabel}</div>
+      <span class="ev-icon">${ev.icon}</span>
+      <div class="ev-title">${ev.title}</div>
+      <div class="ev-desc">${ev.desc}</div>
+    </div>`;
 
-  // Strategy reveal — show 1, blur 2
-  const strategiesHTML = STRATEGIES.map((s, i) => `
-    <div class="strategy-item ${i === 0 ? 'unlocked' : 'locked'}">
-      <div class="strategy-num n${i+1}">${i + 1}</div>
-      <div class="strategy-content">
-        <div class="strategy-name">${s.icon} ${s.name}</div>
-        <div class="strategy-desc">${s.desc}</div>
-        <div class="strategy-income">${s.income}</div>
+  // Choices
+  const ch=document.getElementById('choices');
+  ch.innerHTML='';
+  td.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    // Build cost chips
+    const costsHTML=Object.entries(c.costs).map(([k,v])=>{
+      if(k==='hp') return `<span class="c-cost ${v>0?'cost-hp-pos':'cost-hp-neg'}">HP ${v>0?'+':''}${v}</span>`;
+      if(k==='income') return `<span class="c-cost ${v>0?'cost-inc-pos':'cost-inc-neg'}">INC ${v>0?'+':''}${v}</span>`;
+      if(k==='adaptability') return `<span class="c-cost cost-adp">ADP ${v>0?'+':''}${v}</span>`;
+      if(k==='resistance') return `<span class="c-cost cost-adp">RES ${v>0?'+':''}${v}</span>`;
+      return '';
+    }).join('');
+    btn.innerHTML=`
+      <span class="c-icon">${c.icon}</span>
+      <span class="c-body">
+        <span class="c-text">${c.text}</span>
+        <span class="c-hint">${c.hint}</span>
+        <div class="c-costs">${costsHTML}</div>
+      </span>
+      <span class="c-arrow">›</span>`;
+    btn.onclick=()=>makeChoice(c);
+    ch.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════════════
+// MAKE CHOICE
+// ════════════════════════════════════════════
+function makeChoice(choice){
+  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+
+  const old={hp:G.hp,income:G.income,adaptability:G.adaptability,resistance:G.resistance};
+
+  // Apply random event first
+  if(G.randEventThisTurn){
+    const re=G.randEventThisTurn;
+    Object.entries(re.costs||{}).forEach(([k,v])=>{
+      if(G[k]!==undefined) G[k]=clamp(G[k]+v,0,200);
+    });
+    // HP can't exceed 100
+    G.hp=clamp(G.hp,0,100);
+    if(re.type==='crisis') screenShake('bad');
+    else screenShake('good');
+  }
+
+  // Apply choice
+  Object.entries(choice.costs).forEach(([k,v])=>{
+    if(G[k]!==undefined) G[k]=clamp(G[k]+v,0,k==='hp'?100:150);
+  });
+  G.hp=clamp(G.hp,0,100);
+
+  const netHP=G.hp-old.hp;
+  if(netHP<-5) screenShake('bad');
+  else if(netHP>3) screenShake('good');
+
+  updateHUD(old.hp,old.income,old.adaptability,old.resistance);
+  G.turn++;
+
+  // Check game over
+  if(G.hp<=0){
+    setTimeout(()=>showGameOver(),800);
+    return;
+  }
+  if(G.turn>=G.maxTurns){
+    setTimeout(()=>showResult(),800);
+    return;
+  }
+  setTimeout(()=>renderTurn(),700);
+}
+
+// ════════════════════════════════════════════
+// GAME OVER
+// ════════════════════════════════════════════
+function showGameOver(){
+  const ep=EPITAPHS[Math.floor(Math.random()*EPITAPHS.length)];
+  document.getElementById('go-epitaph').textContent=ep;
+  showScreen('screen-gameover');
+}
+
+function replayGame(){
+  const r=ROLES.find(x=>x.id===G.role);
+  G.hp=r.stats.hp; G.income=r.stats.income;
+  G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
+  G.turn=0; G.randEventThisTurn=null;
+  showScreen('screen-game');
+  setTimeout(renderTurn,400);
+}
+
+// ════════════════════════════════════════════
+// RESULT
+// ════════════════════════════════════════════
+function showResult(){
+  const survScore=Math.round(
+    (G.income*.40)+(G.adaptability*.35)+(Math.max(0,100-G.resistance)*.15)+(G.hp*.10)
+  );
+  const score=clamp(survScore,5,99);
+
+  let ending,endClass,endTitle,endExpl,ringColor;
+  if(score>=70){
+    ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';
+    endTitle='You Mastered the AI Era';
+    endExpl=`With a survival score of ${score}%, you didn't just survive — you leveraged AI to outpace every colleague who resisted. You're in the top 15% of AI-era earners. The market rewards the adaptive.`;
+  } else if(score>=42){
+    ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';
+    endTitle='You\'re Holding On — Barely';
+    endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your resistance to AI tools is the invisible ceiling above your career. One bold pivot away from thriving.`;
+  } else {
+    ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';
+    endTitle='AI Claimed Your Career';
+    endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed around you. Without intervention, automation will complete its takeover. The window is still open — but barely.`;
+  }
+
+  const circ=2*Math.PI*70;
+  const offset=circ-(score/100)*circ;
+  const role=ROLES.find(x=>x.id===G.role);
+
+  const stratsHTML=STRATEGIES.map((s,i)=>`
+    <div class="strat-item ${i===0?'s-unlocked':'s-locked'}">
+      <div class="strat-num n${i+1}">${i+1}</div>
+      <div class="strat-body">
+        <div class="strat-name">${s.icon} ${s.name}</div>
+        <div class="strat-desc">${s.desc}</div>
+        <div class="strat-inc">${s.income}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  document.getElementById('screen-result').innerHTML = `
+  document.getElementById('screen-result').innerHTML=`
     <div class="result-header">
-      <div class="section-label">Simulation Complete</div>
-      <div class="survival-ring">
+      <div class="section-tag">// Simulation Complete — ${role.emoji} ${role.name}</div>
+      <div class="ring-wrap">
         <svg viewBox="0 0 160 160">
-          <circle class="ring-bg" cx="80" cy="80" r="60" />
-          <circle class="ring-fill" cx="80" cy="80" r="60"
+          <circle class="ring-bg" cx="80" cy="80" r="70"/>
+          <circle class="ring-fill" id="ring-fill2" cx="80" cy="80" r="70"
             stroke="${ringColor}"
-            stroke-dasharray="${circumference}"
-            stroke-dashoffset="${circumference}"
-            id="ring-anim" />
+            stroke-dasharray="${circ}"
+            stroke-dashoffset="${circ}"/>
         </svg>
-        <div class="ring-score" style="color:${ringColor}" id="score-count">0%</div>
+        <div class="ring-center">
+          <div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div>
+          <div class="ring-label">SURVIVAL</div>
+        </div>
       </div>
-      <div class="position-badge ${posClass}">${position}</div>
-      <div class="result-title">${role.emoji} ${role.name}</div>
-      <p class="result-explanation">${explanation}</p>
+      <div class="ending-badge ${endClass}">${ending}</div>
+      <div class="result-title">${endTitle}</div>
+      <p class="result-expl">${endExpl}</p>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="s-val" style="color:var(--dead)">${clamp(state.stats.resistance,0,100)}%</span>
-        <span class="s-lbl">AI Resistance</span>
-      </div>
-      <div class="stat-card">
-        <span class="s-val" style="color:var(--safe)">${clamp(state.stats.income,0,100)}%</span>
-        <span class="s-lbl">Income Potential</span>
-      </div>
-      <div class="stat-card">
-        <span class="s-val" style="color:var(--risk)">${clamp(state.stats.adaptability,0,100)}%</span>
-        <span class="s-lbl">Adaptability</span>
-      </div>
+    <div class="final-stats">
+      <div class="fs-card"><span class="fs-val mono" style="color:var(--hp)">${G.hp}</span><span class="fs-lbl">Final HP</span></div>
+      <div class="fs-card"><span class="fs-val mono" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="fs-lbl">Income</span></div>
+      <div class="fs-card"><span class="fs-val mono" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="fs-lbl">Adaptability</span></div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="mono-section">
-      <div class="mono-title">Your AI Income Strategies</div>
-      <div class="mono-sub">Based on your score of ${score}%, here are 3 strategies ranked for your profile. Strategy #1 is unlocked.</div>
-      <div class="strategy-list">
-        ${strategiesHTML}
-      </div>
+    <div class="mono-panel">
+      <div class="mono-panel-title">Your AI Income Strategies</div>
+      <div class="mono-panel-sub">Strategy #1 is unlocked based on your ${score}% score. Strategies #2 and #3 require your full plan.</div>
+      <div class="strat-list">${stratsHTML}</div>
     </div>
 
-    <div class="cta-block">
-      <div class="mono-title">🔓 Unlock Your Full AI Survival Plan</div>
-      <div class="cta-sub">Get strategies #2 and #3 plus a personalized 30-day action plan to transform your career in the AI economy.</div>
-      <div class="cta-features">
-        <div class="cta-feat"><span>✓</span> All 3 income strategies (detailed, step-by-step)</div>
-        <div class="cta-feat"><span>✓</span> 30-day AI skills roadmap for your role</div>
-        <div class="cta-feat"><span>✓</span> Top 10 AI tools ranked for your specific field</div>
-        <div class="cta-feat"><span>✓</span> Templates & prompt library ($40 value)</div>
-        <div class="cta-feat"><span>✓</span> Private community access</div>
+    <div class="cta-panel">
+      <div class="cta-title">🔓 Unlock Your Full AI Survival Plan</div>
+      <div class="cta-sub">Get all 3 income strategies + a personalized 30-day action roadmap for your specific role in the AI economy.</div>
+      <div class="cta-feats">
+        <div class="cta-feat"><span>✓</span> All 3 income strategies — detailed, actionable</div>
+        <div class="cta-feat"><span>✓</span> 30-day AI reskilling roadmap for ${role.name}s</div>
+        <div class="cta-feat"><span>✓</span> Top 10 AI tools ranked for your field</div>
+        <div class="cta-feat"><span>✓</span> Prompt template library ($40 value)</div>
+        <div class="cta-feat"><span>✓</span> Private community + weekly AI briefings</div>
       </div>
-      <button class="cta-btn" onclick="handleCTA()">
-        Unlock My AI Survival Plan
-        <span class="price-tag">$5</span>
+      <button class="cta-buy" onclick="handleCTA(this)">
+        UNLOCK MY SURVIVAL PLAN
+        <span class="price-pill">$5</span>
       </button>
-      <button class="replay-btn" onclick="resetGame()">↩ Try a Different Role</button>
+      <button class="replay-btn" onclick="replayGame()">↩ Replay with Same Role</button>
+      <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Choose Different Role</button>
     </div>
   `;
 
-  // Animate ring
-  setTimeout(() => {
-    const ring = document.getElementById('ring-anim');
-    if (ring) ring.style.strokeDashoffset = offset;
-    
-    // Animate score counter
-    let current = 0;
-    const scoreEl = document.getElementById('score-count');
-    const interval = setInterval(() => {
-      current = Math.min(current + 2, score);
-      if (scoreEl) scoreEl.textContent = current + '%';
-      if (current >= score) clearInterval(interval);
-    }, 25);
-  }, 300);
+  showScreen('screen-result');
+
+  setTimeout(()=>{
+    const ring=document.getElementById('ring-fill2');
+    if(ring) ring.style.strokeDashoffset=offset;
+    let cur=0;
+    const el=document.getElementById('score-num');
+    const iv=setInterval(()=>{
+      cur=Math.min(cur+2,score);
+      if(el) el.textContent=cur+'%';
+      if(cur>=score) clearInterval(iv);
+    },20);
+  },600);
 }
 
-function handleCTA() {
-  const btn = document.querySelector('.cta-btn');
-  if (btn) {
-    btn.innerHTML = '✓ Processing... (Demo mode)';
-    btn.style.background = 'var(--safe)';
-    setTimeout(() => {
-      btn.innerHTML = '🔐 Unlock My AI Survival Plan <span class="price-tag">$5</span>';
-      btn.style.background = '';
-    }, 2000);
-  }
-}
-
-function resetGame() {
-  state = {
-    role: null,
-    turn: 0,
-    stats: { resistance: 50, income: 50, adaptability: 50 },
-    maxTurns: 6,
-    history: []
-  };
-  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('role-btn').disabled = true;
-  
-  const resultEl = document.getElementById('screen-result');
-  resultEl.classList.remove('active');
-  
-  const roleEl = document.getElementById('screen-role');
-  roleEl.classList.add('active');
-  roleEl.style.animation = 'fadeSlideIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards';
+function handleCTA(btn){
+  btn.innerHTML='✓ Processing... (Demo Mode) <span class="price-pill">$5</span>';
+  btn.style.background='var(--good)';
+  setTimeout(()=>{
+    btn.innerHTML='UNLOCK MY SURVIVAL PLAN <span class="price-pill">$5</span>';
+    btn.style.background='';
+  },2500);
 }
 </script>
 </body>
