@@ -46,6 +46,7 @@ html,body{
   min-height:100vh;
   display:flex;align-items:center;justify-content:center;
   padding:16px;
+  padding-top:60px; /* room for home button */
 }
 .screen{display:none;width:100%;max-width:700px;}
 .screen.active{display:block;animation:screenIn .5s cubic-bezier(.16,1,.3,1) both;}
@@ -61,6 +62,80 @@ body::after{
   content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
 }
+
+/* ═══════════════════════════════════════
+   HOME BUTTON (always visible)
+═══════════════════════════════════════ */
+#home-btn{
+  position:fixed;top:14px;left:16px;z-index:100;
+  display:none; /* hidden on intro */
+  align-items:center;gap:7px;
+  background:rgba(8,13,20,.85);
+  border:1px solid var(--border2);
+  border-radius:4px;
+  padding:8px 14px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;
+  transition:all .2s;
+  backdrop-filter:blur(8px);
+}
+#home-btn:hover{
+  color:var(--hp);
+  border-color:rgba(0,229,255,.4);
+  box-shadow:0 0 12px rgba(0,229,255,.15);
+}
+#home-btn svg{width:12px;height:12px;flex-shrink:0;transition:transform .2s;}
+#home-btn:hover svg{transform:translateX(-2px);}
+#home-btn.visible{display:flex;}
+
+/* HOME CONFIRM MODAL */
+#home-modal{
+  display:none;
+  position:fixed;inset:0;z-index:500;
+  align-items:center;justify-content:center;
+  background:rgba(4,7,13,.85);
+  backdrop-filter:blur(6px);
+  animation:fadeIn .2s ease both;
+}
+#home-modal.open{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal-box{
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:32px 28px;
+  max-width:360px;width:90%;
+  text-align:center;
+  animation:screenIn .3s cubic-bezier(.16,1,.3,1) both;
+  position:relative;
+}
+.modal-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--bad),rgba(255,34,68,.2));
+  border-radius:8px 8px 0 0;
+}
+.modal-icon{font-size:36px;margin-bottom:14px;display:block;}
+.modal-title{
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  color:var(--bright);margin-bottom:8px;
+}
+.modal-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px;}
+.modal-btns{display:flex;flex-direction:column;gap:10px;}
+.modal-confirm{
+  background:var(--bad);color:#04070d;border:none;border-radius:4px;
+  padding:13px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.05em;
+}
+.modal-confirm:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,34,68,.4);}
+.modal-cancel{
+  background:transparent;color:var(--muted);border:1px solid var(--border);
+  border-radius:4px;padding:11px;
+  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.modal-cancel:hover{color:var(--text);border-color:var(--border2);}
 
 /* ═══════════════════════════════════════
    INTRO
@@ -297,9 +372,9 @@ body::after{
 }
 .ev-desc{font-size:13px;color:var(--muted);line-height:1.65;}
 
-/* RANDOM EVENT BANNER */
+/* ── RANDOM EVENT BANNER ── */
 .rand-banner{
-  display:flex;align-items:center;gap:12px;
+  display:flex;align-items:flex-start;gap:12px;
   padding:12px 16px;border-radius:4px;margin-bottom:14px;
   font-size:13px;font-weight:600;
   animation:bannerIn .4s cubic-bezier(.16,1,.3,1) both;
@@ -307,7 +382,14 @@ body::after{
 @keyframes bannerIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
 .rand-banner.rb-bad{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.3);color:var(--bad);}
 .rand-banner.rb-good{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--good);}
-.rand-banner .rb-icon{font-size:20px;}
+.rand-banner .rb-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.rb-hp-tag{
+  display:inline-block;
+  font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;
+  padding:2px 8px;border-radius:3px;margin-top:4px;
+}
+.rb-hp-neg{background:rgba(255,34,68,.15);color:var(--bad);border:1px solid rgba(255,34,68,.3);}
+.rb-hp-pos{background:rgba(57,255,20,.12);color:var(--good);border:1px solid rgba(57,255,20,.3);}
 
 /* ═══════════════════════════════════════
    CHOICES
@@ -354,18 +436,21 @@ body::after{
 .choice-btn:hover .c-arrow{transform:translateX(3px);color:var(--hp);}
 
 /* ═══════════════════════════════════════
-   FLOATING DAMAGE NUMBERS
+   FLOATING DAMAGE / HEAL NUMBERS
 ═══════════════════════════════════════ */
 .float-num{
   position:fixed;pointer-events:none;z-index:9999;
-  font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:bold;
-  animation:floatUp .9s cubic-bezier(.16,1,.3,1) both;
-  text-shadow:0 2px 8px rgba(0,0,0,.5);
+  font-family:'Share Tech Mono',monospace;font-weight:bold;
+  animation:floatUp .95s cubic-bezier(.16,1,.3,1) both;
+  text-shadow:0 2px 10px rgba(0,0,0,.7);
+  white-space:nowrap;
 }
+.float-num.fhp{font-size:28px;}   /* HP floats are bigger */
+.float-num.fstat{font-size:18px;} /* stat floats smaller  */
 @keyframes floatUp{
   0%{opacity:1;transform:translateY(0) scale(1);}
-  30%{transform:translateY(-20px) scale(1.2);}
-  100%{opacity:0;transform:translateY(-60px) scale(.8);}
+  25%{transform:translateY(-18px) scale(1.25);}
+  100%{opacity:0;transform:translateY(-70px) scale(.8);}
 }
 
 /* ═══════════════════════════════════════
@@ -378,23 +463,78 @@ body::after{
 @keyframes flash{0%{opacity:.6;}100%{opacity:0;}}
 
 /* ═══════════════════════════════════════
-   GAME OVER
+   GAME OVER SCREEN
 ═══════════════════════════════════════ */
 #screen-gameover{text-align:center;padding:40px 20px;}
-.go-skull{font-size:80px;margin-bottom:24px;display:block;animation:skullIn .8s cubic-bezier(.16,1,.3,1) both;}
-@keyframes skullIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}70%{transform:scale(1.1) rotate(5deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
-.go-title{
-  font-family:'Rajdhani',sans-serif;font-size:56px;font-weight:700;
-  color:var(--bad);letter-spacing:-.02em;margin-bottom:8px;
-  text-shadow:0 0 40px rgba(255,34,68,.6);
+
+.go-skull{
+  font-size:90px;margin-bottom:20px;display:block;
+  animation:skullIn .9s cubic-bezier(.16,1,.3,1) both;
+  filter:drop-shadow(0 0 30px rgba(255,34,68,.5));
 }
-.go-sub{font-size:16px;color:var(--muted);max-width:400px;margin:0 auto 36px;line-height:1.7;}
+@keyframes skullIn{
+  0%{transform:scale(0) rotate(-20deg);opacity:0;}
+  65%{transform:scale(1.15) rotate(6deg);}
+  82%{transform:scale(.95) rotate(-2deg);}
+  100%{transform:scale(1) rotate(0);opacity:1;}
+}
+
+.go-title{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(40px,9vw,64px);font-weight:700;
+  color:var(--bad);letter-spacing:-.02em;margin-bottom:6px;
+  text-shadow:0 0 50px rgba(255,34,68,.7),0 0 100px rgba(255,34,68,.3);
+  animation:goBlink 2s .8s infinite;
+}
+@keyframes goBlink{0%,100%{opacity:1;}50%{opacity:.75;}}
+
+.go-replaced{
+  font-family:'Share Tech Mono',monospace;font-size:13px;
+  color:var(--muted);letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:28px;animation:screenIn .5s .4s both;
+}
+
 .go-epitaph{
   background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);
-  border-radius:6px;padding:20px 24px;margin:0 auto 32px;max-width:440px;
-  font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--bad);
-  line-height:1.7;font-style:italic;
+  border-radius:6px;padding:20px 24px;margin:0 auto 32px;max-width:460px;
+  font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,34,68,.8);
+  line-height:1.8;font-style:italic;
+  animation:screenIn .5s .5s both;
 }
+
+.go-stats-row{
+  display:flex;gap:12px;justify-content:center;margin-bottom:32px;
+  flex-wrap:wrap;animation:screenIn .5s .55s both;
+}
+.go-stat{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:4px;padding:10px 18px;text-align:center;
+}
+.go-stat .gsv{
+  font-family:'Share Tech Mono',monospace;font-size:20px;
+  display:block;color:var(--bad);margin-bottom:3px;
+}
+.go-stat .gsl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+
+.go-btns{
+  display:flex;flex-direction:column;gap:10px;
+  max-width:340px;margin:0 auto;
+  animation:screenIn .5s .65s both;
+}
+.go-try-again{
+  background:var(--bad);color:#04070d;border:none;border-radius:4px;
+  padding:16px;width:100%;
+  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase;
+  box-shadow:0 0 24px rgba(255,34,68,.35);
+}
+.go-try-again:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,34,68,.5);}
+.go-change-role{
+  background:transparent;color:var(--muted);border:1px solid var(--border);
+  border-radius:4px;padding:13px;width:100%;
+  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.go-change-role:hover{color:var(--text);border-color:var(--border2);}
 
 /* ═══════════════════════════════════════
    RESULTS SCREEN
@@ -403,7 +543,6 @@ body::after{
 
 .result-header{text-align:center;padding:32px 20px 28px;position:relative;}
 
-/* Survival ring */
 .ring-wrap{width:180px;height:180px;margin:0 auto 20px;position:relative;}
 .ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:var(--border2);stroke-width:10;}
@@ -528,6 +667,7 @@ body::after{
   .final-stats{grid-template-columns:1fr 1fr;}
   .hud-stats{gap:6px;}
   .hud{gap:10px;}
+  .go-stats-row{gap:8px;}
 }
 </style>
 </head>
@@ -535,6 +675,29 @@ body::after{
 
 <canvas id="bg-canvas"></canvas>
 <div class="vignette"></div>
+
+<!-- ══════════ HOME BUTTON ══════════ -->
+<button id="home-btn" onclick="requestHome()">
+  <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 6L6 1L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M2.5 4.5V10.5H9.5V4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="4.5" y="7" width="3" height="3.5" rx=".5" fill="currentColor" opacity=".5"/>
+  </svg>
+  HOME
+</button>
+
+<!-- ══════════ HOME CONFIRM MODAL ══════════ -->
+<div id="home-modal">
+  <div class="modal-box">
+    <span class="modal-icon">⚠️</span>
+    <div class="modal-title">Abandon Simulation?</div>
+    <p class="modal-sub">Your current run will be lost. All progress will be reset and you'll return to the intro screen.</p>
+    <div class="modal-btns">
+      <button class="modal-confirm" onclick="confirmHome()">YES, GO HOME</button>
+      <button class="modal-cancel" onclick="cancelHome()">KEEP PLAYING</button>
+    </div>
+  </div>
+</div>
 
 <div id="app">
 
@@ -547,7 +710,7 @@ body::after{
         <span class="t2">SIMULATOR</span>
       </h1>
       <p class="intro-sub">
-        100 HP. 6 turns. Dozens of random events. One brutal question:<br>
+        100 HP. 6 turns. Random crises and opportunities. One brutal question:<br>
         <strong style="color:var(--text)">Will AI end your career — or make you rich?</strong>
       </p>
       <div class="intro-stats">
@@ -572,7 +735,7 @@ body::after{
   <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
     <div class="hud" id="hud">
-      <div class="hp-section" id="hp-section">
+      <div class="hp-section hp-high" id="hp-section">
         <div class="hp-label">
           <span class="hp-text mono">// SURVIVAL HP</span>
           <span class="hp-val mono" id="hp-val">100</span>
@@ -599,12 +762,13 @@ body::after{
   <!-- ══════════ GAME OVER ══════════ -->
   <div id="screen-gameover" class="screen">
     <span class="go-skull">💀</span>
-    <div class="go-title">ELIMINATED</div>
-    <p class="go-sub">Your HP hit zero. The AI economy swept you aside before you could adapt.</p>
-    <div class="go-epitaph" id="go-epitaph">Loading epitaph...</div>
-    <div style="display:flex;flex-direction:column;gap:10px;max-width:340px;margin:0 auto;">
-      <button class="btn btn-primary" style="justify-content:center;width:100%;" onclick="replayGame()">TRY AGAIN →</button>
-      <button class="btn btn-ghost" style="justify-content:center;" onclick="gotoRole()">CHANGE ROLE</button>
+    <div class="go-title">GAME OVER</div>
+    <div class="go-replaced">// You were replaced by AI</div>
+    <div class="go-epitaph" id="go-epitaph">Loading final report...</div>
+    <div class="go-stats-row" id="go-stats-row"></div>
+    <div class="go-btns">
+      <button class="go-try-again" onclick="replayGame()">⟳ TRY AGAIN</button>
+      <button class="go-change-role" onclick="gotoRole()">↩ Change Role</button>
     </div>
   </div>
 
@@ -635,7 +799,6 @@ body::after{
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fillStyle=`rgba(0,229,255,${p.op})`;ctx.fill();
     });
-    // Draw connecting lines
     for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
       const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
       if(d<120){
@@ -674,7 +837,7 @@ const TURNS=[
   {
     ev:{type:'neutral',icon:'📊',
       title:'AI Tools Flood Your Industry',
-      desc:'ChatGPT, Copilot, Midjourney — every company evaluating AI. Everyone is watching. What\'s your move?'},
+      desc:'ChatGPT, Copilot, Midjourney — every company is evaluating AI. Everyone is watching. What\'s your move?'},
     choices:[
       {icon:'🎓',text:'Enroll in an AI certification',hint:'6-week course on AI tools & prompting',
        costs:{hp:+5,income:+14,adaptability:+18,resistance:-10}},
@@ -751,32 +914,37 @@ const TURNS=[
   },
 ];
 
-// Random events that fire before a turn
-const RANDOM_EVENTS=[
-  {chance:.28,type:'crisis',icon:'📉',
-   title:'CRISIS: Mass industry layoffs hit overnight',
-   desc:'10,000 jobs cut in your sector. Market confidence crashes.',
-   costs:{hp:-15,income:-8}},
-  {chance:.25,type:'crisis',icon:'🦠',
-   title:'CRISIS: Your main client goes bankrupt',
-   desc:'Without warning, your largest income source disappears.',
-   costs:{hp:-12,income:-12}},
-  {chance:.22,type:'opportunity',icon:'🌟',
-   title:'OPPORTUNITY: Your AI demo goes viral',
-   desc:'A post you shared online explodes. Inbound opportunities flood in.',
-   costs:{hp:+8,income:+14,adaptability:+8}},
-  {chance:.20,type:'opportunity',icon:'💼',
-   title:'OPPORTUNITY: Recruiter offers contract work',
-   desc:'An AI-first company wants your skills. Premium rates.',
-   costs:{hp:+5,income:+16}},
-  {chance:.18,type:'crisis',icon:'⚠️',
-   title:'CRISIS: New AI model makes your skill obsolete',
+// ── RANDOM EVENTS: exactly 20% negative, 20% positive per check ──
+// Each turn we roll once for negative (20% chance) and once for positive (20% chance).
+// At most one fires per turn (negative takes priority if both roll).
+const RANDOM_NEGATIVE=[
+  {icon:'📉',title:'MARKET CRASH: Mass industry layoffs hit overnight',
+   desc:'10,000 jobs cut in your sector. Confidence in your field collapses.',
+   hpDelta:-25},
+  {icon:'🦠',title:'CRISIS: Your main income source vanishes',
+   desc:'Without warning, your largest client or employer disappears.',
+   hpDelta:-20},
+  {icon:'⚠️',title:'DISRUPTION: A new AI model made your skill obsolete',
    desc:'GPT-Next just learned to do what took you years to master.',
-   costs:{hp:-20,resistance:+15}},
-  {chance:.15,type:'opportunity',icon:'🎓',
-   title:'OPPORTUNITY: Free AI bootcamp scholarship',
-   desc:'You get accepted to an elite 2-week AI intensive — at no cost.',
-   costs:{hp:+5,adaptability:+15,resistance:-10}},
+   hpDelta:-15},
+  {icon:'💸',title:'SETBACK: Unexpected expenses drain your runway',
+   desc:'Emergency costs hit hard. Your ability to invest in growth is cut.',
+   hpDelta:-20},
+];
+
+const RANDOM_POSITIVE=[
+  {icon:'🌟',title:'VIRAL: Your AI demo blows up online',
+   desc:'A post you shared explodes. Inbound opportunities flood in.',
+   hpDelta:+15},
+  {icon:'💼',title:'OPPORTUNITY: Premium contract offer arrives',
+   desc:'An AI-first company wants your skills. Top-tier rates.',
+   hpDelta:+15},
+  {icon:'🎓',title:'LUCK: Free AI bootcamp scholarship awarded',
+   desc:'You\'re accepted to an elite 2-week AI intensive — at no cost.',
+   hpDelta:+20},
+  {icon:'🤝',title:'NETWORK: A mentor connects you to top AI firms',
+   desc:'A chance encounter opens three high-value doors.',
+   hpDelta:+15},
 ];
 
 const EPITAPHS=[
@@ -784,7 +952,8 @@ const EPITAPHS=[
   '"Chose comfort over adaptation. The market chose efficiency."',
   '"Waited for the dust to settle. The dust was a tornado."',
   '"Resistant to the end. The AI never noticed."',
-  '"10 years of experience. 0 years of AI. The math was brutal."',
+  '"10 years of experience. 0 years of AI fluency. The math was brutal."',
+  '"The safest choice was the most dangerous one."',
 ];
 
 const STRATEGIES=[
@@ -805,10 +974,44 @@ const STRATEGIES=[
 let G={
   role:null, turn:0, maxTurns:6,
   hp:100, income:50, adaptability:50, resistance:50,
-  randEventThisTurn:null,
+  pendingRandEvent:null,  // set during renderTurn, applied on makeChoice
 };
 
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+
+// ════════════════════════════════════════════
+// HOME BUTTON LOGIC
+// ════════════════════════════════════════════
+function setHomeBtn(visible){
+  const btn=document.getElementById('home-btn');
+  if(visible) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}
+
+function requestHome(){
+  // On intro or role screen — just go, no confirm needed
+  const activeId=[...document.querySelectorAll('.screen.active')].map(s=>s.id)[0];
+  if(activeId==='screen-intro') return;
+  if(activeId==='screen-role'){goHome();return;}
+  // During game / gameover / result — confirm first
+  document.getElementById('home-modal').classList.add('open');
+}
+
+function confirmHome(){
+  document.getElementById('home-modal').classList.remove('open');
+  goHome();
+}
+
+function cancelHome(){
+  document.getElementById('home-modal').classList.remove('open');
+}
+
+function goHome(){
+  // Full reset
+  G={role:null,turn:0,maxTurns:6,hp:100,income:50,adaptability:50,resistance:50,pendingRandEvent:null};
+  setHomeBtn(false);
+  showScreen('screen-intro');
+}
 
 // ════════════════════════════════════════════
 // SCREEN TRANSITIONS
@@ -835,37 +1038,52 @@ function showScreen(id){
 // ════════════════════════════════════════════
 // FLOATING NUMBERS
 // ════════════════════════════════════════════
-function spawnFloat(val, color, anchorEl){
+function spawnFloat(val, color, anchorEl, big){
   const rect=anchorEl.getBoundingClientRect();
   const el=document.createElement('div');
-  el.className='float-num';
-  el.textContent=(val>0?'+':'')+val;
+  el.className='float-num '+(big?'fhp':'fstat');
+  el.textContent=(val>0?'+':'')+val+' HP';
   el.style.color=color;
-  el.style.left=(rect.left+rect.width/2-20)+'px';
-  el.style.top=(rect.top-10)+'px';
+  // Randomise x slightly so multiple floats don't overlap
+  const xOff=(Math.random()-.5)*40;
+  el.style.left=(rect.left+rect.width/2-30+xOff)+'px';
+  el.style.top=(rect.top)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1050);
+}
+
+function spawnStatFloat(val, label, color, anchorEl){
+  const rect=anchorEl.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='float-num fstat';
+  el.textContent=(val>0?'+':'')+val+' '+label;
+  el.style.color=color;
+  const xOff=(Math.random()-.5)*30;
+  el.style.left=(rect.left+rect.width/2-24+xOff)+'px';
+  el.style.top=(rect.top)+'px';
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),1000);
 }
 
-function screenShake(type){
+function screenFlash(type){
   const fl=document.createElement('div');
   fl.className='screen-flash';
-  if(type==='bad') fl.style.background='rgba(255,34,68,.12)';
-  else fl.style.background='rgba(57,255,20,.08)';
+  if(type==='bad')   fl.style.background='rgba(255,34,68,.14)';
+  else if(type==='good') fl.style.background='rgba(57,255,20,.09)';
+  else               fl.style.background='rgba(0,229,255,.05)';
   document.body.appendChild(fl);
   if(type==='bad'){
-    document.getElementById('screen-game').style.animation='shake .5s both';
-    setTimeout(()=>{document.getElementById('screen-game').style.animation='';},600);
+    const sg=document.getElementById('screen-game');
+    if(sg){sg.style.animation='shake .5s both';setTimeout(()=>{sg.style.animation='';},600);}
   }
-  setTimeout(()=>fl.remove(),400);
+  setTimeout(()=>fl.remove(),420);
 }
 
 // ════════════════════════════════════════════
-// HUD UPDATE
+// HUD UPDATE — with floating numbers
 // ════════════════════════════════════════════
 function updateHUD(oldHP, oldInc, oldAdp, oldRes){
   const hp=G.hp;
-  // HP bar
   const pct=clamp(hp,0,100);
   const fill=document.getElementById('hp-fill');
   const hpVal=document.getElementById('hp-val');
@@ -874,22 +1092,24 @@ function updateHUD(oldHP, oldInc, oldAdp, oldRes){
   hpVal.textContent=hp;
   hpSec.className='hp-section '+(hp>55?'hp-high':hp>25?'hp-med':'hp-low');
 
-  // Stats
   document.getElementById('stat-inc').textContent=clamp(G.income,0,100);
   document.getElementById('stat-adp').textContent=clamp(G.adaptability,0,100);
   document.getElementById('stat-res').textContent=clamp(G.resistance,0,100);
 
-  // Floats — anchor to hp-val element
   const hpAnchor=hpVal;
   const incAnchor=document.getElementById('stat-inc');
   const adpAnchor=document.getElementById('stat-adp');
   const resAnchor=document.getElementById('stat-res');
 
-  const dHP=hp-oldHP, dInc=G.income-oldInc, dAdp=G.adaptability-oldAdp, dRes=G.resistance-oldRes;
-  if(dHP!==0) spawnFloat(dHP, dHP>0?'#00e5ff':'#ff2244', hpAnchor);
-  if(dInc!==0) spawnFloat(dInc, dInc>0?'#39ff14':'#ff2244', incAnchor);
-  if(dAdp!==0) spawnFloat(dAdp, dAdp>0?'#ffaa00':'#ff6600', adpAnchor);
-  if(dRes!==0) spawnFloat(dRes, dRes>0?'#ff2244':'#39ff14', resAnchor);
+  const dHP=hp-oldHP;
+  const dInc=G.income-oldInc;
+  const dAdp=G.adaptability-oldAdp;
+  const dRes=G.resistance-oldRes;
+
+  if(dHP!==0) spawnFloat(dHP, dHP>0?'#00e5ff':'#ff2244', hpAnchor, true);
+  if(dInc!==0) spawnStatFloat(dInc,'INC', dInc>0?'#39ff14':'#ff2244', incAnchor);
+  if(dAdp!==0) spawnStatFloat(dAdp,'ADP', dAdp>0?'#ffaa00':'#ff6600', adpAnchor);
+  if(dRes!==0) spawnStatFloat(dRes,'RES', dRes>0?'#ff2244':'#39ff14', resAnchor);
 
   // Turn pips
   const pips=document.getElementById('turn-pips');
@@ -925,6 +1145,7 @@ function gotoRole(){
   });
   document.getElementById('role-btn').disabled=true;
   G.role=null;
+  setHomeBtn(true);
   showScreen('screen-role');
 }
 
@@ -940,16 +1161,35 @@ function confirmRole(){
   const r=ROLES.find(x=>x.id===G.role);
   G.hp=r.stats.hp; G.income=r.stats.income;
   G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
-  G.turn=0; G.randEventThisTurn=null;
+  G.turn=0; G.pendingRandEvent=null;
+  setHomeBtn(true);
   showScreen('screen-game');
   setTimeout(renderTurn,400);
+}
+
+// ════════════════════════════════════════════
+// RANDOM EVENT ROLL — 20% neg, 20% pos
+// Returns null | {type:'neg'|'pos', event}
+// ════════════════════════════════════════════
+function rollRandomEvent(){
+  // Roll for negative first (20%)
+  if(Math.random()<0.20){
+    const ev=RANDOM_NEGATIVE[Math.floor(Math.random()*RANDOM_NEGATIVE.length)];
+    return {type:'neg',ev};
+  }
+  // Roll for positive (20%)
+  if(Math.random()<0.20){
+    const ev=RANDOM_POSITIVE[Math.floor(Math.random()*RANDOM_POSITIVE.length)];
+    return {type:'pos',ev};
+  }
+  return null;
 }
 
 // ════════════════════════════════════════════
 // RENDER TURN
 // ════════════════════════════════════════════
 function renderTurn(){
-  // Update pips label
+  // Refresh HUD display (no floats on turn start)
   const pips=document.getElementById('turn-pips');
   pips.innerHTML='';
   for(let i=0;i<G.maxTurns;i++){
@@ -969,22 +1209,25 @@ function renderTurn(){
   const td=TURNS[G.turn];
   const ev=td.ev;
 
-  // Random event check
-  G.randEventThisTurn=null;
-  if(G.turn>0){
-    for(const re of RANDOM_EVENTS){
-      if(Math.random()<re.chance){G.randEventThisTurn=re;break;}
-    }
-  }
+  // Roll random event (skip turn 0 for better pacing)
+  G.pendingRandEvent = G.turn > 0 ? rollRandomEvent() : null;
 
   // Build random banner
   const rba=document.getElementById('rand-banner-area');
-  if(G.randEventThisTurn){
-    const re=G.randEventThisTurn;
+  if(G.pendingRandEvent){
+    const re=G.pendingRandEvent;
+    const isNeg=re.type==='neg';
+    const hpTag=isNeg
+      ? `<div class="rb-hp-tag rb-hp-neg">${re.ev.hpDelta} HP</div>`
+      : `<div class="rb-hp-tag rb-hp-pos">+${re.ev.hpDelta} HP</div>`;
     rba.innerHTML=`
-      <div class="rand-banner ${re.type==='crisis'?'rb-bad':'rb-good'}">
-        <span class="rb-icon">${re.icon}</span>
-        <div><strong>${re.title}</strong><br><span style="font-weight:400;opacity:.8;">${re.desc}</span></div>
+      <div class="rand-banner ${isNeg?'rb-bad':'rb-good'}">
+        <span class="rb-icon">${re.ev.icon}</span>
+        <div>
+          <strong>${re.ev.title}</strong><br>
+          <span style="font-weight:400;opacity:.85;">${re.ev.desc}</span>
+          ${hpTag}
+        </div>
       </div>`;
   } else {
     rba.innerHTML='';
@@ -1008,12 +1251,11 @@ function renderTurn(){
   td.choices.forEach((c,i)=>{
     const btn=document.createElement('button');
     btn.className='choice-btn';
-    // Build cost chips
     const costsHTML=Object.entries(c.costs).map(([k,v])=>{
-      if(k==='hp') return `<span class="c-cost ${v>0?'cost-hp-pos':'cost-hp-neg'}">HP ${v>0?'+':''}${v}</span>`;
-      if(k==='income') return `<span class="c-cost ${v>0?'cost-inc-pos':'cost-inc-neg'}">INC ${v>0?'+':''}${v}</span>`;
-      if(k==='adaptability') return `<span class="c-cost cost-adp">ADP ${v>0?'+':''}${v}</span>`;
-      if(k==='resistance') return `<span class="c-cost cost-adp">RES ${v>0?'+':''}${v}</span>`;
+      if(k==='hp')          return `<span class="c-cost ${v>0?'cost-hp-pos':'cost-hp-neg'}">HP ${v>0?'+':''}${v}</span>`;
+      if(k==='income')      return `<span class="c-cost ${v>0?'cost-inc-pos':'cost-inc-neg'}">INC ${v>0?'+':''}${v}</span>`;
+      if(k==='adaptability')return `<span class="c-cost cost-adp">ADP ${v>0?'+':''}${v}</span>`;
+      if(k==='resistance')  return `<span class="c-cost cost-adp">RES ${v>0?'+':''}${v}</span>`;
       return '';
     }).join('');
     btn.innerHTML=`
@@ -1037,38 +1279,34 @@ function makeChoice(choice){
 
   const old={hp:G.hp,income:G.income,adaptability:G.adaptability,resistance:G.resistance};
 
-  // Apply random event first
-  if(G.randEventThisTurn){
-    const re=G.randEventThisTurn;
-    Object.entries(re.costs||{}).forEach(([k,v])=>{
-      if(G[k]!==undefined) G[k]=clamp(G[k]+v,0,200);
-    });
-    // HP can't exceed 100
-    G.hp=clamp(G.hp,0,100);
-    if(re.type==='crisis') screenShake('bad');
-    else screenShake('good');
+  // 1. Apply pending random event HP delta
+  if(G.pendingRandEvent){
+    const delta=G.pendingRandEvent.ev.hpDelta;
+    G.hp=clamp(G.hp+delta,0,100);
+    if(delta<0) screenFlash('bad');
+    else screenFlash('good');
   }
 
-  // Apply choice
+  // 2. Apply player's choice
   Object.entries(choice.costs).forEach(([k,v])=>{
-    if(G[k]!==undefined) G[k]=clamp(G[k]+v,0,k==='hp'?100:150);
+    if(G[k]!==undefined) G[k]=clamp(G[k]+v, 0, k==='hp'?100:150);
   });
   G.hp=clamp(G.hp,0,100);
 
   const netHP=G.hp-old.hp;
-  if(netHP<-5) screenShake('bad');
-  else if(netHP>3) screenShake('good');
+  if(netHP<-4) screenFlash('bad');
+  else if(netHP>3) screenFlash('good');
 
   updateHUD(old.hp,old.income,old.adaptability,old.resistance);
   G.turn++;
 
   // Check game over
   if(G.hp<=0){
-    setTimeout(()=>showGameOver(),800);
+    setTimeout(()=>showGameOver(),900);
     return;
   }
   if(G.turn>=G.maxTurns){
-    setTimeout(()=>showResult(),800);
+    setTimeout(()=>showResult(),900);
     return;
   }
   setTimeout(()=>renderTurn(),700);
@@ -1080,14 +1318,31 @@ function makeChoice(choice){
 function showGameOver(){
   const ep=EPITAPHS[Math.floor(Math.random()*EPITAPHS.length)];
   document.getElementById('go-epitaph').textContent=ep;
+
+  // Show final stats snapshot
+  const row=document.getElementById('go-stats-row');
+  row.innerHTML=`
+    <div class="go-stat"><span class="gsv">0</span><span class="gsl">Final HP</span></div>
+    <div class="go-stat"><span class="gsv" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="gsl">Income</span></div>
+    <div class="go-stat"><span class="gsv" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="gsl">Adaptability</span></div>
+    <div class="go-stat"><span class="gsv" style="color:var(--muted)">${G.turn}</span><span class="gsl">Turns Survived</span></div>
+  `;
+
+  setHomeBtn(true);
   showScreen('screen-gameover');
+
+  // Red flash on game over
+  setTimeout(()=>{
+    screenFlash('bad');
+    setTimeout(()=>screenFlash('bad'),250);
+  },200);
 }
 
 function replayGame(){
   const r=ROLES.find(x=>x.id===G.role);
   G.hp=r.stats.hp; G.income=r.stats.income;
   G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
-  G.turn=0; G.randEventThisTurn=null;
+  G.turn=0; G.pendingRandEvent=null;
   showScreen('screen-game');
   setTimeout(renderTurn,400);
 }
@@ -1109,11 +1364,11 @@ function showResult(){
   } else if(score>=42){
     ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';
     endTitle='You\'re Holding On — Barely';
-    endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your resistance to AI tools is the invisible ceiling above your career. One bold pivot away from thriving.`;
+    endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your AI resistance is the invisible ceiling. One bold pivot away from thriving.`;
   } else {
     ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';
     endTitle='AI Claimed Your Career';
-    endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed around you. Without intervention, automation will complete its takeover. The window is still open — but barely.`;
+    endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed. Without intervention, automation will complete its takeover. The window is still open — barely.`;
   }
 
   const circ=2*Math.PI*70;
@@ -1184,6 +1439,7 @@ function showResult(){
     </div>
   `;
 
+  setHomeBtn(true);
   showScreen('screen-result');
 
   setTimeout(()=>{
