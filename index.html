@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Survival Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070a0f;
+    --surface: #0d1117;
+    --surface2: #161b22;
+    --border: #21262d;
+    --accent: #00ff88;
+    --accent2: #ff4d6d;
+    --accent3: #ffbe0b;
+    --warn: #ff6b35;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --safe: #00ff88;
+    --risk: #ffbe0b;
+    --dead: #ff4d6d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(0,255,136,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(255,77,109,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 680px;
+    animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeSlideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-24px); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  @keyframes glitch {
+    0%, 94%, 100% { transform: translateX(0); }
+    95% { transform: translateX(-3px); clip-path: inset(20% 0 40% 0); }
+    97% { transform: translateX(3px); clip-path: inset(60% 0 10% 0); }
+  }
+
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes barFill {
+    from { width: 0%; }
+  }
+
+  @keyframes eventPop {
+    0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+    60% { transform: scale(1.02) translateY(-2px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  /* ===== INTRO SCREEN ===== */
+  .intro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.2);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .intro-badge span {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .intro-title {
+    font-size: clamp(36px, 8vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .intro-title .line2 {
+    color: var(--accent);
+    display: block;
+  }
+
+  .intro-sub {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 440px;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 18px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .stat-chip .val {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-chip .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  /* ===== ROLE SELECTION ===== */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+  }
+
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .role-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .role-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .role-card:hover {
+    border-color: rgba(0,255,136,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,255,136,0.1);
+  }
+
+  .role-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(0,255,136,0.2);
+  }
+
+  .role-card.selected::before { opacity: 0.04; }
+
+  .role-emoji { font-size: 32px; margin-bottom: 10px; display: block; }
+  .role-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .role-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  
+  .role-risk {
+    margin-top: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--warn);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== GAME SCREEN ===== */
+  .hud {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hud-stat {
+    flex: 1;
+    min-width: 100px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+
+  .hud-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  .hud-bar-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .hud-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hud-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .turn-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .turn-dots { display: flex; gap: 6px; }
+  .turn-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .turn-dot.done { background: var(--accent); }
+  .turn-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1s infinite; }
+
+  /* EVENT CARD */
+  .event-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .event-card.danger { border-color: rgba(255,77,109,0.4); }
+  .event-card.danger::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,77,109,0.06), transparent);
+    pointer-events: none;
+  }
+
+  .event-card.opportunity { border-color: rgba(0,255,136,0.3); }
+  .event-card.opportunity::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,255,136,0.05), transparent);
+    pointer-events: none;
+  }
+
+  .event-card.neutral { border-color: rgba(255,190,11,0.3); }
+
+  .event-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .event-icon {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .event-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+  }
+
+  .event-type.danger { color: var(--dead); }
+  .event-type.opportunity { color: var(--safe); }
+  .event-type.neutral { color: var(--risk); }
+
+  .event-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
+  .event-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 4px; }
+
+  .choice-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .choice-btn:hover {
+    border-color: rgba(0,255,136,0.3);
+    background: rgba(0,255,136,0.05);
+    transform: translateX(4px);
+  }
+
+  .choice-btn:hover::before { opacity: 1; }
+
+  .choice-icon { font-size: 20px; flex-shrink: 0; }
+  .choice-text { flex: 1; }
+  .choice-hint { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+  .choice-arrow { color: var(--muted); font-size: 14px; }
+
+  /* RESULT FEEDBACK */
+  .feedback-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .feedback-toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: eventPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+
+  .feedback-toast.pos { border-color: rgba(0,255,136,0.3); color: var(--safe); }
+  .feedback-toast.neg { border-color: rgba(255,77,109,0.3); color: var(--dead); animation: shake 0.5s, eventPop 0.4s forwards; }
+  .feedback-toast.neu { border-color: rgba(255,190,11,0.3); color: var(--risk); }
+
+  /* ===== RESULT SCREEN ===== */
+  .result-header { text-align: center; margin-bottom: 36px; }
+
+  .survival-ring {
+    width: 160px; height: 160px;
+    margin: 0 auto 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .survival-ring svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .ring-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ring-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    z-index: 1;
+    animation: countUp 0.8s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .position-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .pos-safe { background: rgba(0,255,136,0.12); color: var(--safe); border: 1px solid rgba(0,255,136,0.3); }
+  .pos-risk { background: rgba(255,190,11,0.12); color: var(--risk); border: 1px solid rgba(255,190,11,0.3); }
+  .pos-dead { background: rgba(255,77,109,0.12); color: var(--dead); border: 1px solid rgba(255,77,109,0.3); }
+
+  .result-explanation {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto 8px;
+    text-align: center;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-card .s-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .s-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* MONETIZATION */
+  .mono-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mono-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .mono-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .mono-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .strategy-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .strategy-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .strategy-item.unlocked {
+    border-color: rgba(0,255,136,0.25);
+  }
+
+  .strategy-item.locked {
+    filter: blur(0);
+  }
+
+  .strategy-item.locked .strategy-content {
+    filter: blur(5px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .strategy-item.locked::after {
+    content: '🔒 Unlock to reveal';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13,17,23,0.7);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    backdrop-filter: blur(2px);
+    border-radius: 11px;
+  }
+
+  .strategy-num {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .strategy-num.n1 { background: rgba(0,255,136,0.12); color: var(--accent); }
+  .strategy-num.n2 { background: rgba(255,190,11,0.12); color: var(--risk); }
+  .strategy-num.n3 { background: rgba(255,77,109,0.12); color: var(--dead); }
+
+  .strategy-content { flex: 1; }
+  .strategy-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .strategy-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .strategy-income { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 700; }
+
+  .cta-block {
+    background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(255,77,109,0.06));
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+  }
+
+  .cta-headline { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .cta-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+  .cta-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .cta-feat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .cta-feat span { color: var(--accent); font-size: 14px; }
+
+  .cta-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 16px 40px;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,255,136,0.3);
+  }
+
+  .price-tag {
+    background: rgba(0,0,0,0.2);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 14px;
+  }
+
+  .replay-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .replay-btn:hover {
+    border-color: var(--muted);
+    color: var(--text);
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 16px 36px;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(0,255,136,0.3);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ===== LOADING ===== */
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .loading-dots span {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ===== HEADING ===== */
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  h3 { font-size: 20px; font-weight: 700; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .role-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .hud { gap: 8px; }
+    .stat-row { gap: 10px; }
+  }
+
+  /* Scanline effect on transitions */
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(0,255,136,0.3);
+    pointer-events: none;
+    z-index: 200;
+    animation: scanline 0.6s linear forwards;
+    opacity: 0;
+  }
+
+  .result-title {
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div id="app">
+
+  <!-- INTRO SCREEN -->
+  <div id="screen-intro" class="screen active">
+    <div class="intro-badge">
+      <span></span>
+      Live Simulation
+    </div>
+    <h1 class="intro-title">
+      AI Survival
+      <span class="line2">Simulator</span>
+    </h1>
+    <p class="intro-sub">
+      Will AI replace you — or make you irreplaceable? Play through 6 turns to discover your career survival score.
+    </p>
+    <div class="stat-row">
+      <div class="stat-chip">
+        <span class="val">4,200+</span>
+        <span class="lbl">Simulations Run</span>
+      </div>
+      <div class="stat-chip">
+        <span class="val">38%</span>
+        <span class="lbl">Avg Survival Rate</span>
+      </div>
+      <div class="stat-chip">
+        <span class="val">$47k</span>
+        <span class="lbl">Avg Income Gain</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startGame()">
+      Begin Simulation →
+    </button>
+  </div>
+
+  <!-- ROLE SELECT SCREEN -->
+  <div id="screen-role" class="screen">
+    <div class="section-label">Step 01 — Choose Your Role</div>
+    <h2>Who are you<br>in the workforce?</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6;">Your starting stats and risk profile depend on this choice.</p>
+
+    <div class="role-grid">
+      <div class="role-card" onclick="selectRole('office')" id="role-office">
+        <span class="role-emoji">🏢</span>
+        <div class="role-name">Office Worker</div>
+        <div class="role-desc">Admin, HR, marketing, management. Lots of routine work AI loves to automate.</div>
+        <div class="role-risk">⚠ High Risk</div>
+      </div>
+      <div class="role-card" onclick="selectRole('engineer')" id="role-engineer">
+        <span class="role-emoji">⚙️</span>
+        <div class="role-name">Engineer</div>
+        <div class="role-desc">Developer, data analyst, or technical role. AI is both your tool and your rival.</div>
+        <div class="role-risk">⚡ Medium Risk</div>
+      </div>
+      <div class="role-card" onclick="selectRole('creator')" id="role-creator">
+        <span class="role-emoji">🎨</span>
+        <div class="role-name">Creator</div>
+        <div class="role-desc">Freelancer, artist, writer, or designer. Adaptability is your superpower.</div>
+        <div class="role-risk">🎯 Variable Risk</div>
+      </div>
+      <div class="role-card" onclick="selectRole('unemployed')" id="role-unemployed">
+        <span class="role-emoji">🔍</span>
+        <div class="role-name">Unemployed</div>
+        <div class="role-desc">Between jobs. Clean slate — but the job market is flooded with AI-native candidates.</div>
+        <div class="role-risk">🚨 Critical Risk</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="role-btn" onclick="confirmRole()" disabled>
+      Start Simulation →
+    </button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <!-- HUD -->
+    <div class="hud" id="hud"></div>
+
+    <!-- Turn indicator -->
+    <div class="turn-indicator">
+      <span>Turn</span>
+      <div class="turn-dots" id="turn-dots"></div>
+      <span id="turn-label">1 / 6</span>
+    </div>
+
+    <!-- Event card -->
+    <div id="event-area"></div>
+
+    <!-- Choices -->
+    <div class="choice-list" id="choices"></div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen"></div>
+
+</div>
+
+<!-- Feedback overlay -->
+<div class="feedback-overlay" id="feedback-overlay" style="display:none;"></div>
+
+<script>
+// =============== GAME DATA ===============
+
+const ROLES = {
+  office: {
+    name: 'Office Worker', emoji: '🏢',
+    stats: { resistance: 60, income: 30, adaptability: 40 }
+  },
+  engineer: {
+    name: 'Engineer', emoji: '⚙️',
+    stats: { resistance: 45, income: 60, adaptability: 65 }
+  },
+  creator: {
+    name: 'Creator', emoji: '🎨',
+    stats: { resistance: 40, income: 45, adaptability: 80 }
+  },
+  unemployed: {
+    name: 'Unemployed', emoji: '🔍',
+    stats: { resistance: 25, income: 10, adaptability: 55 }
+  }
+};
+
+const TURNS = [
+  {
+    event: {
+      type: 'neutral',
+      icon: '📊',
+      title: 'AI tools are flooding your industry',
+      desc: 'ChatGPT, Copilot, Midjourney — every company is evaluating AI. What\'s your move?'
+    },
+    choices: [
+      { icon: '🎓', text: 'Learn AI tools', hint: 'Enroll in a free AI certification course', effects: { resistance: -8, income: +12, adaptability: +18 } },
+      { icon: '💼', text: 'Continue routine work', hint: 'Stay in your lane and hope it blows over', effects: { resistance: +5, income: +3, adaptability: -5 } },
+      { icon: '🚀', text: 'Start a side hustle using AI', hint: 'Launch a small AI-powered service', effects: { resistance: -5, income: +20, adaptability: +10 } }
+    ]
+  },
+  {
+    event: {
+      type: 'danger',
+      icon: '⚡',
+      title: 'Your company announces layoffs',
+      desc: '15% of the workforce will be cut. AI-literate employees are safe. Who are you?'
+    },
+    choices: [
+      { icon: '🤖', text: 'Volunteer to lead AI adoption', hint: 'Become the AI champion on your team', effects: { resistance: -15, income: +8, adaptability: +20 } },
+      { icon: '🤫', text: 'Keep your head down', hint: 'Hope you\'re not on the list', effects: { resistance: +10, income: -5, adaptability: -10 } },
+      { icon: '📝', text: 'Update resume & network', hint: 'Prepare for the worst, aim for the best', effects: { resistance: -5, income: +5, adaptability: +8 } }
+    ]
+  },
+  {
+    event: {
+      type: 'opportunity',
+      icon: '💡',
+      title: 'AI-skilled workers get promoted',
+      desc: 'Your colleague who learned Cursor just got a 40% raise. The opportunity window is open.'
+    },
+    choices: [
+      { icon: '📚', text: 'Deep-dive into AI prompting', hint: 'Spend weekends mastering advanced techniques', effects: { resistance: -12, income: +15, adaptability: +15 } },
+      { icon: '💰', text: 'Sell AI-enhanced freelance work', hint: 'Charge 3x more with AI-assisted output', effects: { resistance: -8, income: +25, adaptability: +5 } },
+      { icon: '😴', text: 'Do nothing', hint: 'It\'ll probably sort itself out', effects: { resistance: +8, income: -8, adaptability: -12 } }
+    ]
+  },
+  {
+    event: {
+      type: 'danger',
+      icon: '🤖',
+      title: 'AI replaces part of your job',
+      desc: 'An AI model now does 40% of what you used to do. Your role is being "restructured."'
+    },
+    choices: [
+      { icon: '🔄', text: 'Pivot to AI management', hint: 'Manage AI outputs instead of creating manually', effects: { resistance: -20, income: +10, adaptability: +20 } },
+      { icon: '🆕', text: 'Learn a new high-demand skill', hint: 'AI can\'t replace niche expertise yet', effects: { resistance: -10, income: +12, adaptability: +12 } },
+      { icon: '😤', text: 'Resist and fight the change', hint: 'Push back on the automation', effects: { resistance: +15, income: -15, adaptability: -15 } }
+    ]
+  },
+  {
+    event: {
+      type: 'neutral',
+      icon: '🌐',
+      title: 'New AI income opportunities emerge',
+      desc: 'Prompt engineering, AI consulting, and synthetic content are booming markets.'
+    },
+    choices: [
+      { icon: '📈', text: 'Build an AI income stream', hint: 'Create templates, courses, or AI agents to sell', effects: { resistance: -10, income: +30, adaptability: +8 } },
+      { icon: '🤝', text: 'Partner with AI-native companies', hint: 'Get contract work from AI startups', effects: { resistance: -5, income: +18, adaptability: +10 } },
+      { icon: '⏳', text: 'Wait for things to stabilize', hint: 'Too risky right now', effects: { resistance: +5, income: -5, adaptability: -8 } }
+    ]
+  },
+  {
+    event: {
+      type: 'opportunity',
+      icon: '🏆',
+      title: 'Final Test: The AI-first economy is here',
+      desc: 'In 2026, every job listing requires AI fluency. This is your last chance to position yourself.'
+    },
+    choices: [
+      { icon: '🎯', text: 'Launch your AI-powered brand', hint: 'Become a known expert in your field + AI', effects: { resistance: -20, income: +35, adaptability: +15 } },
+      { icon: '🔧', text: 'Specialize in AI tool integration', hint: 'Become the "AI fixer" companies need', effects: { resistance: -15, income: +25, adaptability: +10 } },
+      { icon: '🏳️', text: 'Accept automation defeat', hint: 'Let AI take over and coast', effects: { resistance: +20, income: -20, adaptability: -20 } }
+    ]
+  }
+];
+
+const RANDOM_EVENTS = [
+  { chance: 0.3, type: 'danger', msg: '⚡ RANDOM EVENT: Competitor uses AI to undercut your price!', effects: { income: -8 } },
+  { chance: 0.25, type: 'opportunity', msg: '🌟 RANDOM EVENT: Viral AI demo gets you noticed online!', effects: { income: +10, adaptability: +5 } },
+  { chance: 0.25, type: 'danger', msg: '😰 RANDOM EVENT: Mass layoffs hit your industry!', effects: { resistance: +10, income: -10 } },
+  { chance: 0.2, type: 'opportunity', msg: '🚀 RANDOM EVENT: AI startup offers you a contract!', effects: { income: +15, adaptability: +8 } }
+];
+
+const STRATEGIES = [
+  {
+    name: 'AI-Enhanced Freelancing',
+    desc: 'Use AI tools to deliver 10x faster. Charge premium rates for AI-augmented work.',
+    income: '$4,000–$12,000/mo',
+    icon: '💼'
+  },
+  {
+    name: 'Prompt Engineering & Consulting',
+    desc: 'Teach companies how to use AI tools. High demand, low competition right now.',
+    income: '$6,000–$20,000/mo',
+    icon: '🧠'
+  },
+  {
+    name: 'AI Product Creation',
+    desc: 'Build and sell AI templates, agents, or micro-SaaS tools with no-code platforms.',
+    income: '$2,000–$50,000/mo',
+    icon: '⚙️'
+  }
+];
+
+// =============== GAME STATE ===============
+
+let state = {
+  role: null,
+  turn: 0,
+  stats: { resistance: 50, income: 50, adaptability: 50 },
+  maxTurns: 6,
+  history: []
+};
+
+// =============== UI HELPERS ===============
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function transition(outId, inId, fn) {
+  const outEl = document.getElementById(outId);
+  outEl.style.animation = 'fadeSlideOut 0.35s cubic-bezier(0.7,0,0.8,1) forwards';
+  
+  const scanline = document.createElement('div');
+  scanline.className = 'scanline';
+  document.body.appendChild(scanline);
+  setTimeout(() => scanline.remove(), 700);
+
+  setTimeout(() => {
+    outEl.classList.remove('active');
+    outEl.style.animation = '';
+    if (fn) fn();
+    const inEl = document.getElementById(inId);
+    inEl.classList.add('active');
+  }, 350);
+}
+
+function showFeedback(msg, type) {
+  const overlay = document.getElementById('feedback-overlay');
+  overlay.style.display = 'flex';
+  overlay.innerHTML = `<div class="feedback-toast ${type}">${msg}</div>`;
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.innerHTML = '';
+  }, 1800);
+}
+
+// =============== SCREENS ===============
+
+function startGame() {
+  transition('screen-intro', 'screen-role', null);
+}
+
+function selectRole(roleKey) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('role-' + roleKey).classList.add('selected');
+  state.role = roleKey;
+  document.getElementById('role-btn').disabled = false;
+}
+
+function confirmRole() {
+  if (!state.role) return;
+  const role = ROLES[state.role];
+  state.stats = { ...role.stats };
+  state.turn = 0;
+  transition('screen-role', 'screen-game', renderTurn);
+}
+
+function renderHUD() {
+  const s = state.stats;
+  const hud = document.getElementById('hud');
+  
+  const bars = [
+    { label: 'AI Resistance', val: s.resistance, color: '#ff4d6d', key: 'resistance' },
+    { label: 'Income Potential', val: s.income, color: '#00ff88', key: 'income' },
+    { label: 'Adaptability', val: s.adaptability, color: '#ffbe0b', key: 'adaptability' }
+  ];
+
+  hud.innerHTML = bars.map(b => `
+    <div class="hud-stat">
+      <div class="hud-label">${b.label}</div>
+      <div class="hud-bar-track">
+        <div class="hud-bar-fill" style="width:${clamp(b.val,0,100)}%;background:${b.color};animation:barFill 0.6s ease both;"></div>
+      </div>
+      <div class="hud-val" style="color:${b.color}">${clamp(b.val,0,100)}%</div>
+    </div>
+  `).join('');
+}
+
+function renderTurnDots() {
+  const container = document.getElementById('turn-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < state.maxTurns; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'turn-dot' + (i < state.turn ? ' done' : i === state.turn ? ' active' : '');
+    container.appendChild(dot);
+  }
+  document.getElementById('turn-label').textContent = `${state.turn + 1} / ${state.maxTurns}`;
+}
+
+function renderTurn() {
+  renderHUD();
+  renderTurnDots();
+
+  const turnData = TURNS[state.turn];
+  const ev = turnData.event;
+
+  // Random event overlay
+  const randEv = RANDOM_EVENTS.find(r => Math.random() < r.chance && state.turn > 0);
+
+  const eventArea = document.getElementById('event-area');
+  
+  let randHTML = '';
+  if (randEv) {
+    // Apply random event effects
+    setTimeout(() => {
+      if (randEv.effects) {
+        Object.keys(randEv.effects).forEach(k => {
+          if (state.stats[k] !== undefined) {
+            state.stats[k] = clamp(state.stats[k] + randEv.effects[k], 0, 100);
+          }
+        });
+        renderHUD();
+      }
+      showFeedback(randEv.msg, randEv.type === 'danger' ? 'neg' : 'pos');
+    }, 200);
+  }
+
+  eventArea.style.animation = 'eventPop 0.5s cubic-bezier(0.16,1,0.3,1) both';
+  eventArea.innerHTML = `
+    <div class="event-card ${ev.type}">
+      <div class="event-header">
+        <div class="event-icon">${ev.icon}</div>
+        <div>
+          <div class="event-type ${ev.type}">${ev.type === 'danger' ? '⚠ Threat' : ev.type === 'opportunity' ? '✦ Opportunity' : '◈ Situation'}</div>
+          <div class="event-title">${ev.title}</div>
+        </div>
+      </div>
+      <div class="event-desc">${ev.desc}</div>
+    </div>
+  `;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  
+  turnData.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.style.animationDelay = `${i * 0.08}s`;
+    btn.style.animation = `fadeSlideIn 0.4s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1) both`;
+    btn.innerHTML = `
+      <span class="choice-icon">${choice.icon}</span>
+      <span class="choice-text">
+        ${choice.text}
+        <div class="choice-hint">${choice.hint}</div>
+      </span>
+      <span class="choice-arrow">›</span>
+    `;
+    btn.onclick = () => makeChoice(choice);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function makeChoice(choice) {
+  // Disable all buttons
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  
+  // Apply effects
+  const effects = choice.effects;
+  let feedbackParts = [];
+  
+  Object.keys(effects).forEach(k => {
+    const delta = effects[k];
+    if (state.stats[k] !== undefined) {
+      state.stats[k] = clamp(state.stats[k] + delta, 0, 100);
+      if (k === 'income') feedbackParts.push(`Income ${delta > 0 ? '+' : ''}${delta}%`);
+      if (k === 'adaptability') feedbackParts.push(`Adaptability ${delta > 0 ? '+' : ''}${delta}%`);
+      if (k === 'resistance') feedbackParts.push(`Resistance ${delta > 0 ? '+' : ''}${delta}%`);
+    }
+  });
+
+  state.history.push({ choice: choice.text, effects });
+
+  const isGood = (effects.income || 0) + (effects.adaptability || 0) > 0;
+  const feedbackMsg = isGood
+    ? `✓ ${feedbackParts.join(' · ')}`
+    : `${feedbackParts.join(' · ')}`;
+
+  showFeedback(feedbackMsg, isGood ? 'pos' : 'neg');
+  renderHUD();
+
+  state.turn++;
+
+  if (state.turn >= state.maxTurns) {
+    setTimeout(() => {
+      transition('screen-game', 'screen-result', renderResult);
+    }, 1000);
+  } else {
+    setTimeout(() => {
+      renderTurn();
+    }, 800);
+  }
+}
+
+function renderResult() {
+  const s = state.stats;
+  
+  // Calculate survival score
+  const survivalScore = Math.round(
+    (s.income * 0.45) +
+    (s.adaptability * 0.35) +
+    (Math.max(0, 100 - s.resistance) * 0.20)
+  );
+
+  const score = clamp(survivalScore, 5, 99);
+  
+  let position, posClass, explanation;
+  
+  if (score >= 68) {
+    position = '🛡 Safe';
+    posClass = 'pos-safe';
+    explanation = `You've successfully adapted to the AI era. Your income potential and adaptability scores put you ahead of 80% of workers. You're not just surviving — you're positioned to thrive as AI eliminates your competition.`;
+  } else if (score >= 40) {
+    position = '⚠ At Risk';
+    posClass = 'pos-risk';
+    explanation = `You've made some smart moves, but your AI resistance is still high. You're in the danger zone — a single major layoff wave could push you out. The window to act is still open, but it's closing fast.`;
+  } else {
+    position = '💀 Replaced';
+    posClass = 'pos-dead';
+    explanation = `Your choices kept you in the comfort zone while AI advanced rapidly. Your income potential has flatlined and your adaptability is critically low. Without urgent action, automation will complete its takeover of your career.`;
+  }
+
+  const circumference = 2 * Math.PI * 60;
+  const offset = circumference - (score / 100) * circumference;
+  const ringColor = score >= 68 ? '#00ff88' : score >= 40 ? '#ffbe0b' : '#ff4d6d';
+
+  const role = ROLES[state.role];
+
+  // Strategy reveal — show 1, blur 2
+  const strategiesHTML = STRATEGIES.map((s, i) => `
+    <div class="strategy-item ${i === 0 ? 'unlocked' : 'locked'}">
+      <div class="strategy-num n${i+1}">${i + 1}</div>
+      <div class="strategy-content">
+        <div class="strategy-name">${s.icon} ${s.name}</div>
+        <div class="strategy-desc">${s.desc}</div>
+        <div class="strategy-income">${s.income}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('screen-result').innerHTML = `
+    <div class="result-header">
+      <div class="section-label">Simulation Complete</div>
+      <div class="survival-ring">
+        <svg viewBox="0 0 160 160">
+          <circle class="ring-bg" cx="80" cy="80" r="60" />
+          <circle class="ring-fill" cx="80" cy="80" r="60"
+            stroke="${ringColor}"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${circumference}"
+            id="ring-anim" />
+        </svg>
+        <div class="ring-score" style="color:${ringColor}" id="score-count">0%</div>
+      </div>
+      <div class="position-badge ${posClass}">${position}</div>
+      <div class="result-title">${role.emoji} ${role.name}</div>
+      <p class="result-explanation">${explanation}</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="s-val" style="color:var(--dead)">${clamp(state.stats.resistance,0,100)}%</span>
+        <span class="s-lbl">AI Resistance</span>
+      </div>
+      <div class="stat-card">
+        <span class="s-val" style="color:var(--safe)">${clamp(state.stats.income,0,100)}%</span>
+        <span class="s-lbl">Income Potential</span>
+      </div>
+      <div class="stat-card">
+        <span class="s-val" style="color:var(--risk)">${clamp(state.stats.adaptability,0,100)}%</span>
+        <span class="s-lbl">Adaptability</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="mono-section">
+      <div class="mono-title">Your AI Income Strategies</div>
+      <div class="mono-sub">Based on your score of ${score}%, here are 3 strategies ranked for your profile. Strategy #1 is unlocked.</div>
+      <div class="strategy-list">
+        ${strategiesHTML}
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <div class="mono-title">🔓 Unlock Your Full AI Survival Plan</div>
+      <div class="cta-sub">Get strategies #2 and #3 plus a personalized 30-day action plan to transform your career in the AI economy.</div>
+      <div class="cta-features">
+        <div class="cta-feat"><span>✓</span> All 3 income strategies (detailed, step-by-step)</div>
+        <div class="cta-feat"><span>✓</span> 30-day AI skills roadmap for your role</div>
+        <div class="cta-feat"><span>✓</span> Top 10 AI tools ranked for your specific field</div>
+        <div class="cta-feat"><span>✓</span> Templates & prompt library ($40 value)</div>
+        <div class="cta-feat"><span>✓</span> Private community access</div>
+      </div>
+      <button class="cta-btn" onclick="handleCTA()">
+        Unlock My AI Survival Plan
+        <span class="price-tag">$5</span>
+      </button>
+      <button class="replay-btn" onclick="resetGame()">↩ Try a Different Role</button>
+    </div>
+  `;
+
+  // Animate ring
+  setTimeout(() => {
+    const ring = document.getElementById('ring-anim');
+    if (ring) ring.style.strokeDashoffset = offset;
+    
+    // Animate score counter
+    let current = 0;
+    const scoreEl = document.getElementById('score-count');
+    const interval = setInterval(() => {
+      current = Math.min(current + 2, score);
+      if (scoreEl) scoreEl.textContent = current + '%';
+      if (current >= score) clearInterval(interval);
+    }, 25);
+  }, 300);
+}
+
+function handleCTA() {
+  const btn = document.querySelector('.cta-btn');
+  if (btn) {
+    btn.innerHTML = '✓ Processing... (Demo mode)';
+    btn.style.background = 'var(--safe)';
+    setTimeout(() => {
+      btn.innerHTML = '🔐 Unlock My AI Survival Plan <span class="price-tag">$5</span>';
+      btn.style.background = '';
+    }, 2000);
+  }
+}
+
+function resetGame() {
+  state = {
+    role: null,
+    turn: 0,
+    stats: { resistance: 50, income: 50, adaptability: 50 },
+    maxTurns: 6,
+    history: []
+  };
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('role-btn').disabled = true;
+  
+  const resultEl = document.getElementById('screen-result');
+  resultEl.classList.remove('active');
+  
+  const roleEl = document.getElementById('screen-role');
+  roleEl.classList.add('active');
+  roleEl.style.animation = 'fadeSlideIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards';
+}
+</script>
+</body>
+</html>
