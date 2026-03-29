@@ -1634,6 +1634,31 @@ function initMiniGame(){
   }
 
   loop();
+} 
+
+let screenHistory = [];
+
+function showScreen(id){
+  const current = document.querySelector('.screen.active');
+  if(current){
+    screenHistory.push(current.id);
+    current.classList.remove('active');
+  }
+  document.getElementById(id).classList.add('active');
+}
+
+function goBack(){
+  if(screenHistory.length > 0){
+    const prev = screenHistory.pop();
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+  }
+}
+
+function goHome(){
+  screenHistory = [];
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-intro').classList.add('active');
 }  
 </script>
 </body>
