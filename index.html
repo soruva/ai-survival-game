@@ -1585,7 +1585,10 @@ function handleCTA(btn){
 
 function startMiniGameFlow(){
   showScreen('screen-minigame');
-  initMiniGame();
+
+  setTimeout(()=>{
+    initMiniGame();
+  },100);
 }
 
 function startMainGame(){
