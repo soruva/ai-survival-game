@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Survival Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:       #04070d;
@@ -29,7 +29,7 @@ html,body{
   width:100%;min-height:100vh;
   background:var(--bg);
   color:var(--text);
-  font-family:'Exo 2','Rajdhani',sans-serif;
+  font-family:'Barlow Condensed','Share Tech Mono',sans-serif;
   overflow-x:hidden;
 }
 
@@ -46,13 +46,13 @@ html,body{
   min-height:100vh;
   display:flex;align-items:center;justify-content:center;
   padding:16px;
-  padding-top:60px; /* room for home button */
+  padding-top:56px;
 }
 .screen{display:none;width:100%;max-width:700px;}
-.screen.active{display:block;animation:screenIn .5s cubic-bezier(.16,1,.3,1) both;}
+.screen.active{display:block;animation:screenIn .45s cubic-bezier(.16,1,.3,1) both;}
 
-@keyframes screenIn{from{opacity:0;transform:translateY(30px) scale(.97);}to{opacity:1;transform:none;}}
-@keyframes screenOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-20px) scale(.97);}}
+@keyframes screenIn{from{opacity:0;transform:translateY(28px) scale(.97);}to{opacity:1;transform:none;}}
+@keyframes screenOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-18px) scale(.97);}}
 
 /* ── MONO FONT ── */
 .mono{font-family:'Share Tech Mono',monospace;}
@@ -60,99 +60,71 @@ html,body{
 /* ── SCANLINE OVERLAY ── */
 body::after{
   content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
 }
 
-/* ═══════════════════════════════════════
-   HOME BUTTON (always visible)
-═══════════════════════════════════════ */
-#home-btn{
-  position:fixed;
-  top:14px;
-  left:16px;
-  z-index:100;
-  display:none;
-
-  align-items:center;
-  gap:8px;
-
-  background:#0b1120;
-
-  border:1px solid rgba(0,229,255,0.35);
-  box-shadow:0 0 20px rgba(0,229,255,0.15);
-
-  border-radius:6px;
-  padding:9px 16px;
-
+/* ══════════════════════════════════════════
+   NAV — top-right, non-intrusive, hidden on intro
+══════════════════════════════════════════ */
+#nav-overlay{
+  position:fixed;top:12px;right:14px;z-index:200;
+  display:none;align-items:center;gap:6px;
+}
+#nav-overlay.visible{display:flex;}
+.nav-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(8,13,20,.82);
+  border:1px solid rgba(0,229,255,.22);
+  border-radius:3px;
+  padding:6px 12px;
   font-family:'Share Tech Mono',monospace;
-  font-size:11px;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:#6f89a8;cursor:pointer;
+  transition:all .2s;
+  backdrop-filter:blur(8px);
+}
+.nav-pill:hover{
   color:#00e5ff;
-
-  letter-spacing:.12em;
-  text-transform:uppercase;
-
-  cursor:pointer;
-  transition:all .25s cubic-bezier(.16,1,.3,1);
-
-  backdrop-filter:blur(6px);
+  border-color:rgba(0,229,255,.5);
+  box-shadow:0 0 10px rgba(0,229,255,.18);
 }
-#home-btn:hover{
-  color:#ffffff;
-  border-color:#00e5ff;
+.nav-pill svg{width:10px;height:10px;flex-shrink:0;}
 
-  box-shadow:
-    0 0 12px rgba(0,229,255,.5),
-    0 0 30px rgba(0,229,255,.25);
-
-  transform:translateY(-2px);
-}
-#home-btn svg{width:12px;height:12px;flex-shrink:0;transition:transform .2s;}
-#home-btn:hover svg{transform:translateX(-2px);}
-#home-btn.visible{display:flex;}
+/* ── Remove old nav-bar styles ── */
+.nav-bar{display:none !important;}
 
 /* HOME CONFIRM MODAL */
 #home-modal{
-  display:none;
-  position:fixed;inset:0;z-index:500;
+  display:none;position:fixed;inset:0;z-index:500;
   align-items:center;justify-content:center;
-  background:rgba(4,7,13,.85);
-  backdrop-filter:blur(6px);
-  animation:fadeIn .2s ease both;
+  background:rgba(4,7,13,.88);backdrop-filter:blur(8px);
 }
 #home-modal.open{display:flex;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 .modal-box{
-  background:var(--panel);
-  border:1px solid var(--border2);
-  border-radius:8px;
-  padding:32px 28px;
-  max-width:360px;width:90%;
-  text-align:center;
-  animation:screenIn .3s cubic-bezier(.16,1,.3,1) both;
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:6px;padding:32px 28px;max-width:340px;width:90%;
+  text-align:center;animation:screenIn .3s cubic-bezier(.16,1,.3,1) both;
   position:relative;
 }
 .modal-box::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--bad),rgba(255,34,68,.2));
-  border-radius:8px 8px 0 0;
+  background:linear-gradient(90deg,var(--bad),rgba(255,34,68,.15));
+  border-radius:6px 6px 0 0;
 }
-.modal-icon{font-size:36px;margin-bottom:14px;display:block;}
-.modal-title{
-  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
-  color:var(--bright);margin-bottom:8px;
-}
-.modal-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px;}
-.modal-btns{display:flex;flex-direction:column;gap:10px;}
+.modal-icon{font-size:32px;margin-bottom:12px;display:block;}
+.modal-title{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
+.modal-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:22px;}
+.modal-btns{display:flex;flex-direction:column;gap:9px;}
 .modal-confirm{
-  background:var(--bad);color:#04070d;border:none;border-radius:4px;
-  padding:13px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
-  cursor:pointer;transition:all .2s;letter-spacing:.05em;
+  background:var(--bad);color:#04070d;border:none;border-radius:3px;
+  padding:12px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.06em;
 }
-.modal-confirm:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,34,68,.4);}
+.modal-confirm:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(255,34,68,.45);}
 .modal-cancel{
-  background:transparent;color:var(--muted);border:1px solid var(--border);
-  border-radius:4px;padding:11px;
-  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  background:rgba(255,255,255,.04);color:var(--muted);
+  border:1px solid var(--border);border-radius:3px;padding:10px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
   cursor:pointer;transition:all .2s;
 }
 .modal-cancel:hover{color:var(--text);border-color:var(--border2);}
@@ -172,16 +144,16 @@ body::after{
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
 .intro-title{
-  font-family:'Rajdhani',sans-serif;
-  font-size:clamp(48px,10vw,88px);
-  font-weight:700;line-height:.95;
-  letter-spacing:-.02em;
-  margin-bottom:6px;
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(36px,8vw,72px);
+  font-weight:900;line-height:.95;
+  letter-spacing:-.01em;
+  margin-bottom:8px;
 }
 .intro-title .t1{color:var(--bright);display:block;}
 .intro-title .t2{
   color:var(--bad);display:block;
-  text-shadow:0 0 40px rgba(255,34,68,.6),0 0 80px rgba(255,34,68,.3);
+  text-shadow:0 0 40px rgba(255,34,68,.7),0 0 80px rgba(255,34,68,.3);
   animation:glitch 5s infinite;
 }
 @keyframes glitch{
@@ -191,42 +163,40 @@ body::after{
   95%{transform:translateX(-2px);clip-path:inset(10% 0 70% 0);}
 }
 
-.intro-sub{font-size:16px;color:#8fb3d9;line-height:1.7;max-width:480px;margin-bottom:36px;font-weight:300;}
+.intro-sub{font-size:17px;color:#8fb3d9;line-height:1.65;max-width:480px;margin-bottom:36px;font-weight:400;}
 
 .intro-stats{display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap;}
 .i-stat{
   flex:1;min-width:110px;
   background:var(--panel);border:1px solid var(--border);
-  padding:14px 16px;border-radius:4px;
+  padding:14px 16px;border-radius:3px;
 }
 .i-stat .v{font-family:'Share Tech Mono',monospace;font-size:26px;color:var(--hp);display:block;}
-.i-stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+.i-stat .l{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
 
-/* ── BUTTON ── */
+/* ── BUTTONS ── */
 .btn{
   display:inline-flex;align-items:center;gap:10px;
-  padding:16px 36px;border:none;border-radius:3px;
-  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+  padding:15px 34px;border:none;border-radius:3px;
+  font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;
   cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);
-  letter-spacing:.05em;text-transform:uppercase;
+  letter-spacing:.06em;text-transform:uppercase;
 }
 .btn-primary{
   background:var(--hp);color:#04070d;
-  box-shadow:0 0 30px rgba(0,229,255,.4);
+  box-shadow:0 0 28px rgba(0,229,255,.45);
 }
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,229,255,.6);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 38px rgba(0,229,255,.65);}
 .btn-primary:disabled{opacity:.3;transform:none;box-shadow:none;cursor:not-allowed;}
 .btn-ghost{
-  background:#0b1120;
-  color:var(--muted);
-  border:1px solid var(--border);
-  font-size:15px;
-  padding:12px 28px;
+  background:rgba(8,13,20,.9);
+  color:#8fb3d9;
+  border:1px solid rgba(0,229,255,.25);
+  font-size:13px;padding:11px 26px;
 }
 .btn-ghost:hover{
-  color:#00e5ff;
-  border-color:rgba(0,229,255,.5);
-  box-shadow:0 0 12px rgba(0,229,255,.2);
+  color:#00e5ff;border-color:rgba(0,229,255,.55);
+  box-shadow:0 0 14px rgba(0,229,255,.22);
 }
 
 /* ═══════════════════════════════════════
@@ -238,16 +208,16 @@ body::after{
   margin-bottom:16px;opacity:.8;
 }
 .screen-title{
-  font-family:'Rajdhani',sans-serif;
-  font-size:clamp(28px,5vw,40px);font-weight:700;
-  color:var(--bright);margin-bottom:6px;letter-spacing:-.01em;
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(22px,4.5vw,34px);font-weight:700;
+  color:var(--bright);margin-bottom:6px;letter-spacing:.02em;
 }
-.screen-sub{font-size:14px;color:#8fb3d9;margin-bottom:28px;line-height:1.6;}
+.screen-sub{font-size:15px;color:#8fb3d9;margin-bottom:28px;line-height:1.55;font-weight:400;}
 
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;}
 .role-card{
   background:var(--panel);border:2px solid var(--border);
-  border-radius:6px;padding:22px 18px;cursor:pointer;
+  border-radius:5px;padding:22px 18px;cursor:pointer;
   transition:all .25s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
 }
 .role-card::before{
@@ -262,9 +232,9 @@ body::after{
   box-shadow:0 0 0 1px var(--hp),inset 0 0 20px rgba(0,229,255,.05),var(--glow-hp);
 }
 .role-card.sel::before{opacity:1;}
-.role-em{font-size:30px;margin-bottom:10px;display:block;}
-.role-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--bright);margin-bottom:5px;}
-.role-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.role-em{font-size:28px;margin-bottom:10px;display:block;}
+.role-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--bright);margin-bottom:5px;letter-spacing:.02em;}
+.role-desc{font-size:13px;color:var(--muted);line-height:1.5;}
 .role-stats{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
 .rs-chip{
   font-family:'Share Tech Mono',monospace;font-size:10px;
@@ -279,7 +249,7 @@ body::after{
 ═══════════════════════════════════════ */
 .hud{
   background:var(--panel);border:1px solid var(--border);
-  border-radius:6px 6px 0 0;border-bottom:none;
+  border-radius:5px 5px 0 0;border-bottom:none;
   padding:14px 18px;display:flex;align-items:center;gap:16px;
   flex-wrap:wrap;position:relative;overflow:hidden;
 }
@@ -291,49 +261,27 @@ body::after{
 
 /* HP BAR */
 .hp-section{flex:2;min-width:200px;}
-.hp-label{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:6px;
-}
-.hp-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em;}
+.hp-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.hp-text{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.12em;}
 .hp-val{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:bold;}
-.hp-track{height:10px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;position:relative;}
-.hp-fill{
-  height:100%;border-radius:2px;
-  transition:width .7s cubic-bezier(.16,1,.3,1);
-  position:relative;
-}
-.hp-fill::after{
-  content:'';position:absolute;top:0;right:0;bottom:0;width:3px;
-  background:rgba(255,255,255,.6);filter:blur(2px);
-}
-
-.hp-high  .hp-fill{background:linear-gradient(90deg,#00b4cc,var(--hp));box-shadow:0 0 10px rgba(0,229,255,.5);}
-.hp-med   .hp-fill{background:linear-gradient(90deg,#cc6600,var(--warn));box-shadow:0 0 10px rgba(255,170,0,.5);}
-.hp-low   .hp-fill{background:linear-gradient(90deg,#880011,var(--bad));box-shadow:0 0 10px rgba(255,34,68,.6);animation:hpCrit 1s infinite;}
+.hp-track{height:10px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;position:relative;}
+.hp-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.16,1,.3,1);position:relative;}
+.hp-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px;background:rgba(255,255,255,.65);filter:blur(2px);}
+.hp-high .hp-fill{background:linear-gradient(90deg,#00b4cc,var(--hp));box-shadow:0 0 10px rgba(0,229,255,.5);}
+.hp-med  .hp-fill{background:linear-gradient(90deg,#cc6600,var(--warn));box-shadow:0 0 10px rgba(255,170,0,.5);}
+.hp-low  .hp-fill{background:linear-gradient(90deg,#880011,var(--bad));box-shadow:0 0 10px rgba(255,34,68,.6);animation:hpCrit 1s infinite;}
 @keyframes hpCrit{0%,100%{opacity:1;}50%{opacity:.6;}}
 
 /* MINI STATS */
 .hud-stats{display:flex;gap:10px;flex:1;}
-.hud-s{
-  flex:1;background:rgba(255,255,255,.08);border:1px solid var(--border);
-  border-radius:4px;padding:8px 10px;text-align:center;min-width:70px;
-}
+.hud-s{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:3px;padding:8px 10px;text-align:center;min-width:70px;}
 .hud-s .sv{font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:bold;display:block;}
-.hud-s .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+.hud-s .sl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
 
 /* TURN INDICATOR */
-.turn-hud{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 18px;
-  background:var(--panel);border:1px solid var(--border);
-  border-top:none;border-bottom:none;
-}
+.turn-hud{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--panel);border:1px solid var(--border);border-top:none;border-bottom:none;}
 .turn-pips{display:flex;gap:5px;}
-.t-pip{
-  width:22px;height:5px;border-radius:2px;
-  background:var(--border2);transition:all .4s;
-}
+.t-pip{width:22px;height:5px;border-radius:2px;background:var(--border2);transition:all .4s;}
 .t-pip.done{background:var(--hp);box-shadow:0 0 6px rgba(0,229,255,.5);}
 .t-pip.active{background:var(--hp);animation:pipPulse 1s infinite;}
 @keyframes pipPulse{0%,100%{box-shadow:0 0 6px rgba(0,229,255,.5);}50%{box-shadow:0 0 14px rgba(0,229,255,.9);}}
@@ -342,79 +290,42 @@ body::after{
 /* ═══════════════════════════════════════
    EVENT CARD
 ═══════════════════════════════════════ */
-.game-body{
-  background:var(--panel);border:1px solid var(--border);
-  border-top:none;border-radius:0 0 6px 6px;
-  padding:22px;
-}
+.game-body{background:var(--panel);border:1px solid var(--border);border-top:none;border-radius:0 0 5px 5px;padding:22px;}
 
-.event-card{
-  border-radius:6px;padding:20px 22px;margin-bottom:18px;
-  position:relative;overflow:hidden;
-  animation:eventAppear .5s cubic-bezier(.16,1,.3,1) both;
-}
+.event-card{border-radius:5px;padding:20px 22px;margin-bottom:18px;position:relative;overflow:hidden;animation:eventAppear .5s cubic-bezier(.16,1,.3,1) both;}
 @keyframes eventAppear{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:none;}}
-
-.event-card.ev-crisis{
-  background:rgba(255,34,68,.05);border:1px solid rgba(255,34,68,.3);
-}
-.event-card.ev-opportunity{
-  background:rgba(57,255,20,.04);border:1px solid rgba(57,255,20,.25);
-}
-.event-card.ev-neutral{
-  background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.2);
-}
-.event-card.ev-random-crisis{
-  background:rgba(255,34,68,.08);border:2px solid rgba(255,34,68,.5);
-  animation:eventAppear .4s both, shake .5s .1s both;
-}
-.event-card.ev-random-opp{
-  background:rgba(57,255,20,.07);border:2px solid rgba(57,255,20,.4);
-  animation:eventAppear .4s both, glowPulse .6s .1s both;
-}
+.event-card.ev-crisis{background:rgba(255,34,68,.05);border:1px solid rgba(255,34,68,.3);}
+.event-card.ev-opportunity{background:rgba(57,255,20,.04);border:1px solid rgba(57,255,20,.25);}
+.event-card.ev-neutral{background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.2);}
+.event-card.ev-random-crisis{background:rgba(255,34,68,.08);border:2px solid rgba(255,34,68,.5);animation:eventAppear .4s both,shake .5s .1s both;}
+.event-card.ev-random-opp{background:rgba(57,255,20,.07);border:2px solid rgba(57,255,20,.4);animation:eventAppear .4s both,glowPulse .6s .1s both;}
 @keyframes glowPulse{0%{box-shadow:0 0 0 rgba(57,255,20,0);}50%{box-shadow:0 0 30px rgba(57,255,20,.3);}100%{box-shadow:0 0 8px rgba(57,255,20,.1);}}
 @keyframes shake{0%,100%{transform:none;}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(3px);}}
 
-.ev-accent{
-  font-family:'Share Tech Mono',monospace;font-size:10px;
-  letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;
-  display:flex;align-items:center;gap:8px;
-}
+.ev-accent{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .ev-accent::before{content:'';flex:1;height:1px;}
-.ev-crisis   .ev-accent{color:var(--bad);}
-.ev-crisis   .ev-accent::before{background:rgba(255,34,68,.3);}
+.ev-crisis .ev-accent{color:var(--bad);}
+.ev-crisis .ev-accent::before{background:rgba(255,34,68,.3);}
 .ev-opportunity .ev-accent{color:var(--good);}
 .ev-opportunity .ev-accent::before{background:rgba(57,255,20,.3);}
-.ev-neutral  .ev-accent{color:var(--warn);}
-.ev-neutral  .ev-accent::before{background:rgba(255,170,0,.3);}
+.ev-neutral .ev-accent{color:var(--warn);}
+.ev-neutral .ev-accent::before{background:rgba(255,170,0,.3);}
 .ev-random-crisis .ev-accent{color:var(--bad);}
 .ev-random-crisis .ev-accent::before{background:rgba(255,34,68,.4);}
-.ev-random-opp  .ev-accent{color:var(--good);}
-.ev-random-opp  .ev-accent::before{background:rgba(57,255,20,.4);}
+.ev-random-opp .ev-accent{color:var(--good);}
+.ev-random-opp .ev-accent::before{background:rgba(57,255,20,.4);}
 
-.ev-icon{font-size:32px;margin-bottom:10px;display:block;}
-.ev-title{
-  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
-  color:var(--bright);margin-bottom:6px;line-height:1.2;
-}
-.ev-desc{font-size:13px;color:#9fc2e6;line-height:1.65;}
+.ev-icon{font-size:30px;margin-bottom:10px;display:block;}
+.ev-title{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:var(--bright);margin-bottom:6px;line-height:1.25;letter-spacing:.01em;}
+.ev-desc{font-size:14px;color:#9fc2e6;line-height:1.6;}
 
-/* ── RANDOM EVENT BANNER ── */
-.rand-banner{
-  display:flex;align-items:flex-start;gap:12px;
-  padding:12px 16px;border-radius:4px;margin-bottom:14px;
-  font-size:13px;font-weight:600;
-  animation:bannerIn .4s cubic-bezier(.16,1,.3,1) both;
-}
+/* RANDOM EVENT BANNER */
+.rand-banner{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:4px;margin-bottom:14px;font-size:14px;font-weight:600;animation:bannerIn .4s cubic-bezier(.16,1,.3,1) both;}
 @keyframes bannerIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
 .rand-banner.rb-bad{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.3);color:var(--bad);}
 .rand-banner.rb-good{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--good);}
 .rand-banner .rb-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-.rb-hp-tag{
-  display:inline-block;
-  font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;
-  padding:2px 8px;border-radius:3px;margin-top:4px;
-}
+.rb-hp-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;padding:2px 8px;border-radius:2px;margin-top:4px;}
 .rb-hp-neg{background:rgba(255,34,68,.15);color:var(--bad);border:1px solid rgba(255,34,68,.3);}
 .rb-hp-pos{background:rgba(57,255,20,.12);color:var(--good);border:1px solid rgba(57,255,20,.3);}
 
@@ -424,9 +335,9 @@ body::after{
 .choices{display:flex;flex-direction:column;gap:10px;}
 .choice-btn{
   background:var(--card);border:1px solid var(--border);
-  border-radius:5px;padding:16px 18px;cursor:pointer;
+  border-radius:4px;padding:16px 18px;cursor:pointer;
   text-align:left;color:var(--text);
-  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
   display:flex;align-items:center;gap:14px;
   transition:all .2s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
   animation:choiceIn .4s both;
@@ -434,31 +345,23 @@ body::after{
 .choice-btn:nth-child(1){animation-delay:.05s;}
 .choice-btn:nth-child(2){animation-delay:.12s;}
 .choice-btn:nth-child(3){animation-delay:.19s;}
+.choice-btn:nth-child(4){animation-delay:.26s;}
 @keyframes choiceIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:none;}}
-
-.choice-btn::after{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:0;
-  background:linear-gradient(90deg,rgba(0,229,255,.08),transparent);
-  transition:width .3s;
-}
-.choice-btn:hover{border-color:rgba(0,229,255,.3);transform:translateX(5px);}
+.choice-btn::after{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(0,229,255,.08),transparent);transition:width .3s;}
+.choice-btn:hover{border-color:rgba(0,229,255,.35);transform:translateX(5px);}
 .choice-btn:hover::after{width:100%;}
 .choice-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-
 .c-icon{font-size:22px;flex-shrink:0;z-index:1;}
 .c-body{flex:1;z-index:1;}
-.c-text{display:block;margin-bottom:2px;}
-.c-hint{font-size:11px;color:#8fb3d9;font-weight:400;}
+.c-text{display:block;margin-bottom:2px;font-size:15px;}
+.c-hint{font-size:12px;color:#8fb3d9;font-weight:400;}
 .c-costs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
-.c-cost{
-  font-family:'Share Tech Mono',monospace;font-size:10px;
-  padding:2px 7px;border-radius:2px;border:1px solid;
-}
-.cost-hp-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.06);}
-.cost-hp-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.06);}
-.cost-inc-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.06);}
-.cost-inc-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.06);}
-.cost-adp{color:var(--warn);border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.06);}
+.c-cost{font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid;}
+.cost-hp-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.07);}
+.cost-hp-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.07);}
+.cost-inc-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.07);}
+.cost-inc-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.07);}
+.cost-adp{color:var(--warn);border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.07);}
 .c-arrow{color:var(--muted);font-size:16px;z-index:1;transition:transform .2s;}
 .choice-btn:hover .c-arrow{transform:translateX(3px);color:var(--hp);}
 
@@ -469,222 +372,158 @@ body::after{
   position:fixed;pointer-events:none;z-index:9999;
   font-family:'Share Tech Mono',monospace;font-weight:bold;
   animation:floatUp .95s cubic-bezier(.16,1,.3,1) both;
-  text-shadow:0 2px 10px rgba(0,0,0,.7);
+  text-shadow:0 2px 10px rgba(0,0,0,.8);
   white-space:nowrap;
 }
-.float-num.fhp{font-size:28px;}   /* HP floats are bigger */
-.float-num.fstat{font-size:18px;} /* stat floats smaller  */
+.float-num.fhp{font-size:26px;}
+.float-num.fstat{font-size:16px;}
 @keyframes floatUp{
   0%{opacity:1;transform:translateY(0) scale(1);}
-  25%{transform:translateY(-18px) scale(1.25);}
-  100%{opacity:0;transform:translateY(-70px) scale(.8);}
+  25%{transform:translateY(-18px) scale(1.2);}
+  100%{opacity:0;transform:translateY(-65px) scale(.8);}
 }
 
 /* ═══════════════════════════════════════
    SCREEN FLASH
 ═══════════════════════════════════════ */
-.screen-flash{
-  position:fixed;inset:0;z-index:1000;pointer-events:none;
-  animation:flash .4s ease-out both;
-}
+.screen-flash{position:fixed;inset:0;z-index:1000;pointer-events:none;animation:flash .4s ease-out both;}
 @keyframes flash{0%{opacity:.6;}100%{opacity:0;}}
 
 /* ═══════════════════════════════════════
    GAME OVER SCREEN
 ═══════════════════════════════════════ */
 #screen-gameover{text-align:center;padding:40px 20px;}
-
-.go-skull{
-  font-size:90px;margin-bottom:20px;display:block;
-  animation:skullIn .9s cubic-bezier(.16,1,.3,1) both;
-  filter:drop-shadow(0 0 30px rgba(255,34,68,.5));
-}
-@keyframes skullIn{
-  0%{transform:scale(0) rotate(-20deg);opacity:0;}
-  65%{transform:scale(1.15) rotate(6deg);}
-  82%{transform:scale(.95) rotate(-2deg);}
-  100%{transform:scale(1) rotate(0);opacity:1;}
-}
-
-.go-title{
-  font-family:'Rajdhani',sans-serif;font-size:clamp(40px,9vw,64px);font-weight:700;
-  color:var(--bad);letter-spacing:-.02em;margin-bottom:6px;
-  text-shadow:0 0 50px rgba(255,34,68,.7),0 0 100px rgba(255,34,68,.3);
-  animation:goBlink 2s .8s infinite;
-}
+.go-skull{font-size:88px;margin-bottom:20px;display:block;animation:skullIn .9s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 0 30px rgba(255,34,68,.5));}
+@keyframes skullIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}65%{transform:scale(1.15) rotate(6deg);}82%{transform:scale(.95) rotate(-2deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.go-title{font-family:'Orbitron',sans-serif;font-size:clamp(36px,8vw,58px);font-weight:900;color:var(--bad);letter-spacing:.02em;margin-bottom:8px;text-shadow:0 0 50px rgba(255,34,68,.7),0 0 100px rgba(255,34,68,.3);animation:goBlink 2s .8s infinite;}
 @keyframes goBlink{0%,100%{opacity:1;}50%{opacity:.75;}}
-
-.go-replaced{
-  font-family:'Share Tech Mono',monospace;font-size:13px;
-  color:var(--muted);letter-spacing:.2em;text-transform:uppercase;
-  margin-bottom:28px;animation:screenIn .5s .4s both;
-}
-
-.go-epitaph{
-  background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);
-  border-radius:6px;padding:20px 24px;margin:0 auto 32px;max-width:460px;
-  font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,34,68,.8);
-  line-height:1.8;font-style:italic;
-  animation:screenIn .5s .5s both;
-}
-
-.go-stats-row{
-  display:flex;gap:12px;justify-content:center;margin-bottom:32px;
-  flex-wrap:wrap;animation:screenIn .5s .55s both;
-}
-.go-stat{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:4px;padding:10px 18px;text-align:center;
-}
-.go-stat .gsv{
-  font-family:'Share Tech Mono',monospace;font-size:20px;
-  display:block;color:var(--bad);margin-bottom:3px;
-}
-.go-stat .gsl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
-
-.go-btns{
-  display:flex;flex-direction:column;gap:10px;
-  max-width:340px;margin:0 auto;
-  animation:screenIn .5s .65s both;
-}
-.go-try-again{
-  background:var(--bad);color:#04070d;border:none;border-radius:4px;
-  padding:16px;width:100%;
-  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
-  cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase;
-  box-shadow:0 0 24px rgba(255,34,68,.35);
-}
-.go-try-again:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,34,68,.5);}
-.go-change-role{
-  background:transparent;color:var(--muted);border:1px solid var(--border);
-  border-radius:4px;padding:13px;width:100%;
-  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .2s;
-}
-.go-change-role:hover{color:var(--text);border-color:var(--border2);}
+.go-replaced{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:.22em;text-transform:uppercase;margin-bottom:28px;animation:screenIn .5s .4s both;}
+.go-epitaph{background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);border-radius:4px;padding:20px 24px;margin:0 auto 30px;max-width:460px;font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,34,68,.85);line-height:1.8;font-style:italic;animation:screenIn .5s .5s both;}
+.go-stats-row{display:flex;gap:12px;justify-content:center;margin-bottom:30px;flex-wrap:wrap;animation:screenIn .5s .55s both;}
+.go-stat{background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:10px 18px;text-align:center;}
+.go-stat .gsv{font-family:'Share Tech Mono',monospace;font-size:20px;display:block;color:var(--bad);margin-bottom:3px;}
+.go-stat .gsl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.go-btns{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;animation:screenIn .5s .65s both;}
+.go-try-again{background:var(--bad);color:#04070d;border:none;border-radius:3px;padding:15px;width:100%;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 22px rgba(255,34,68,.38);}
+.go-try-again:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(255,34,68,.55);}
+.go-change-role{background:rgba(8,13,20,.9);color:var(--muted);border:1px solid rgba(0,229,255,.22);border-radius:3px;padding:12px;width:100%;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.go-change-role:hover{color:#00e5ff;border-color:rgba(0,229,255,.5);}
 
 /* ═══════════════════════════════════════
    RESULTS SCREEN
 ═══════════════════════════════════════ */
 #screen-result{padding:4px 0 40px;}
-
 .result-header{text-align:center;padding:32px 20px 28px;position:relative;}
-
 .ring-wrap{width:180px;height:180px;margin:0 auto 20px;position:relative;}
 .ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:var(--border2);stroke-width:10;}
 .ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);}
-.ring-center{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .ring-score{font-family:'Share Tech Mono',monospace;font-size:38px;font-weight:bold;line-height:1;}
-.ring-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;}
-
-.ending-badge{
-  display:inline-block;padding:8px 28px;border-radius:3px;
-  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;
-}
+.ring-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:4px;}
+.ending-badge{display:inline-block;padding:8px 28px;border-radius:3px;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
 .end-replaced{background:rgba(255,34,68,.12);color:var(--bad);border:1px solid rgba(255,34,68,.3);box-shadow:var(--glow-bad);}
 .end-surviving{background:rgba(255,170,0,.12);color:var(--warn);border:1px solid rgba(255,170,0,.3);box-shadow:0 0 20px rgba(255,170,0,.3);}
 .end-thriving{background:rgba(57,255,20,.1);color:var(--good);border:1px solid rgba(57,255,20,.3);box-shadow:var(--glow-good);}
-
-.result-title{
-  font-family:'Rajdhani',sans-serif;font-size:clamp(26px,5vw,38px);
-  font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:-.01em;
-}
+.result-title{font-family:'Orbitron',sans-serif;font-size:clamp(20px,4vw,30px);font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
 .result-expl{font-size:14px;color:#9fc2e6;max-width:500px;margin:0 auto;line-height:1.75;}
-
-.final-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-  margin:24px 0;
-}
-.fs-card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:6px;padding:16px;text-align:center;
-}
+.final-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0;}
+.fs-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center;}
 .fs-val{font-family:'Share Tech Mono',monospace;font-size:28px;display:block;margin-bottom:4px;}
-.fs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
-
+.fs-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
 .divider{height:1px;background:var(--border);margin:24px 0;}
 
 /* ═══════════════════════════════════════
    MONETIZATION
 ═══════════════════════════════════════ */
-.mono-panel{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:8px;padding:26px;margin-bottom:16px;position:relative;overflow:hidden;
-}
-.mono-panel::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--hp),var(--good),var(--warn));
-}
-.mono-panel-title{
-  font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;
-  color:var(--bright);margin-bottom:4px;
-}
+.mono-panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
+.mono-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--hp),var(--good),var(--warn));}
+.mono-panel-title{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--bright);margin-bottom:4px;letter-spacing:.02em;}
 .mono-panel-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
-
 .strat-list{display:flex;flex-direction:column;gap:10px;}
-.strat-item{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:6px;padding:14px 16px;display:flex;
-  align-items:center;gap:14px;position:relative;overflow:hidden;
-}
+.strat-item{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
 .strat-item.s-unlocked{border-color:rgba(0,229,255,.2);}
 .strat-item.s-locked .strat-body{filter:blur(5px);user-select:none;}
-.strat-item.s-locked::after{
-  content:'🔒  Locked — Unlock to reveal';
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  background:rgba(8,13,20,.75);backdrop-filter:blur(2px);
-  font-size:13px;font-weight:700;color:var(--muted);border-radius:5px;
-}
-.strat-num{
-  width:34px;height:34px;border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:bold;flex-shrink:0;
-}
+.strat-item.s-locked::after{content:'🔒  Locked — Unlock to reveal';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,13,20,.78);backdrop-filter:blur(2px);font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:700;color:var(--muted);border-radius:3px;}
+.strat-num{width:34px;height:34px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:bold;flex-shrink:0;}
 .n1{background:rgba(0,229,255,.1);color:var(--hp);}
 .n2{background:rgba(57,255,20,.08);color:var(--good);}
 .n3{background:rgba(255,170,0,.1);color:var(--warn);}
-.strat-name{font-size:14px;font-weight:700;color:var(--bright);margin-bottom:3px;}
+.strat-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:var(--bright);margin-bottom:3px;letter-spacing:.02em;}
 .strat-desc{font-size:12px;color:var(--muted);line-height:1.4;}
-.strat-inc{
-  font-family:'Share Tech Mono',monospace;font-size:12px;
-  color:var(--good);margin-top:5px;
+.strat-inc{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--good);margin-top:5px;}
+.cta-panel{background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(57,255,20,.04));border:1px solid rgba(0,229,255,.2);border-radius:6px;padding:28px;text-align:center;}
+.cta-title{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
+.cta-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 22px;line-height:1.6;}
+.cta-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;}
+.cta-feat{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);}
+.cta-feat span{color:var(--hp);font-size:15px;}
+.cta-buy{background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;border:none;border-radius:3px;padding:18px 0;width:100%;font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:12px;}
+.cta-buy:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,.42);}
+.price-pill{background:rgba(0,0,0,.25);padding:4px 14px;border-radius:100px;font-size:14px;font-family:'Share Tech Mono',monospace;}
+.replay-btn{width:100%;background:rgba(8,13,20,.85);border:1px solid rgba(0,229,255,.2);color:var(--muted);border-radius:3px;padding:12px;margin-top:10px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.replay-btn:hover{border-color:rgba(0,229,255,.45);color:#00e5ff;}
+
+/* ═══════════════════════════════════════
+   MINI-GAME SCREEN
+═══════════════════════════════════════ */
+#screen-minigame{padding-bottom:20px;}
+
+/* Mini-game intro header */
+.mg-header{
+  text-align:center;
+  padding:10px 0 22px;
+}
+.mg-header .section-tag{margin-bottom:10px;}
+.mg-header h2{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(26px,6vw,44px);
+  font-weight:900;
+  color:var(--hp);
+  text-shadow:0 0 28px rgba(0,229,255,.55),0 0 60px rgba(0,229,255,.2);
+  letter-spacing:.05em;
+  margin-bottom:8px;
+}
+.mg-header p{
+  font-size:15px;color:#8fb3d9;line-height:1.6;
+  font-family:'Barlow Condensed',sans-serif;font-weight:400;
 }
 
-.cta-panel{
-  background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(57,255,20,.04));
-  border:1px solid rgba(0,229,255,.2);border-radius:8px;
-  padding:28px;text-align:center;
+/* Mini HUD (above canvas) */
+.mg-hud{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--panel);border:1px solid var(--border);
+  border-bottom:none;border-radius:5px 5px 0 0;
+  padding:10px 16px;
 }
-.cta-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--bright);margin-bottom:8px;}
-.cta-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 22px;line-height:1.65;}
-.cta-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;}
-.cta-feat{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
-.cta-feat span{color:var(--hp);font-size:15px;}
-.cta-buy{
-  background:linear-gradient(135deg,var(--hp),#0099cc);
-  color:#04070d;border:none;border-radius:4px;
-  padding:18px 0;width:100%;
-  font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;
-  cursor:pointer;transition:all .2s;letter-spacing:.05em;
-  display:flex;align-items:center;justify-content:center;gap:12px;
+.mg-hud-stat{text-align:center;}
+.mg-hud-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:2px;}
+.mg-hud-val{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:bold;display:block;}
+.mg-hp-wrap{flex:1;max-width:260px;}
+.mg-hp-track{height:8px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:4px;}
+.mg-hp-fill{height:100%;border-radius:2px;transition:width .35s cubic-bezier(.16,1,.3,1);}
+
+/* Canvas — responsive, fills container */
+#miniCanvas{
+  display:block;
+  width:100%;
+  max-width:700px;
+  border:1px solid var(--border);
+  border-radius:0 0 5px 5px;
+  cursor:pointer;
+  touch-action:manipulation;
 }
-.cta-buy:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,.4);}
-.price-pill{
-  background:rgba(0,0,0,.25);padding:4px 14px;
-  border-radius:100px;font-size:15px;
+
+/* Score/HP text row below canvas */
+.mg-info-row{
+  display:none; /* hidden — we use in-canvas HUD instead */
 }
-.replay-btn{
-  width:100%;background:transparent;border:1px solid var(--border);
-  color:var(--muted);border-radius:4px;padding:12px;margin-top:10px;
-  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .2s;
+
+/* Continue button */
+.mg-continue-wrap{
+  margin-top:18px;
+  text-align:center;
 }
-.replay-btn:hover{border-color:var(--border2);color:var(--text);}
 
 /* ═══════════════════════════════════════
    RESPONSIVE
@@ -695,9 +534,8 @@ body::after{
   .hud-stats{gap:6px;}
   .hud{gap:10px;}
   .go-stats-row{gap:8px;}
+  .mg-hud{flex-wrap:wrap;gap:8px;}
 }
-
-#home-btn{display:none !important;}  
 </style>
 </head>
 <body>
@@ -705,17 +543,22 @@ body::after{
 <canvas id="bg-canvas"></canvas>
 <div class="vignette"></div>
 
-<!-- ══════════ HOME BUTTON ══════════ -->
-<button id="home-btn" onclick="requestHome()">
-  <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M1 6L6 1L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M2.5 4.5V10.5H9.5V4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="4.5" y="7" width="3" height="3.5" rx=".5" fill="currentColor" opacity=".5"/>
-  </svg>
-  HOME
-</button>
+<!-- ══ GLOBAL NAV — top-right, hidden on intro ══ -->
+<div id="nav-overlay">
+  <button class="nav-pill" id="nav-back-btn" onclick="goBack()">
+    <svg viewBox="0 0 10 10" fill="none"><path d="M7 2L3 5L7 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    BACK
+  </button>
+  <button class="nav-pill" onclick="requestHome()">
+    <svg viewBox="0 0 10 10" fill="none"><path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 4.5V9h6V4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    HOME
+  </button>
+</div>
 
-<!-- ══════════ HOME CONFIRM MODAL ══════════ -->
+<!-- keep old home-btn in DOM but hide it (JS references it) -->
+<button id="home-btn" style="display:none!important;" onclick="requestHome()"></button>
+
+<!-- HOME CONFIRM MODAL -->
 <div id="home-modal">
   <div class="modal-box">
     <span class="modal-icon">⚠️</span>
@@ -732,10 +575,6 @@ body::after{
 
   <!-- ══════════ INTRO ══════════ -->
   <div id="screen-intro" class="screen active">
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-    </div>
     <div class="intro-wrap">
       <div class="intro-eyebrow"><i></i> 2026 Career Simulation</div>
       <h1 class="intro-title">
@@ -758,11 +597,6 @@ body::after{
 
   <!-- ══════════ ROLE SELECT ══════════ -->
   <div id="screen-role" class="screen">
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-      <button onclick="goBack()" class="nav-btn">Back</button>
-    </div>
     <div class="section-tag">// Step 01 — Identity</div>
     <div class="screen-title">Choose Your Role</div>
     <div class="screen-sub">Your career identity sets your starting stats and risk profile.</div>
@@ -772,11 +606,6 @@ body::after{
 
   <!-- ══════════ GAME ══════════ -->
   <div id="screen-game" class="screen">
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-      <button onclick="goBack()" class="nav-btn">Back</button>
-    </div>
     <div class="hud" id="hud">
       <div class="hp-section hp-high" id="hp-section">
         <div class="hp-label">
@@ -804,11 +633,6 @@ body::after{
 
   <!-- ══════════ GAME OVER ══════════ -->
   <div id="screen-gameover" class="screen">
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-      <button onclick="goBack()" class="nav-btn">Back</button>
-    </div>
     <span class="go-skull">💀</span>
     <div class="go-title">GAME OVER</div>
     <div class="go-replaced">// You were replaced by AI</div>
@@ -820,76 +644,76 @@ body::after{
     </div>
   </div>
 
+  <!-- ══════════ MINI-GAME ══════════ -->
   <div id="screen-minigame" class="screen">
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-      <button onclick="goBack()" class="nav-btn">Back</button>
+    <!-- Header -->
+    <div class="mg-header">
+      <div class="section-tag">// Mini Game — Phase 01</div>
+      <h2>AI SKILL RUSH</h2>
+      <p>
+        Jump to collect AI tools. Avoid outdated skills.<br>
+        <strong style="color:var(--bright)">SPACE</strong> or <strong style="color:var(--bright)">TAP</strong> to jump &nbsp;·&nbsp; Double-jump supported
+      </p>
     </div>
-  <div class="section-tag">// Mini Game</div>
 
-  <h2 style="color:#00e5ff;">AI SKILL RUSH</h2>
+    <!-- In-canvas HUD -->
+    <div class="mg-hud">
+      <div class="mg-hud-stat">
+        <span class="mg-hud-lbl">Score</span>
+        <span class="mg-hud-val" id="miniScore" style="color:var(--good)">0</span>
+      </div>
+      <div class="mg-hp-wrap">
+        <div style="display:flex;justify-content:space-between;">
+          <span class="mg-hud-lbl">Skill HP</span>
+          <span class="mg-hud-lbl" id="miniHP" style="color:var(--hp)">100</span>
+        </div>
+        <div class="mg-hp-track">
+          <div class="mg-hp-fill" id="mg-hp-fill" style="width:100%;background:linear-gradient(90deg,#00b4cc,#00e5ff);box-shadow:0 0 8px rgba(0,229,255,.4);"></div>
+        </div>
+      </div>
+      <div class="mg-hud-stat">
+        <span class="mg-hud-lbl">Time</span>
+        <span class="mg-hud-val" id="mg-time" style="color:var(--warn)">30</span>
+      </div>
+    </div>
 
-  <p style="color:#aaa;font-size:14px;">
-    Jump to collect AI tools. Avoid obsolete skills.<br>
-    Press SPACE or TAP to jump.
-  </p>
+    <canvas id="miniCanvas"></canvas>
 
-  <canvas id="miniCanvas" width="400" height="600"></canvas>
-
-  <div style="margin-top:10px;">
-    <span id="miniScore">Score: 0</span>
-    &nbsp; | &nbsp;
-    <span id="miniHP">HP: 100</span>
+    <div class="mg-continue-wrap">
+      <button onclick="startMainGame()" class="btn btn-primary">
+        Skip &amp; Continue →
+      </button>
+    </div>
   </div>
 
-  <button onclick="startMainGame()" class="btn btn-primary" style="margin-top:20px;">
-    Continue →
-  </button>
-</div>
-  
   <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen">
-
-  <div class="nav-bar">
-    <button onclick="goHome()" class="nav-btn">Home</button>
-    <button onclick="goBack()" class="nav-btn">Back</button>
-  </div>
-
-  <div class="screen-title">Your AI Survival Result</div>
-
-  <div id="strategy-list"></div>
-
-  <!-- 🔥 Stripe CTA -->
-  <div class="cta-panel">
-
-    <div class="cta-title">Unlock Your AI Survival Strategy</div>
-
-    <div class="cta-sub">
-      See exactly how to adapt, earn, and stay ahead in the AI economy.
+    <div class="screen-title">Your AI Survival Result</div>
+    <div id="strategy-list"></div>
+    <div class="cta-panel">
+      <div class="cta-title">Unlock Your AI Survival Strategy</div>
+      <div class="cta-sub">See exactly how to adapt, earn, and stay ahead in the AI economy.</div>
+      <div class="cta-feats">
+        <div class="cta-feat"><span>✓</span> Personalized strategy</div>
+        <div class="cta-feat"><span>✓</span> Income paths</div>
+        <div class="cta-feat"><span>✓</span> Next steps</div>
+      </div>
+      <a href="https://buy.stripe.com/XXXX" target="_blank">
+        <button class="cta-buy">
+          Unlock Full AI Strategy
+          <span class="price-pill">$5</span>
+        </button>
+      </a>
     </div>
-
-    <div class="cta-feats">
-      <div class="cta-feat"><span>✓</span> Personalized strategy</div>
-      <div class="cta-feat"><span>✓</span> Income paths</div>
-      <div class="cta-feat"><span>✓</span> Next steps</div>
-    </div>
-
-    <a href="https://buy.stripe.com/XXXX" target="_blank">
-      <button class="cta-buy">
-        Unlock Full AI Strategy
-        <span class="price-pill">$5</span>
-      </button>
-    </a>
-
   </div>
 
 </div>
 
+<div style="text-align:center;font-size:11px;color:#4a6080;margin-top:40px;font-family:'Share Tech Mono',monospace;letter-spacing:.05em;">
+  <a href="terms.html" style="color:#4a6080;text-decoration:none;">Terms</a>
+  &nbsp;|&nbsp;
+  <a href="privacy.html" style="color:#4a6080;text-decoration:none;">Privacy</a>
 </div>
-
-
-
 
 <script>
 // ════════════════════════════════════════════
@@ -949,137 +773,58 @@ const ROLES=[
 
 const TURNS=[
   {
-  ev:{
-    type:'neutral',
-    icon:'📊',
-    title:'AI Tools Flood Your Industry',
-    desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly replacing manual workflows. Some teams are already 2x faster. You can feel it. If you don’t adapt now, you may not catch up.'
-  },
+  ev:{type:'neutral',icon:'📊',title:'AI Tools Flood Your Industry',
+    desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly replacing manual workflows. Some teams are already 2x faster. You can feel it. If you don\'t adapt now, you may not catch up.'},
   choices:[
-    {
-      icon:'🎓',
-      text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',
-      hint:'Invest time to understand workflows and prompting',
-      costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}
-    },
-    {
-      icon:'💼',
-      text:'Ignore AI and continue current workflow',
-      hint:'Assume your role will remain stable',
-      costs:{hp:-15,income:0,adaptability:-12,resistance:+18}
-    },
-    {
-      icon:'🚀',
-      text:'Build a small AI-driven side project',
-      hint:'Launch something using APIs or tools like Cursor',
-      costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}
-    },
-    {
-      icon:'🎨',
-      text:'Experiment with creative AI tools',
-      hint:'Use Midjourney or similar tools for new output',
-      costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}
-    }
-  ]
-  },
-  {
-    ev:{type:'crisis',icon:'⚡',
-      title:'Company-Wide Layoffs Announced',
-      desc:'15% of staff will be cut. Managers are looking for reasons to keep or cut you. AI-literate employees are the obvious survivors.'},
-    choices:[
-      {icon:'🤖',text:'Volunteer to lead AI transition',hint:'Become the team\'s AI champion',
-       costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
-      {icon:'🤫',text:'Keep your head down',hint:'Stay invisible and hope for the best',
-       costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
-      {icon:'📝',text:'Polish résumé & start networking',hint:'Prepare a safety net while you can',
-       costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
-    ]
-  },
-  {
-    ev:{type:'opportunity',icon:'💡',
-      title:'AI Workers Get 40% Raises',
-      desc:'Your colleague who mastered Cursor just got promoted and a $20k raise. The gap between AI-fluent and AI-ignorant is widening fast.'},
-    choices:[
-      {icon:'📚',text:'Deep-dive into AI prompting',hint:'Spend weekends on advanced techniques',
-       costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
-      {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3x with AI-assisted output',
-       costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
-      {icon:'😴',text:'Ignore it — wait and see',hint:'Maybe the market corrects itself',
-       costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
-    ]
-  },
-  {
-    ev:{type:'crisis',icon:'🤖',
-      title:'AI Replaces 40% of Your Job',
-      desc:'A new model just automated the core of what you do. HR is "reviewing role structures." You have a week to adapt or become redundant.'},
-    choices:[
-      {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Become the human-in-the-loop they need',
-       costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
-      {icon:'🆕',text:'Rapidly reskill into new area',hint:'AI-proof niche skills are rising fast',
-       costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
-      {icon:'😤',text:'Fight automation, file complaints',hint:'Resist the change and push back hard',
-       costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
-    ]
-  },
-  {
-    ev:{type:'opportunity',icon:'🌐',
-      title:'New AI Income Streams Emerge',
-      desc:'Prompt engineering, AI consulting, and synthetic content creation are now $100k+ careers. The gap between movers and waiters is now a chasm.'},
-    choices:[
-      {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, or AI micro-SaaS',
-       costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
-      {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work from frontier companies',
-       costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
-      {icon:'⏳',text:'Wait for the market to stabilize',hint:'Too risky right now',
-       costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
-    ]
-  },
-  {
-    ev:{type:'neutral',icon:'🏆',
-      title:'FINAL TEST: The AI-First Economy',
-      desc:'It\'s 2027. Every job posting requires AI fluency. Every company runs on LLMs. This is your defining moment — how do you position yourself?'},
-    choices:[
-      {icon:'🎯',text:'Launch your AI-powered personal brand',hint:'Become a recognized AI expert in your field',
-       costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
-      {icon:'🔧',text:'Specialize as an AI integration expert',hint:'Companies pay huge to be "AI-fixed"',
-       costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
-      {icon:'🏳️',text:'Accept defeat — let AI take over',hint:'Surrender and coast on basic income',
-       costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
-    ]
-  },
+    {icon:'🎓',text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',hint:'Invest time to understand workflows and prompting',costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}},
+    {icon:'💼',text:'Ignore AI and continue current workflow',hint:'Assume your role will remain stable',costs:{hp:-15,income:0,adaptability:-12,resistance:+18}},
+    {icon:'🚀',text:'Build a small AI-driven side project',hint:'Launch something using APIs or tools like Cursor',costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}},
+    {icon:'🎨',text:'Experiment with creative AI tools',hint:'Use Midjourney or similar tools for new output',costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}}
+  ]},
+  {ev:{type:'crisis',icon:'⚡',title:'Company-Wide Layoffs Announced',desc:'15% of staff will be cut. Managers are looking for reasons to keep or cut you. AI-literate employees are the obvious survivors.'},
+   choices:[
+    {icon:'🤖',text:'Volunteer to lead AI transition',hint:'Become the team\'s AI champion',costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
+    {icon:'🤫',text:'Keep your head down',hint:'Stay invisible and hope for the best',costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
+    {icon:'📝',text:'Polish résumé & start networking',hint:'Prepare a safety net while you can',costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
+  ]},
+  {ev:{type:'opportunity',icon:'💡',title:'AI Workers Get 40% Raises',desc:'Your colleague who mastered Cursor just got promoted and a $20k raise. The gap between AI-fluent and AI-ignorant is widening fast.'},
+   choices:[
+    {icon:'📚',text:'Deep-dive into AI prompting',hint:'Spend weekends on advanced techniques',costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
+    {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3x with AI-assisted output',costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
+    {icon:'😴',text:'Ignore it — wait and see',hint:'Maybe the market corrects itself',costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
+  ]},
+  {ev:{type:'crisis',icon:'🤖',title:'AI Replaces 40% of Your Job',desc:'A new model just automated the core of what you do. HR is "reviewing role structures." You have a week to adapt or become redundant.'},
+   choices:[
+    {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Become the human-in-the-loop they need',costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
+    {icon:'🆕',text:'Rapidly reskill into new area',hint:'AI-proof niche skills are rising fast',costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
+    {icon:'😤',text:'Fight automation, file complaints',hint:'Resist the change and push back hard',costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
+  ]},
+  {ev:{type:'opportunity',icon:'🌐',title:'New AI Income Streams Emerge',desc:'Prompt engineering, AI consulting, and synthetic content creation are now $100k+ careers. The gap between movers and waiters is now a chasm.'},
+   choices:[
+    {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, or AI micro-SaaS',costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
+    {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work from frontier companies',costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
+    {icon:'⏳',text:'Wait for the market to stabilize',hint:'Too risky right now',costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
+  ]},
+  {ev:{type:'neutral',icon:'🏆',title:'FINAL TEST: The AI-First Economy',desc:'It\'s 2027. Every job posting requires AI fluency. Every company runs on LLMs. This is your defining moment — how do you position yourself?'},
+   choices:[
+    {icon:'🎯',text:'Launch your AI-powered personal brand',hint:'Become a recognized AI expert in your field',costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
+    {icon:'🔧',text:'Specialize as an AI integration expert',hint:'Companies pay huge to be "AI-fixed"',costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
+    {icon:'🏳️',text:'Accept defeat — let AI take over',hint:'Surrender and coast on basic income',costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
+  ]},
 ];
 
-// ── RANDOM EVENTS: exactly 20% negative, 20% positive per check ──
-// Each turn we roll once for negative (20% chance) and once for positive (20% chance).
-// At most one fires per turn (negative takes priority if both roll).
 const RANDOM_NEGATIVE=[
-  {icon:'📉',title:'MARKET CRASH: Mass industry layoffs hit overnight',
-   desc:'10,000 jobs cut in your sector. Confidence in your field collapses.',
-   hpDelta:-25},
-  {icon:'🦠',title:'CRISIS: Your main income source vanishes',
-   desc:'Without warning, your largest client or employer disappears.',
-   hpDelta:-20},
-  {icon:'⚠️',title:'DISRUPTION: A new AI model made your skill obsolete',
-   desc:'GPT-Next just learned to do what took you years to master.',
-   hpDelta:-15},
-  {icon:'💸',title:'SETBACK: Unexpected expenses drain your runway',
-   desc:'Emergency costs hit hard. Your ability to invest in growth is cut.',
-   hpDelta:-20},
+  {icon:'📉',title:'MARKET CRASH: Mass industry layoffs hit overnight',desc:'10,000 jobs cut in your sector. Confidence in your field collapses.',hpDelta:-25},
+  {icon:'🦠',title:'CRISIS: Your main income source vanishes',desc:'Without warning, your largest client or employer disappears.',hpDelta:-20},
+  {icon:'⚠️',title:'DISRUPTION: A new AI model made your skill obsolete',desc:'GPT-Next just learned to do what took you years to master.',hpDelta:-15},
+  {icon:'💸',title:'SETBACK: Unexpected expenses drain your runway',desc:'Emergency costs hit hard. Your ability to invest in growth is cut.',hpDelta:-20},
 ];
 
 const RANDOM_POSITIVE=[
-  {icon:'🌟',title:'VIRAL: Your AI demo blows up online',
-   desc:'A post you shared explodes. Inbound opportunities flood in.',
-   hpDelta:+15},
-  {icon:'💼',title:'OPPORTUNITY: Premium contract offer arrives',
-   desc:'An AI-first company wants your skills. Top-tier rates.',
-   hpDelta:+15},
-  {icon:'🎓',title:'LUCK: Free AI bootcamp scholarship awarded',
-   desc:'You\'re accepted to an elite 2-week AI intensive — at no cost.',
-   hpDelta:+20},
-  {icon:'🤝',title:'NETWORK: A mentor connects you to top AI firms',
-   desc:'A chance encounter opens three high-value doors.',
-   hpDelta:+15},
+  {icon:'🌟',title:'VIRAL: Your AI demo blows up online',desc:'A post you shared explodes. Inbound opportunities flood in.',hpDelta:+15},
+  {icon:'💼',title:'OPPORTUNITY: Premium contract offer arrives',desc:'An AI-first company wants your skills. Top-tier rates.',hpDelta:+15},
+  {icon:'🎓',title:'LUCK: Free AI bootcamp scholarship awarded',desc:'You\'re accepted to an elite 2-week AI intensive — at no cost.',hpDelta:+20},
+  {icon:'🤝',title:'NETWORK: A mentor connects you to top AI firms',desc:'A chance encounter opens three high-value doors.',hpDelta:+15},
 ];
 
 const EPITAPHS=[
@@ -1092,75 +837,55 @@ const EPITAPHS=[
 ];
 
 const STRATEGIES=[
-  {name:'AI-Enhanced Freelancing',
-   desc:'Use AI to deliver 10× faster, charge premium rates. Clients pay for results, not hours.',
-   income:'$4,000 – $12,000/mo',icon:'💼'},
-  {name:'Prompt Engineering & Consulting',
-   desc:'Train companies to use AI tools effectively. High demand, almost no certified competition yet.',
-   income:'$6,000 – $20,000/mo',icon:'🧠'},
-  {name:'AI Micro-SaaS / Digital Products',
-   desc:'Build and sell AI templates, agents, or tools with no-code platforms. Passive income at scale.',
-   income:'$2,000 – $50,000/mo',icon:'⚙️'},
+  {name:'AI-Enhanced Freelancing',desc:'Use AI to deliver 10× faster, charge premium rates. Clients pay for results, not hours.',income:'$4,000 – $12,000/mo',icon:'💼'},
+  {name:'Prompt Engineering & Consulting',desc:'Train companies to use AI tools effectively. High demand, almost no certified competition yet.',income:'$6,000 – $20,000/mo',icon:'🧠'},
+  {name:'AI Micro-SaaS / Digital Products',desc:'Build and sell AI templates, agents, or tools with no-code platforms. Passive income at scale.',income:'$2,000 – $50,000/mo',icon:'⚙️'},
 ];
 
 // ════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════
-let G={
-  role:null, turn:0, maxTurns:6,
-  hp:100, income:50, adaptability:50, resistance:50,
-  pendingRandEvent:null,  // set during renderTurn, applied on makeChoice
-};
+let G={role:null,turn:0,maxTurns:6,hp:100,income:50,adaptability:50,resistance:50,pendingRandEvent:null};
 
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
 
 // ════════════════════════════════════════════
-// HOME BUTTON LOGIC
+// NAV OVERLAY
 // ════════════════════════════════════════════
-function setHomeBtn(visible){
-  const btn=document.getElementById('home-btn');
-  if(visible) btn.classList.add('visible');
-  else btn.classList.remove('visible');
+function setNavVisible(visible,showBack){
+  const nav=document.getElementById('nav-overlay');
+  const backBtn=document.getElementById('nav-back-btn');
+  if(visible){nav.classList.add('visible');}else{nav.classList.remove('visible');}
+  if(backBtn) backBtn.style.display=showBack?'inline-flex':'none';
 }
+// keep setHomeBtn for compatibility
+function setHomeBtn(visible){setNavVisible(visible,screenHistory.length>0);}
 
 function requestHome(){
-  // On intro or role screen — just go, no confirm needed
   const activeId=[...document.querySelectorAll('.screen.active')].map(s=>s.id)[0];
   if(activeId==='screen-intro') return;
   if(activeId==='screen-role'){goHome();return;}
-  // During game / gameover / result — confirm first
   document.getElementById('home-modal').classList.add('open');
 }
-
-function confirmHome(){
-  document.getElementById('home-modal').classList.remove('open');
-  goHome();
-}
-
-function cancelHome(){
-  document.getElementById('home-modal').classList.remove('open');
-}
-
-/* goHome is defined later in the unified navigation block. */
+function confirmHome(){document.getElementById('home-modal').classList.remove('open');goHome();}
+function cancelHome(){document.getElementById('home-modal').classList.remove('open');}
 
 // ════════════════════════════════════════════
 // FLOATING NUMBERS
 // ════════════════════════════════════════════
-function spawnFloat(val, color, anchorEl, big){
+function spawnFloat(val,color,anchorEl,big){
   const rect=anchorEl.getBoundingClientRect();
   const el=document.createElement('div');
   el.className='float-num '+(big?'fhp':'fstat');
-  el.textContent=(val>0?'+':'')+val+' HP';
+  el.textContent=(val>0?'+':'')+val+(big?' HP':'');
   el.style.color=color;
-  // Randomise x slightly so multiple floats don't overlap
   const xOff=(Math.random()-.5)*40;
   el.style.left=(rect.left+rect.width/2-30+xOff)+'px';
   el.style.top=(rect.top)+'px';
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),1050);
 }
-
-function spawnStatFloat(val, label, color, anchorEl){
+function spawnStatFloat(val,label,color,anchorEl){
   const rect=anchorEl.getBoundingClientRect();
   const el=document.createElement('div');
   el.className='float-num fstat';
@@ -1172,13 +897,11 @@ function spawnStatFloat(val, label, color, anchorEl){
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),1000);
 }
-
 function screenFlash(type){
-  const fl=document.createElement('div');
-  fl.className='screen-flash';
-  if(type==='bad')   fl.style.background='rgba(255,34,68,.14)';
-  else if(type==='good') fl.style.background='rgba(57,255,20,.09)';
-  else               fl.style.background='rgba(0,229,255,.05)';
+  const fl=document.createElement('div');fl.className='screen-flash';
+  if(type==='bad')fl.style.background='rgba(255,34,68,.14)';
+  else if(type==='good')fl.style.background='rgba(57,255,20,.09)';
+  else fl.style.background='rgba(0,229,255,.05)';
   document.body.appendChild(fl);
   if(type==='bad'){
     const sg=document.getElementById('screen-game');
@@ -1188,9 +911,9 @@ function screenFlash(type){
 }
 
 // ════════════════════════════════════════════
-// HUD UPDATE — with floating numbers
+// HUD UPDATE
 // ════════════════════════════════════════════
-function updateHUD(oldHP, oldInc, oldAdp, oldRes){
+function updateHUD(oldHP,oldInc,oldAdp,oldRes){
   const hp=G.hp;
   const pct=clamp(hp,0,100);
   const fill=document.getElementById('hp-fill');
@@ -1199,34 +922,20 @@ function updateHUD(oldHP, oldInc, oldAdp, oldRes){
   fill.style.width=pct+'%';
   hpVal.textContent=hp;
   hpSec.className='hp-section '+(hp>55?'hp-high':hp>25?'hp-med':'hp-low');
-
   document.getElementById('stat-inc').textContent=clamp(G.income,0,100);
   document.getElementById('stat-adp').textContent=clamp(G.adaptability,0,100);
   document.getElementById('stat-res').textContent=clamp(G.resistance,0,100);
-
   const hpAnchor=hpVal;
   const incAnchor=document.getElementById('stat-inc');
   const adpAnchor=document.getElementById('stat-adp');
   const resAnchor=document.getElementById('stat-res');
-
-  const dHP=hp-oldHP;
-  const dInc=G.income-oldInc;
-  const dAdp=G.adaptability-oldAdp;
-  const dRes=G.resistance-oldRes;
-
-  if(dHP!==0) spawnFloat(dHP, dHP>0?'#00e5ff':'#ff2244', hpAnchor, true);
-  if(dInc!==0) spawnStatFloat(dInc,'INC', dInc>0?'#39ff14':'#ff2244', incAnchor);
-  if(dAdp!==0) spawnStatFloat(dAdp,'ADP', dAdp>0?'#ffaa00':'#ff6600', adpAnchor);
-  if(dRes!==0) spawnStatFloat(dRes,'RES', dRes>0?'#ff2244':'#39ff14', resAnchor);
-
-  // Turn pips
-  const pips=document.getElementById('turn-pips');
-  pips.innerHTML='';
-  for(let i=0;i<G.maxTurns;i++){
-    const d=document.createElement('div');
-    d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');
-    pips.appendChild(d);
-  }
+  const dHP=hp-oldHP,dInc=G.income-oldInc,dAdp=G.adaptability-oldAdp,dRes=G.resistance-oldRes;
+  if(dHP!==0)spawnFloat(dHP,dHP>0?'#00e5ff':'#ff2244',hpAnchor,true);
+  if(dInc!==0)spawnStatFloat(dInc,'INC',dInc>0?'#39ff14':'#ff2244',incAnchor);
+  if(dAdp!==0)spawnStatFloat(dAdp,'ADP',dAdp>0?'#ffaa00':'#ff6600',adpAnchor);
+  if(dRes!==0)spawnStatFloat(dRes,'RES',dRes>0?'#ff2244':'#39ff14',resAnchor);
+  const pips=document.getElementById('turn-pips');pips.innerHTML='';
+  for(let i=0;i<G.maxTurns;i++){const d=document.createElement('div');d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');pips.appendChild(d);}
   document.getElementById('turn-txt').textContent=`TURN ${G.turn+1} / ${G.maxTurns}`;
 }
 
@@ -1234,62 +943,33 @@ function updateHUD(oldHP, oldInc, oldAdp, oldRes){
 // ROLE SCREEN
 // ════════════════════════════════════════════
 function gotoRole(){
-  const grid=document.getElementById('role-grid');
-  grid.innerHTML='';
+  const grid=document.getElementById('role-grid');grid.innerHTML='';
   ROLES.forEach(r=>{
-    const card=document.createElement('div');
-    card.className='role-card';card.id='rc-'+r.id;
-    card.innerHTML=`
-      <span class="role-em">${r.emoji}</span>
-      <div class="role-name">${r.name}</div>
-      <div class="role-desc">${r.desc}</div>
-      <div class="role-stats">
-        <span class="rs-chip rs-hp">${r.chips[0]}</span>
-        <span class="rs-chip rs-inc">${r.chips[1]}</span>
-        <span class="rs-chip rs-adp">${r.chips[2]}</span>
-      </div>`;
-    card.onclick=()=>selectRole(r.id);
-    grid.appendChild(card);
+    const card=document.createElement('div');card.className='role-card';card.id='rc-'+r.id;
+    card.innerHTML=`<span class="role-em">${r.emoji}</span><div class="role-name">${r.name}</div><div class="role-desc">${r.desc}</div><div class="role-stats"><span class="rs-chip rs-hp">${r.chips[0]}</span><span class="rs-chip rs-inc">${r.chips[1]}</span><span class="rs-chip rs-adp">${r.chips[2]}</span></div>`;
+    card.onclick=()=>selectRole(r.id);grid.appendChild(card);
   });
-  document.getElementById('role-btn').disabled=true;
-  G.role=null;
-  setHomeBtn(true);
-  showScreen('screen-role');
+  document.getElementById('role-btn').disabled=true;G.role=null;
+  setHomeBtn(true);showScreen('screen-role');
 }
-
 function selectRole(id){
   document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
-  document.getElementById('rc-'+id).classList.add('sel');
-  G.role=id;
+  document.getElementById('rc-'+id).classList.add('sel');G.role=id;
   document.getElementById('role-btn').disabled=false;
 }
-
 function confirmRole(){
   if(!G.role)return;
   const r=ROLES.find(x=>x.id===G.role);
-  G.hp=r.stats.hp; G.income=r.stats.income;
-  G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
-  G.turn=0; G.pendingRandEvent=null;
-  setHomeBtn(true);
-  showScreen('screen-game');
-  setTimeout(renderTurn,400);
+  G.hp=r.stats.hp;G.income=r.stats.income;G.adaptability=r.stats.adaptability;G.resistance=r.stats.resistance;
+  G.turn=0;G.pendingRandEvent=null;setHomeBtn(true);showScreen('screen-game');setTimeout(renderTurn,400);
 }
 
 // ════════════════════════════════════════════
-// RANDOM EVENT ROLL — 20% neg, 20% pos
-// Returns null | {type:'neg'|'pos', event}
+// RANDOM EVENT ROLL
 // ════════════════════════════════════════════
 function rollRandomEvent(){
-  // Roll for negative first (20%)
-  if(Math.random()<0.20){
-    const ev=RANDOM_NEGATIVE[Math.floor(Math.random()*RANDOM_NEGATIVE.length)];
-    return {type:'neg',ev};
-  }
-  // Roll for positive (20%)
-  if(Math.random()<0.20){
-    const ev=RANDOM_POSITIVE[Math.floor(Math.random()*RANDOM_POSITIVE.length)];
-    return {type:'pos',ev};
-  }
+  if(Math.random()<0.20){const ev=RANDOM_NEGATIVE[Math.floor(Math.random()*RANDOM_NEGATIVE.length)];return{type:'neg',ev};}
+  if(Math.random()<0.20){const ev=RANDOM_POSITIVE[Math.floor(Math.random()*RANDOM_POSITIVE.length)];return{type:'pos',ev};}
   return null;
 }
 
@@ -1297,14 +977,8 @@ function rollRandomEvent(){
 // RENDER TURN
 // ════════════════════════════════════════════
 function renderTurn(){
-  // Refresh HUD display (no floats on turn start)
-  const pips=document.getElementById('turn-pips');
-  pips.innerHTML='';
-  for(let i=0;i<G.maxTurns;i++){
-    const d=document.createElement('div');
-    d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');
-    pips.appendChild(d);
-  }
+  const pips=document.getElementById('turn-pips');pips.innerHTML='';
+  for(let i=0;i<G.maxTurns;i++){const d=document.createElement('div');d.className='t-pip'+(i<G.turn?' done':i===G.turn?' active':'');pips.appendChild(d);}
   document.getElementById('turn-txt').textContent=`TURN ${G.turn+1} / ${G.maxTurns}`;
   document.getElementById('stat-inc').textContent=clamp(G.income,0,100);
   document.getElementById('stat-adp').textContent=clamp(G.adaptability,0,100);
@@ -1314,68 +988,33 @@ function renderTurn(){
   document.getElementById('hp-fill').style.width=clamp(G.hp,0,100)+'%';
   document.getElementById('hp-val').textContent=G.hp;
 
-  const td=TURNS[G.turn];
-  const ev=td.ev;
+  const td=TURNS[G.turn],ev=td.ev;
+  G.pendingRandEvent=G.turn>0?rollRandomEvent():null;
 
-  // Roll random event (skip turn 0 for better pacing)
-  G.pendingRandEvent = G.turn > 0 ? rollRandomEvent() : null;
-
-  // Build random banner
   const rba=document.getElementById('rand-banner-area');
   if(G.pendingRandEvent){
-    const re=G.pendingRandEvent;
-    const isNeg=re.type==='neg';
-    const hpTag=isNeg
-      ? `<div class="rb-hp-tag rb-hp-neg">${re.ev.hpDelta} HP</div>`
-      : `<div class="rb-hp-tag rb-hp-pos">+${re.ev.hpDelta} HP</div>`;
-    rba.innerHTML=`
-      <div class="rand-banner ${isNeg?'rb-bad':'rb-good'}">
-        <span class="rb-icon">${re.ev.icon}</span>
-        <div>
-          <strong>${re.ev.title}</strong><br>
-          <span style="font-weight:400;opacity:.85;">${re.ev.desc}</span>
-          ${hpTag}
-        </div>
-      </div>`;
-  } else {
-    rba.innerHTML='';
-  }
+    const re=G.pendingRandEvent,isNeg=re.type==='neg';
+    const hpTag=isNeg?`<div class="rb-hp-tag rb-hp-neg">${re.ev.hpDelta} HP</div>`:`<div class="rb-hp-tag rb-hp-pos">+${re.ev.hpDelta} HP</div>`;
+    rba.innerHTML=`<div class="rand-banner ${isNeg?'rb-bad':'rb-good'}"><span class="rb-icon">${re.ev.icon}</span><div><strong>${re.ev.title}</strong><br><span style="font-weight:400;opacity:.85;">${re.ev.desc}</span>${hpTag}</div></div>`;
+  }else{rba.innerHTML='';}
 
-  // Event card
   const ea=document.getElementById('event-area');
   const evClass=ev.type==='crisis'?'ev-crisis':ev.type==='opportunity'?'ev-opportunity':'ev-neutral';
   const evLabel=ev.type==='crisis'?'⚠ CRISIS EVENT':ev.type==='opportunity'?'✦ OPPORTUNITY':'◈ SITUATION';
-  ea.innerHTML=`
-    <div class="event-card ${evClass}" style="animation-delay:.05s">
-      <div class="ev-accent">${evLabel}</div>
-      <span class="ev-icon">${ev.icon}</span>
-      <div class="ev-title">${ev.title}</div>
-      <div class="ev-desc">${ev.desc}</div>
-    </div>`;
+  ea.innerHTML=`<div class="event-card ${evClass}" style="animation-delay:.05s"><div class="ev-accent">${evLabel}</div><span class="ev-icon">${ev.icon}</span><div class="ev-title">${ev.title}</div><div class="ev-desc">${ev.desc}</div></div>`;
 
-  // Choices
-  const ch=document.getElementById('choices');
-  ch.innerHTML='';
+  const ch=document.getElementById('choices');ch.innerHTML='';
   td.choices.forEach((c,i)=>{
-    const btn=document.createElement('button');
-    btn.className='choice-btn';
+    const btn=document.createElement('button');btn.className='choice-btn';
     const costsHTML=Object.entries(c.costs).map(([k,v])=>{
-      if(k==='hp')          return `<span class="c-cost ${v>0?'cost-hp-pos':'cost-hp-neg'}">HP ${v>0?'+':''}${v}</span>`;
-      if(k==='income')      return `<span class="c-cost ${v>0?'cost-inc-pos':'cost-inc-neg'}">INC ${v>0?'+':''}${v}</span>`;
+      if(k==='hp')return `<span class="c-cost ${v>0?'cost-hp-pos':'cost-hp-neg'}">HP ${v>0?'+':''}${v}</span>`;
+      if(k==='income')return `<span class="c-cost ${v>0?'cost-inc-pos':'cost-inc-neg'}">INC ${v>0?'+':''}${v}</span>`;
       if(k==='adaptability')return `<span class="c-cost cost-adp">ADP ${v>0?'+':''}${v}</span>`;
-      if(k==='resistance')  return `<span class="c-cost cost-adp">RES ${v>0?'+':''}${v}</span>`;
+      if(k==='resistance')return `<span class="c-cost cost-adp">RES ${v>0?'+':''}${v}</span>`;
       return '';
     }).join('');
-    btn.innerHTML=`
-      <span class="c-icon">${c.icon}</span>
-      <span class="c-body">
-        <span class="c-text">${c.text}</span>
-        <span class="c-hint">${c.hint}</span>
-        <div class="c-costs">${costsHTML}</div>
-      </span>
-      <span class="c-arrow">›</span>`;
-    btn.onclick=()=>makeChoice(c);
-    ch.appendChild(btn);
+    btn.innerHTML=`<span class="c-icon">${c.icon}</span><span class="c-body"><span class="c-text">${c.text}</span><span class="c-hint">${c.hint}</span><div class="c-costs">${costsHTML}</div></span><span class="c-arrow">›</span>`;
+    btn.onclick=()=>makeChoice(c);ch.appendChild(btn);
   });
 }
 
@@ -1384,39 +1023,20 @@ function renderTurn(){
 // ════════════════════════════════════════════
 function makeChoice(choice){
   document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
-
   const old={hp:G.hp,income:G.income,adaptability:G.adaptability,resistance:G.resistance};
-
-  // 1. Apply pending random event HP delta
   if(G.pendingRandEvent){
     const delta=G.pendingRandEvent.ev.hpDelta;
     G.hp=clamp(G.hp+delta,0,100);
-    if(delta<0) screenFlash('bad');
-    else screenFlash('good');
+    if(delta<0)screenFlash('bad');else screenFlash('good');
   }
-
-  // 2. Apply player's choice
-  Object.entries(choice.costs).forEach(([k,v])=>{
-    if(G[k]!==undefined) G[k]=clamp(G[k]+v, 0, k==='hp'?100:150);
-  });
+  Object.entries(choice.costs).forEach(([k,v])=>{if(G[k]!==undefined)G[k]=clamp(G[k]+v,0,k==='hp'?100:150);});
   G.hp=clamp(G.hp,0,100);
-
   const netHP=G.hp-old.hp;
-  if(netHP<-4) screenFlash('bad');
-  else if(netHP>3) screenFlash('good');
-
+  if(netHP<-4)screenFlash('bad');else if(netHP>3)screenFlash('good');
   updateHUD(old.hp,old.income,old.adaptability,old.resistance);
   G.turn++;
-
-  // Check game over
-  if(G.hp<=0){
-    setTimeout(()=>showGameOver(),900);
-    return;
-  }
-  if(G.turn>=G.maxTurns){
-    setTimeout(()=>showResult(),900);
-    return;
-  }
+  if(G.hp<=0){setTimeout(()=>showGameOver(),900);return;}
+  if(G.turn>=G.maxTurns){setTimeout(()=>showResult(),900);return;}
   setTimeout(()=>renderTurn(),700);
 }
 
@@ -1426,108 +1046,51 @@ function makeChoice(choice){
 function showGameOver(){
   const ep=EPITAPHS[Math.floor(Math.random()*EPITAPHS.length)];
   document.getElementById('go-epitaph').textContent=ep;
-
-  // Show final stats snapshot
   const row=document.getElementById('go-stats-row');
-  row.innerHTML=`
-    <div class="go-stat"><span class="gsv">0</span><span class="gsl">Final HP</span></div>
-    <div class="go-stat"><span class="gsv" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="gsl">Income</span></div>
-    <div class="go-stat"><span class="gsv" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="gsl">Adaptability</span></div>
-    <div class="go-stat"><span class="gsv" style="color:var(--muted)">${G.turn}</span><span class="gsl">Turns Survived</span></div>
-  `;
-
-  setHomeBtn(true);
-  showScreen('screen-gameover');
-
-  // Red flash on game over
-  setTimeout(()=>{
-    screenFlash('bad');
-    setTimeout(()=>screenFlash('bad'),250);
-  },200);
+  row.innerHTML=`<div class="go-stat"><span class="gsv">0</span><span class="gsl">Final HP</span></div><div class="go-stat"><span class="gsv" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="gsl">Income</span></div><div class="go-stat"><span class="gsv" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="gsl">Adaptability</span></div><div class="go-stat"><span class="gsv" style="color:var(--muted)">${G.turn}</span><span class="gsl">Turns Survived</span></div>`;
+  setHomeBtn(true);showScreen('screen-gameover');
+  setTimeout(()=>{screenFlash('bad');setTimeout(()=>screenFlash('bad'),250);},200);
 }
-
 function replayGame(){
   const r=ROLES.find(x=>x.id===G.role);
-  G.hp=r.stats.hp; G.income=r.stats.income;
-  G.adaptability=r.stats.adaptability; G.resistance=r.stats.resistance;
-  G.turn=0; G.pendingRandEvent=null;
-  showScreen('screen-game');
-  setTimeout(renderTurn,400);
+  G.hp=r.stats.hp;G.income=r.stats.income;G.adaptability=r.stats.adaptability;G.resistance=r.stats.resistance;
+  G.turn=0;G.pendingRandEvent=null;showScreen('screen-game');setTimeout(renderTurn,400);
 }
 
 // ════════════════════════════════════════════
 // RESULT
 // ════════════════════════════════════════════
 function showResult(){
-  const survScore=Math.round(
-    (G.income*.40)+(G.adaptability*.35)+(Math.max(0,100-G.resistance)*.15)+(G.hp*.10)
-  );
+  const survScore=Math.round((G.income*.40)+(G.adaptability*.35)+(Math.max(0,100-G.resistance)*.15)+(G.hp*.10));
   const score=clamp(survScore,5,99);
-
   let ending,endClass,endTitle,endExpl,ringColor;
-  if(score>=70){
-    ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';
-    endTitle='You Mastered the AI Era';
-    endExpl=`With a survival score of ${score}%, you didn't just survive — you leveraged AI to outpace every colleague who resisted. You're in the top 15% of AI-era earners. The market rewards the adaptive.`;
-  } else if(score>=42){
-    ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';
-    endTitle='You\'re Holding On — Barely';
-    endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your AI resistance is the invisible ceiling. One bold pivot away from thriving.`;
-  } else {
-    ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';
-    endTitle='AI Claimed Your Career';
-    endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed. Without intervention, automation will complete its takeover. The window is still open — barely.`;
-  }
+  if(score>=70){ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';endTitle='You Mastered the AI Era';endExpl=`With a survival score of ${score}%, you didn't just survive — you leveraged AI to outpace every colleague who resisted. You're in the top 15% of AI-era earners. The market rewards the adaptive.`;}
+  else if(score>=42){ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';endTitle='You\'re Holding On — Barely';endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your AI resistance is the invisible ceiling. One bold pivot away from thriving.`;}
+  else{ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';endTitle='AI Claimed Your Career';endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed. Without intervention, automation will complete its takeover. The window is still open — barely.`;}
 
-  const circ=2*Math.PI*70;
-  const offset=circ-(score/100)*circ;
+  const circ=2*Math.PI*70,offset=circ-(score/100)*circ;
   const role=ROLES.find(x=>x.id===G.role);
-
-  const stratsHTML=STRATEGIES.map((s,i)=>`
-    <div class="strat-item ${i===0?'s-unlocked':'s-locked'}">
-      <div class="strat-num n${i+1}">${i+1}</div>
-      <div class="strat-body">
-        <div class="strat-name">${s.icon} ${s.name}</div>
-        <div class="strat-desc">${s.desc}</div>
-        <div class="strat-inc">${s.income}</div>
-      </div>
-    </div>`).join('');
+  const stratsHTML=STRATEGIES.map((s,i)=>`<div class="strat-item ${i===0?'s-unlocked':'s-locked'}"><div class="strat-num n${i+1}">${i+1}</div><div class="strat-body"><div class="strat-name">${s.icon} ${s.name}</div><div class="strat-desc">${s.desc}</div><div class="strat-inc">${s.income}</div></div></div>`).join('');
 
   document.getElementById('screen-result').innerHTML=`
     <div class="result-header">
       <div class="section-tag">// Simulation Complete — ${role.emoji} ${role.name}</div>
-      <div class="ring-wrap">
-        <svg viewBox="0 0 160 160">
-          <circle class="ring-bg" cx="80" cy="80" r="70"/>
-          <circle class="ring-fill" id="ring-fill2" cx="80" cy="80" r="70"
-            stroke="${ringColor}"
-            stroke-dasharray="${circ}"
-            stroke-dashoffset="${circ}"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div>
-          <div class="ring-label">SURVIVAL</div>
-        </div>
-      </div>
+      <div class="ring-wrap"><svg viewBox="0 0 160 160"><circle class="ring-bg" cx="80" cy="80" r="70"/><circle class="ring-fill" id="ring-fill2" cx="80" cy="80" r="70" stroke="${ringColor}" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/></svg><div class="ring-center"><div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div><div class="ring-label">SURVIVAL</div></div></div>
       <div class="ending-badge ${endClass}">${ending}</div>
       <div class="result-title">${endTitle}</div>
       <p class="result-expl">${endExpl}</p>
     </div>
-
     <div class="final-stats">
       <div class="fs-card"><span class="fs-val mono" style="color:var(--hp)">${G.hp}</span><span class="fs-lbl">Final HP</span></div>
       <div class="fs-card"><span class="fs-val mono" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="fs-lbl">Income</span></div>
       <div class="fs-card"><span class="fs-val mono" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="fs-lbl">Adaptability</span></div>
     </div>
-
     <div class="divider"></div>
-
     <div class="mono-panel">
       <div class="mono-panel-title">Your AI Income Strategies</div>
       <div class="mono-panel-sub">Strategy #1 is unlocked based on your ${score}% score. Strategies #2 and #3 require your full plan.</div>
       <div class="strat-list">${stratsHTML}</div>
     </div>
-
     <div class="cta-panel">
       <div class="cta-title">🔓 Unlock Your Full AI Survival Plan</div>
       <div class="cta-sub">Get all 3 income strategies + a personalized 30-day action roadmap for your specific role in the AI economy.</div>
@@ -1538,204 +1101,386 @@ function showResult(){
         <div class="cta-feat"><span>✓</span> Prompt template library ($40 value)</div>
         <div class="cta-feat"><span>✓</span> Private community + weekly AI briefings</div>
       </div>
-      <button class="cta-buy" onclick="handleCTA(this)">
-        UNLOCK MY SURVIVAL PLAN
-        <span class="price-pill">$5</span>
-      </button>
+      <button class="cta-buy" onclick="handleCTA(this)">UNLOCK MY SURVIVAL PLAN<span class="price-pill">$5</span></button>
       <button class="replay-btn" onclick="replayGame()">↩ Replay with Same Role</button>
       <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Choose Different Role</button>
-    </div>
-  `;
+    </div>`;
 
-  setHomeBtn(true);
-  showScreen('screen-result');
-
+  setHomeBtn(true);showScreen('screen-result');
   setTimeout(()=>{
     const ring=document.getElementById('ring-fill2');
-    if(ring) ring.style.strokeDashoffset=offset;
-    let cur=0;
-    const el=document.getElementById('score-num');
-    const iv=setInterval(()=>{
-      cur=Math.min(cur+2,score);
-      if(el) el.textContent=cur+'%';
-      if(cur>=score) clearInterval(iv);
-    },20);
+    if(ring)ring.style.strokeDashoffset=offset;
+    let cur=0;const el=document.getElementById('score-num');
+    const iv=setInterval(()=>{cur=Math.min(cur+2,score);if(el)el.textContent=cur+'%';if(cur>=score)clearInterval(iv);},20);
   },600);
 }
-
 function handleCTA(btn){
   btn.innerHTML='✓ Processing... (Demo Mode) <span class="price-pill">$5</span>';
   btn.style.background='var(--good)';
-  setTimeout(()=>{
-    btn.innerHTML='UNLOCK MY SURVIVAL PLAN <span class="price-pill">$5</span>';
-    btn.style.background='';
-  },2500);
+  setTimeout(()=>{btn.innerHTML='UNLOCK MY SURVIVAL PLAN <span class="price-pill">$5</span>';btn.style.background='';},2500);
 }
 
+// ════════════════════════════════════════════
+// MINI GAME
+// ════════════════════════════════════════════
 const MINI={
-  playerY:300,
-  velocity:0,
-  items:[],
-  score:0,
-  hp:100,
+  playerY:0, velocity:0, jumpsLeft:2,
+  items:[], floats:[],
+  score:0, hp:100, timeLeft:30,
   running:false,
-  spawnTimer:null,
-  rafId:null,
-  canvas:null,
-  ctx:null
+  spawnTimer:null, timerInterval:null, rafId:null,
+  canvas:null, ctx:null,
+  speed:3,
+  CW:0, CH:0,
+  GROUND:0,
+  GOOD_ITEMS:[
+    {label:'ChatGPT',pts:10,color:'#39ff14'},
+    {label:'Gemini',pts:10,color:'#39ff14'},
+    {label:'Claude',pts:15,color:'#00e5ff'},
+    {label:'Cursor',pts:12,color:'#39ff14'},
+    {label:'Copilot',pts:10,color:'#39ff14'},
+    {label:'Midjourney',pts:12,color:'#b6ff52'},
+  ],
+  BAD_ITEMS:[
+    {label:'Automation',pts:-15,color:'#ff2244'},
+    {label:'Layoff',pts:-20,color:'#ff2244'},
+    {label:'Obsolete',pts:-15,color:'#ff4466'},
+    {label:'Outsource',pts:-12,color:'#ff3355'},
+    {label:'Replaced',pts:-18,color:'#ff2244'},
+  ],
 };
 
-let screenHistory = [];
+let screenHistory=[];
 
 function stopMiniGame(){
   MINI.running=false;
-  if(MINI.spawnTimer){
-    clearInterval(MINI.spawnTimer);
-    MINI.spawnTimer=null;
-  }
-  if(MINI.rafId){
-    cancelAnimationFrame(MINI.rafId);
-    MINI.rafId=null;
-  }
+  if(MINI.spawnTimer){clearInterval(MINI.spawnTimer);MINI.spawnTimer=null;}
+  if(MINI.timerInterval){clearInterval(MINI.timerInterval);MINI.timerInterval=null;}
+  if(MINI.rafId){cancelAnimationFrame(MINI.rafId);MINI.rafId=null;}
   document.onkeydown=null;
-  if(MINI.canvas) MINI.canvas.onclick=null;
+  if(MINI.canvas){MINI.canvas.onclick=null;MINI.canvas.ontouchstart=null;}
 }
 
 function showScreen(id,{recordHistory=true}={}){
   const next=document.getElementById(id);
-  if(!next) return;
-
+  if(!next)return;
   const current=document.querySelector('.screen.active');
-  if(current && current.id!==id){
-    if(current.id==='screen-minigame') stopMiniGame();
-    if(recordHistory) screenHistory.push(current.id);
+  if(current&&current.id!==id){
+    if(current.id==='screen-minigame')stopMiniGame();
+    if(recordHistory)screenHistory.push(current.id);
     current.classList.remove('active');
   }
-
   next.classList.add('active');
-  if(id==='screen-intro') setHomeBtn(false);
+  const isIntro=id==='screen-intro';
+  setNavVisible(!isIntro, screenHistory.length>0);
 }
 
 function goBack(){
-  if(screenHistory.length===0) return;
-
+  if(screenHistory.length===0)return;
   const current=document.querySelector('.screen.active');
-  if(current && current.id==='screen-minigame') stopMiniGame();
-
+  if(current&&current.id==='screen-minigame')stopMiniGame();
   const prev=screenHistory.pop();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const prevEl=document.getElementById(prev);
-  if(prevEl) prevEl.classList.add('active');
-  setHomeBtn(prev!=='screen-intro');
+  if(prevEl)prevEl.classList.add('active');
+  setNavVisible(prev!=='screen-intro', screenHistory.length>0);
 }
 
 function goHome(){
-  stopMiniGame();
-  screenHistory = [];
+  stopMiniGame();screenHistory=[];
   G={role:null,turn:0,maxTurns:6,hp:100,income:50,adaptability:50,resistance:50,pendingRandEvent:null};
-  setHomeBtn(false);
+  setNavVisible(false,false);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-intro').classList.add('active');
 }
 
-function startMiniGameFlow(){
-  showScreen('screen-minigame');
-  setTimeout(initMiniGame,100);
-}
+function startMiniGameFlow(){showScreen('screen-minigame');setTimeout(initMiniGame,120);}
+function startMainGame(){stopMiniGame();gotoRole();}
 
-function startMainGame(){
-  stopMiniGame();
-  gotoRole();
-}
-
-// ======================
-// MINI GAME CORE
-// ======================
+// ─── MINI-GAME INIT ───
 function initMiniGame(){
   stopMiniGame();
-
   const canvas=document.getElementById('miniCanvas');
-  if(!canvas) return;
+  if(!canvas)return;
   const ctx=canvas.getContext('2d');
-  if(!ctx) return;
+  if(!ctx)return;
 
-  MINI.canvas=canvas;
-  MINI.ctx=ctx;
-  MINI.playerY=300;
-  MINI.velocity=0;
-  MINI.items=[];
-  MINI.score=0;
-  MINI.hp=100;
-  MINI.running=true;
+  // Responsive sizing — fill available width, 16:9 aspect
+  const wrap=canvas.parentElement;
+  const W=Math.min(wrap.clientWidth||660,700);
+  const H=Math.round(W*0.52);
+  canvas.width=W; canvas.height=H;
+  // CSS sizing handled by width:100% in style
 
-  document.getElementById('miniScore').innerText='Score: 0';
-  document.getElementById('miniHP').innerText='HP: 100';
+  MINI.canvas=canvas; MINI.ctx=ctx;
+  MINI.CW=W; MINI.CH=H;
+  MINI.GROUND=H-70;
+  MINI.playerY=MINI.GROUND;
+  MINI.velocity=0; MINI.jumpsLeft=2;
+  MINI.items=[]; MINI.floats=[];
+  MINI.score=0; MINI.hp=100; MINI.timeLeft=30;
+  MINI.running=true; MINI.speed=3;
 
-  const jump=()=>{ MINI.velocity=-9; };
-  document.onkeydown=(e)=>{
-    if(e.code==='Space' || e.key===' ' || e.key==='ArrowUp'){
-      e.preventDefault();
-      jump();
-    }
+  // update HUD
+  mgUpdateHUD();
+
+  // jump handler
+  const jump=()=>{
+    if(!MINI.running)return;
+    if(MINI.jumpsLeft>0){MINI.velocity=-12;MINI.jumpsLeft--;}
   };
+  document.onkeydown=(e)=>{if(e.code==='Space'||e.key===' '||e.key==='ArrowUp'){e.preventDefault();jump();}};
   canvas.onclick=jump;
+  canvas.ontouchstart=(e)=>{e.preventDefault();jump();};
 
+  // spawn
   function spawn(){
-    MINI.items.push({
-      x:400,
-      y:Math.random()*500,
-      type:Math.random()>0.5?'good':'bad'
-    });
+    if(!MINI.running)return;
+    const isGood=Math.random()>0.42;
+    const pool=isGood?MINI.GOOD_ITEMS:MINI.BAD_ITEMS;
+    const def=pool[Math.floor(Math.random()*pool.length)];
+    const airY=Math.random()<(isGood?0.55:0.2)?MINI.GROUND-90-Math.random()*60:MINI.GROUND-36;
+    MINI.items.push({x:W+20,y:airY,w:80,h:36,isGood,label:def.label,pts:def.pts,color:def.color,alive:true});
   }
+  const spawnMs=()=>800+Math.random()*600;
+  function scheduleSpawn(){if(!MINI.running)return;MINI.spawnTimer=setTimeout(()=>{spawn();scheduleSpawn();},spawnMs());}
+  scheduleSpawn();
 
-  MINI.spawnTimer=setInterval(spawn,1200);
+  // countdown
+  MINI.timerInterval=setInterval(()=>{
+    if(!MINI.running)return;
+    MINI.timeLeft=Math.max(0,MINI.timeLeft-1);
+    mgUpdateHUD();
+    if(MINI.timeLeft<=0){stopMiniGame();setTimeout(startMainGame,600);}
+  },1000);
 
-  function loop(){
-    if(!MINI.running) return;
+  if(MINI.rafId)cancelAnimationFrame(MINI.rafId);
+  MINI.rafId=requestAnimationFrame(mgLoop);
+}
 
-    ctx.fillStyle='#020617';
-    ctx.fillRect(0,0,400,600);
+function mgUpdateHUD(){
+  const scoreEl=document.getElementById('miniScore');
+  const hpEl=document.getElementById('miniHP');
+  const timeEl=document.getElementById('mg-time');
+  const fillEl=document.getElementById('mg-hp-fill');
+  if(scoreEl)scoreEl.textContent=MINI.score;
+  if(hpEl)hpEl.textContent=Math.max(0,MINI.hp);
+  if(timeEl)timeEl.textContent=Math.max(0,MINI.timeLeft);
+  if(fillEl){
+    const pct=Math.max(0,MINI.hp)/100;
+    fillEl.style.width=(pct*100)+'%';
+    if(pct>0.5)fillEl.style.background='linear-gradient(90deg,#00b4cc,#00e5ff)';
+    else if(pct>0.25)fillEl.style.background='linear-gradient(90deg,#cc6600,#ffaa00)';
+    else fillEl.style.background='linear-gradient(90deg,#880011,#ff2244)';
+    fillEl.style.boxShadow=pct>0.5?'0 0 8px rgba(0,229,255,.5)':pct>0.25?'0 0 8px rgba(255,170,0,.5)':'0 0 8px rgba(255,34,68,.6)';
+  }
+}
 
-    MINI.velocity+=0.6;
-    MINI.playerY+=MINI.velocity;
+let mgLastTime=0;
+function mgLoop(ts){
+  if(!MINI.running)return;
+  const dt=Math.min((ts-mgLastTime)/1000,.05);
+  mgLastTime=ts;
+  mgUpdate(dt);
+  mgDraw();
+  MINI.rafId=requestAnimationFrame(mgLoop);
+}
 
-    ctx.fillStyle='#00e5ff';
-    ctx.fillRect(180,MINI.playerY,20,20);
+function mgUpdate(dt){
+  const C=MINI;
+  // speed ramp
+  C.speed=3+(30-C.timeLeft)*0.18;
 
-    MINI.items=MINI.items.filter(item=>{
-      item.x-=3;
-      ctx.fillStyle=item.type==='good'?'#39ff14':'#ff2244';
-      ctx.fillRect(item.x,item.y,20,20);
+  // gravity
+  C.velocity+=28*dt; // tune: 28 feels floaty but responsive
+  C.playerY+=C.velocity;
+  if(C.playerY>=C.GROUND){C.playerY=C.GROUND;C.velocity=0;C.jumpsLeft=2;}
 
-      const hit=item.x<200 && item.x>160 && item.y<MINI.playerY+20 && item.y+20>MINI.playerY;
-      if(hit){
-        if(item.type==='good') MINI.score+=10;
-        else MINI.hp-=20;
-        return false;
+  // items
+  C.items.forEach(item=>{
+    if(!item.alive)return;
+    item.x-=C.speed;
+    // collision
+    const px=80,py=C.playerY,pw=30,ph=40; // player hitbox
+    const pad=6;
+    if(px<item.x+item.w-pad&&px+pw>item.x+pad&&py<item.y+item.h-pad&&py+ph>item.y+pad){
+      item.alive=false;
+      if(item.isGood){
+        C.score+=item.pts;
+        C.floats.push({x:item.x+item.w/2,y:item.y,text:'+'+item.pts,color:'#39ff14',life:1});
+        // screen flash good
+        const fl=document.createElement('div');fl.className='screen-flash';fl.style.background='rgba(57,255,20,.08)';document.body.appendChild(fl);setTimeout(()=>fl.remove(),400);
+      }else{
+        C.hp=Math.max(0,C.hp+item.pts);
+        C.floats.push({x:item.x+item.w/2,y:item.y,text:''+item.pts+' HP',color:'#ff2244',life:1});
+        // screen flash bad
+        const fl=document.createElement('div');fl.className='screen-flash';fl.style.background='rgba(255,34,68,.13)';document.body.appendChild(fl);setTimeout(()=>fl.remove(),400);
+        if(C.canvas){C.canvas.style.animation='shake .3s both';setTimeout(()=>{if(C.canvas)C.canvas.style.animation='';},350);}
       }
-      return item.x>-25;
-    });
-
-    document.getElementById('miniScore').innerText='Score: '+MINI.score;
-    document.getElementById('miniHP').innerText='HP: '+MINI.hp;
-
-    if(MINI.hp<=0){
-      stopMiniGame();
-      setTimeout(startMainGame,800);
-      return;
+      mgUpdateHUD();
+      if(C.hp<=0){stopMiniGame();setTimeout(startMainGame,700);}
     }
+  });
+  C.items=C.items.filter(i=>i.alive&&i.x>-100);
 
-    MINI.rafId=requestAnimationFrame(loop);
+  // float labels
+  C.floats.forEach(f=>{f.y-=40*dt;f.life-=dt*1.1;});
+  C.floats=C.floats.filter(f=>f.life>0);
+}
+
+function mgDraw(){
+  const C=MINI,ctx=C.ctx,W=C.CW,H=C.CH;
+
+  // ── BG ──
+  ctx.fillStyle='#050b18';
+  ctx.fillRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle='rgba(0,229,255,0.04)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // city silhouette
+  const t=Date.now()/1000;
+  for(let i=0;i<10;i++){
+    const bx=((i*73+t*12)%W+W)%W;
+    const bh=30+((i*37)%80);
+    ctx.fillStyle=`rgba(0,229,255,${0.03+((i%3)*0.01)})`;
+    ctx.fillRect(bx,H-54-bh,22+((i*11)%18),bh);
   }
 
-  loop();
-}</script>
+  // horizon glow
+  const hg=ctx.createLinearGradient(0,H-70,0,H-54);
+  hg.addColorStop(0,'rgba(0,229,255,0)');hg.addColorStop(1,'rgba(0,229,255,0.1)');
+  ctx.fillStyle=hg;ctx.fillRect(0,H-70,W,16);
 
-<div style="text-align:center;font-size:12px;color:#6f89a8;margin-top:40px;">
-  <a href="terms.html" style="color:#6f89a8;text-decoration:none;">Terms</a>
-  &nbsp;|&nbsp;
-  <a href="privacy.html" style="color:#6f89a8;text-decoration:none;">Privacy</a>
-</div>  
+  // ── GROUND ──
+  const fg=ctx.createLinearGradient(0,H-54,0,H);
+  fg.addColorStop(0,'#0d1a2a');fg.addColorStop(1,'#060e1a');
+  ctx.fillStyle=fg;ctx.fillRect(0,H-54,W,54);
+  ctx.strokeStyle='rgba(0,229,255,0.45)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,H-54);ctx.lineTo(W,H-54);ctx.stroke();
+  // ground dashes
+  ctx.strokeStyle='rgba(0,229,255,0.12)';ctx.lineWidth=1;
+  for(let x=((Date.now()/20)%60)-60;x<W;x+=60){
+    ctx.beginPath();ctx.moveTo(x,H-54+8);ctx.lineTo(x+36,H-54+8);ctx.stroke();
+  }
 
+  // ── PLAYER ──
+  drawMGPlayer(ctx,80,C.playerY);
+
+  // ── ITEMS ──
+  C.items.forEach(item=>{
+    if(!item.alive)return;
+    const x=item.x,y=item.y,w=item.w,h=item.h;
+    const gc=item.isGood?item.color:'#ff2244';
+    const alpha=item.isGood?0.15:0.18;
+    // glow bg
+    ctx.save();
+    ctx.shadowColor=gc;ctx.shadowBlur=14;
+    ctx.fillStyle=`rgba(${hexToRgb(gc)},${alpha})`;
+    mgRoundRect(ctx,x,y,w,h,6);ctx.fill();
+    ctx.restore();
+    // border
+    ctx.strokeStyle=gc;ctx.lineWidth=1.5;
+    mgRoundRect(ctx,x,y,w,h,6);ctx.stroke();
+    // label
+    ctx.fillStyle=gc;
+    ctx.font=`bold 12px "Share Tech Mono",monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(item.label,x+w/2,y+h/2);
+    // type indicator
+    ctx.font=`10px "Share Tech Mono",monospace`;
+    ctx.fillStyle=item.isGood?'rgba(57,255,20,0.7)':'rgba(255,34,68,0.7)';
+    ctx.fillText(item.isGood?'+ TOOL':'– RISK',x+w/2,y+h+12);
+  });
+
+  // ── FLOAT LABELS ──
+  C.floats.forEach(f=>{
+    ctx.save();
+    ctx.globalAlpha=Math.min(1,f.life*1.5);
+    ctx.fillStyle=f.color;
+    ctx.font=`bold 16px "Share Tech Mono",monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor=f.color;ctx.shadowBlur=10;
+    ctx.fillText(f.text,f.x,f.y);
+    ctx.restore();
+  });
+
+  // ── DANGER VIGNETTE (last 5s) ──
+  if(C.timeLeft<=5&&C.timeLeft>0){
+    const pulse=0.04+0.04*Math.sin(Date.now()/100);
+    ctx.fillStyle=`rgba(255,34,68,${pulse})`;
+    ctx.fillRect(0,0,W,H);
+    // danger border
+    ctx.strokeStyle=`rgba(255,34,68,${0.3+0.2*Math.sin(Date.now()/80)})`;
+    ctx.lineWidth=3;ctx.strokeRect(1.5,1.5,W-3,H-3);
+  }
+}
+
+function drawMGPlayer(ctx,x,y){
+  const w=30,h=40;
+  ctx.save();
+  ctx.shadowColor='rgba(0,229,255,0.7)';ctx.shadowBlur=18;
+  // body
+  const bg=ctx.createLinearGradient(x,y,x,y+h);
+  bg.addColorStop(0,'#1e4060');bg.addColorStop(1,'#0d2035');
+  ctx.fillStyle=bg;
+  mgRoundRect(ctx,x+2,y+12,w-4,h-12,4);ctx.fill();
+  // visor
+  const vg=ctx.createLinearGradient(x+4,y+6,x+4,y+22);
+  vg.addColorStop(0,'rgba(0,229,255,0.95)');vg.addColorStop(1,'rgba(0,180,210,0.55)');
+  ctx.fillStyle=vg;
+  mgRoundRect(ctx,x+4,y+6,w-8,14,3);ctx.fill();
+  // visor shine
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  mgRoundRect(ctx,x+6,y+8,6,3,1.5);ctx.fill();
+  // center line
+  ctx.strokeStyle='rgba(0,229,255,0.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x+w/2,y+20);ctx.lineTo(x+w/2,y+h-8);ctx.stroke();
+  // legs
+  const legSwing=(MINI.velocity!==0)?0:Math.sin(Date.now()/130)*3;
+  ctx.fillStyle='#0a2030';
+  ctx.fillRect(x+4,y+h-10,8,10);
+  ctx.fillRect(x+w-12,y+h-10+Math.abs(legSwing),8,10);
+  // jetpack
+  ctx.fillStyle='#081828';
+  mgRoundRect(ctx,x+w-4,y+14,6,16,2);ctx.fill();
+  ctx.strokeStyle='rgba(0,229,255,0.4)';ctx.lineWidth=1;
+  mgRoundRect(ctx,x+w-4,y+14,6,16,2);ctx.stroke();
+  // exhaust when in air
+  if(MINI.playerY<MINI.GROUND-2&&MINI.velocity<0){
+    const eg=ctx.createLinearGradient(x+w-1,y+30,x+w-1,y+50);
+    eg.addColorStop(0,'rgba(0,229,255,0.9)');eg.addColorStop(1,'rgba(0,229,255,0)');
+    ctx.fillStyle=eg;
+    ctx.beginPath();ctx.moveTo(x+w-4,y+30);ctx.lineTo(x+w+2,y+30);ctx.lineTo(x+w-1,y+30+16+Math.random()*8);ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
+
+function mgRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+// window resize — resize canvas
+window.addEventListener('resize',()=>{
+  if(!MINI.canvas||!MINI.running)return;
+  const wrap=MINI.canvas.parentElement;
+  const W=Math.min(wrap.clientWidth||660,700);
+  const H=Math.round(W*0.52);
+  MINI.canvas.width=W;MINI.canvas.height=H;
+  MINI.CW=W;MINI.CH=H;MINI.GROUND=H-70;
+  if(MINI.playerY>MINI.GROUND)MINI.playerY=MINI.GROUND;
+});
+</script>
 </body>
 </html>
