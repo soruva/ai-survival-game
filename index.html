@@ -611,7 +611,7 @@ body::after{
         <div class="i-stat"><span class="v">3</span><span class="l">Endings</span></div>
         <div class="i-stat"><span class="v">38%</span><span class="l">Avg Survival</span></div>
       </div>
-      <button class="btn btn-primary" onclick="startMiniGameFlow()">LAUNCH SIMULATION →</button>
+      <button class="btn btn-primary" onclick="initGameAudio(); startMiniGameFlow()">LAUNCH SIMULATION →</button>
     </div>
   </div>
 
@@ -1145,11 +1145,94 @@ function showResult(){
     const iv=setInterval(()=>{cur=Math.min(cur+2,score);if(el)el.textContent=cur+'%';if(cur>=score)clearInterval(iv);},20);
   },600);
 }
-function handleCTA(btn){
-  btn.innerHTML='✓ Processing... (Demo Mode) <span class="price-pill">$5</span>';
-  btn.style.background='var(--good)';
-  setTimeout(()=>{btn.innerHTML='UNLOCK MY SURVIVAL PLAN <span class="price-pill">$5</span>';btn.style.background='';},2500);
+
+function buildUnlockContent(){
+  const role=ROLES.find(x=>x.id===G.role);
+  const roleName=role?role.name:'your role';
+  const topToolsByRole={
+    office:['ChatGPT','Gemini','Notion AI','Zapier','Claude','Canva AI','Gamma','Perplexity','Sheets AI','Otter'],
+    engineer:['Cursor','GitHub Copilot','ChatGPT','Claude','Perplexity','Warp','Postman AI','Vercel AI SDK','Raycast AI','Linear AI'],
+    creator:['ChatGPT','Midjourney','Claude','Canva AI','CapCut AI','Runway','Adobe Firefly','Notion AI','Perplexity','Descript'],
+    unemployed:['ChatGPT','Claude','Gemini','Canva AI','Notion AI','Perplexity','LinkedIn AI','Gamma','CapCut AI','Google AI Studio']
+  };
+  const rolePrompts={
+    office:'Create a 3-step automation workflow for my repetitive weekly tasks. Show what I should keep human and what AI should handle.',
+    engineer:'Review this feature spec and produce an implementation plan, test cases, edge cases, and the fastest way to ship an MVP.',
+    creator:'Turn this rough content idea into 5 monetizable content angles, a posting plan, and 3 premium offer ideas.',
+    unemployed:'Given my current background, create a 30-day reskilling plan to reach my first AI-assisted income online.'
+  };
+  const roadmap={
+    office:['Audit your repetitive work and list 10 tasks AI can shorten.','Build 2 automation workflows using ChatGPT + Zapier/Sheets.','Create one measurable “AI saved us time” win at work.','Package your AI workflow knowledge into a promotion case or freelance offer.'],
+    engineer:['Master one coding assistant workflow end to end.','Ship a tiny AI-assisted tool or internal productivity script.','Practice reviewing AI output faster than peers.','Turn your workflow into a portfolio case study and outbound pitch.'],
+    creator:['Choose one niche and one repeatable offer.','Use AI to produce 3x more output without lowering quality.','Package content into a service, template, or mini-product.','Test one paid offer and collect first revenue or testimonials.'],
+    unemployed:['Pick one AI income path and one niche market.','Learn the core tools daily and complete 2 tiny projects.','Create a simple portfolio and outreach message.','Start pitching, freelancing, or selling a first AI-assisted service.']
+  };
+  const tools=(topToolsByRole[G.role]||topToolsByRole.unemployed).map((t,i)=>`<div class="cta-feat"><span>${i+1}.</span> ${t}</div>`).join('');
+  const days=(roadmap[G.role]||roadmap.unemployed).map((t,i)=>`<div class="strat-item s-unlocked"><div class="strat-num n${(i%3)+1}">${i+1}</div><div class="strat-body"><div class="strat-name">Week ${i+1}</div><div class="strat-desc">${t}</div></div></div>`).join('');
+  return `
+    <div class="divider unlock-divider"></div>
+    <div id="unlock-content" class="mono-panel" style="margin-top:18px;">
+      <div class="mono-panel-title">Your Full Survival Plan — ${roleName}</div>
+      <div class="mono-panel-sub">This is what the paid unlock is meant to contain for your current role in the AI economy.</div>
+
+      <div class="strat-list" style="margin-bottom:18px;">
+        <div class="strat-item s-unlocked"><div class="strat-num n1">1</div><div class="strat-body"><div class="strat-name">Income Strategy #1 — AI-Enhanced Freelancing</div><div class="strat-desc">Offer faster delivery, research, writing, design, analysis, or operations help using AI-assisted workflows.</div><div class="strat-inc">$4,000 – $12,000/mo</div></div></div>
+        <div class="strat-item s-unlocked"><div class="strat-num n2">2</div><div class="strat-body"><div class="strat-name">Income Strategy #2 — Prompting / Workflow Consulting</div><div class="strat-desc">Help individuals or teams adopt the exact AI workflows they are still confused about.</div><div class="strat-inc">$6,000 – $20,000/mo</div></div></div>
+        <div class="strat-item s-unlocked"><div class="strat-num n3">3</div><div class="strat-body"><div class="strat-name">Income Strategy #3 — AI Product / Template Layer</div><div class="strat-desc">Turn your repeated workflow into a template pack, agent setup, mini-tool, or digital product.</div><div class="strat-inc">$2,000 – $50,000/mo</div></div></div>
+      </div>
+
+      <div class="mono-panel-title">30-Day Action Roadmap</div>
+      <div class="strat-list" style="margin-bottom:18px;">${days}</div>
+
+      <div class="mono-panel-title">Top 10 AI Tools Ranked for ${roleName}</div>
+      <div class="cta-feats" style="margin-bottom:18px;">${tools}</div>
+
+      <div class="mono-panel-title">Prompt Template Starter</div>
+      <div class="strat-item s-unlocked" style="margin-bottom:18px;">
+        <div class="strat-num n1">★</div>
+        <div class="strat-body">
+          <div class="strat-name">Use this as your first template</div>
+          <div class="strat-desc" style="font-family:'JetBrains Mono',monospace;white-space:pre-wrap;">${rolePrompts[G.role]||rolePrompts.unemployed}</div>
+        </div>
+      </div>
+
+      <div class="mono-panel-title">Private Community + Weekly AI Briefings</div>
+      <div class="strat-item s-unlocked">
+        <div class="strat-num n2">→</div>
+        <div class="strat-body">
+          <div class="strat-name">What members would get</div>
+          <div class="strat-desc">A weekly breakdown of what changed in AI, what tools matter now, and what income opportunities are becoming easier to enter.</div>
+        </div>
+      </div>
+    </div>`;
 }
+
+function handleCTA(btn){
+  initGameAudio();
+  mgBeep('unlock');
+  document.querySelectorAll('.strat-item.s-locked').forEach(el=>{
+    el.classList.remove('s-locked');
+    el.classList.add('s-unlocked');
+  });
+
+  let unlock=document.getElementById('unlock-content');
+  if(!unlock){
+    const result=document.getElementById('screen-result');
+    if(result){
+      result.insertAdjacentHTML('beforeend', buildUnlockContent());
+      unlock=document.getElementById('unlock-content');
+    }
+  }
+
+  btn.innerHTML='✓ PLAN UNLOCKED <span class="price-pill">$5</span>';
+  btn.style.background='linear-gradient(135deg,var(--good),#16d66d)';
+  btn.disabled=true;
+
+  if(unlock){
+    unlock.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
 
 // ════════════════════════════════════════════
 // MINI GAME
@@ -1226,21 +1309,31 @@ function goHome(){
   document.getElementById('screen-intro').classList.add('active');
 }
 
-function startMiniGameFlow(){showScreen('screen-minigame');setTimeout(initMiniGame,120);}
+function startMiniGameFlow(){initGameAudio();showScreen('screen-minigame');setTimeout(initMiniGame,120);}
 function startMainGame(){stopMiniGame();gotoRole();}
 
-function mgBeep(kind='good'){
+function initGameAudio(){
   try{
     const AC=window.AudioContext||window.webkitAudioContext;
-    if(!AC)return;
+    if(!AC)return null;
     if(!window.__mgAudio)window.__mgAudio=new AC();
     const ac=window.__mgAudio;
+    if(ac.state==='suspended')ac.resume();
+    return ac;
+  }catch(e){return null;}
+}
+
+function mgBeep(kind='good'){
+  const ac=initGameAudio();
+  if(!ac)return;
+  try{
     const o=ac.createOscillator(), g=ac.createGain();
     o.connect(g);g.connect(ac.destination);
     const now=ac.currentTime;
-    const map={good:[880,.05,'triangle'],bad:[180,.09,'square'],end:[520,.16,'sawtooth']};
+    const map={good:[880,.05,'triangle'],bad:[180,.09,'square'],end:[520,.16,'sawtooth'],unlock:[1040,.12,'triangle']};
     const [freq,dur,type]=map[kind]||map.good;
-    o.type=type;o.frequency.setValueAtTime(freq,now);
+    o.type=type;
+    o.frequency.setValueAtTime(freq,now);
     g.gain.setValueAtTime(.0001,now);
     g.gain.exponentialRampToValueAtTime(.08,now+.01);
     g.gain.exponentialRampToValueAtTime(.0001,now+dur);
@@ -1462,14 +1555,17 @@ function mgDraw(){
     // border
     ctx.strokeStyle=gc;ctx.lineWidth=1.5;
     mgRoundRect(ctx,x,y,w,h,6);ctx.stroke();
-    // label
-    ctx.fillStyle=gc;
-    ctx.font=`bold 12px "Share Tech Mono",monospace`;
+    // label + emoji
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(item.label,x+w/2,y+h/2);
+    ctx.font='18px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    ctx.fillStyle='#ffffff';
+    ctx.fillText(item.emoji||'',x+w/2,y+11);
+    ctx.fillStyle=gc;
+    ctx.font=`bold 12px "JetBrains Mono",monospace`;
+    ctx.fillText(item.label,x+w/2,y+h/2+5);
     // type indicator
-    ctx.font=`10px "Share Tech Mono",monospace`;
-    ctx.fillStyle=item.isGood?'rgba(57,255,20,0.7)':'rgba(255,34,68,0.7)';
+    ctx.font=`10px "JetBrains Mono",monospace`;
+    ctx.fillStyle=item.isGood?'rgba(57,255,20,0.78)':'rgba(255,34,68,0.78)';
     ctx.fillText(item.isGood?'+ TOOL':'– RISK',x+w/2,y+h+12);
   });
 
@@ -1478,7 +1574,7 @@ function mgDraw(){
     ctx.save();
     ctx.globalAlpha=Math.min(1,f.life*1.5);
     ctx.fillStyle=f.color;
-    ctx.font=`bold 16px "Share Tech Mono",monospace`;
+    ctx.font=`bold 16px "JetBrains Mono",monospace`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor=f.color;ctx.shadowBlur=10;
     ctx.fillText(f.text,f.x,f.y);
