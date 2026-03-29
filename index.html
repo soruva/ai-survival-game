@@ -910,16 +910,37 @@ const ROLES=[
 
 const TURNS=[
   {
-    ev:{type:'neutral',icon:'📊',
+    ev:{
+      type:'neutral',
+      icon:'📊',
       title:'AI Tools Flood Your Industry',
-      desc:'ChatGPT, Copilot, Midjourney — every company is evaluating AI. Everyone is watching. What\'s your move?'},
+      desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly reshaping workflows. Companies are actively testing and adopting them. What is your move?'
+    },
     choices:[
-      {icon:'🎓',text:'Enroll in an AI certification',hint:'6-week course on AI tools & prompting',
-       costs:{hp:+5,income:+14,adaptability:+18,resistance:-10}},
-      {icon:'💼',text:'Continue your normal routine',hint:'Hope the hype dies down',
-       costs:{hp:-8,income:+3,adaptability:-6,resistance:+8}},
-      {icon:'🚀',text:'Launch an AI side hustle',hint:'Build a micro-service using AI tools',
-       costs:{hp:0,income:+20,adaptability:+10,resistance:-8}},
+      {
+        icon:'🎓',
+        text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',
+        hint:'Understand prompting, workflows, and automation',
+        costs:{hp:+5,income:+14,adaptability:+18,resistance:-12}
+      },
+      {
+        icon:'💼',
+        text:'Ignore AI and continue current workflow',
+        hint:'Assume your role will remain stable',
+        costs:{hp:-10,income:+3,adaptability:-8,resistance:+12}
+      },
+      {
+        icon:'🚀',
+        text:'Build a small AI-driven side project',
+        hint:'Use tools like Cursor or APIs to create something',
+        costs:{hp:-2,income:+20,adaptability:+12,resistance:-10}
+      },
+      {
+        icon:'🎨',
+        text:'Experiment with creative AI tools',
+        hint:'Use Midjourney or similar tools for new output',
+        costs:{hp:+2,income:+8,adaptability:+10,resistance:-6}
+      }
     ]
   },
   {
