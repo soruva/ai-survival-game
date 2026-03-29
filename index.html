@@ -910,38 +910,38 @@ const ROLES=[
 
 const TURNS=[
   {
-    ev:{
-      type:'neutral',
-      icon:'📊',
-      title:'AI Tools Flood Your Industry',
-      desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly replacing manual workflows. Some teams are already 2x faster. You can feel it. If you don’t adapt now, you may not catch up.'
+  ev:{
+    type:'neutral',
+    icon:'📊',
+    title:'AI Tools Flood Your Industry',
+    desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly replacing manual workflows. Some teams are already 2x faster. You can feel it. If you don’t adapt now, you may not catch up.'
+  },
+  choices:[
+    {
+      icon:'🎓',
+      text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',
+      hint:'Invest time to understand workflows and prompting',
+      costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}
     },
-    choices:[
-      {
-        icon:'🎓',
-        text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',
-        hint:'Understand prompting, workflows, and automation',
-        costs:{hp:+5,income:+14,adaptability:+18,resistance:-12}
-      },
-      {
-        icon:'💼',
-        text:'Ignore AI and continue current workflow',
-        hint:'Assume your role will remain stable',
-        costs:{hp:-15,income:0,adaptability:-12,resistance:+18}
-      },
-      {
-        icon:'🚀',
-        text:'Build a small AI-driven side project',
-        hint:'Use tools like Cursor or APIs to create something',
-        costs:{hp:-2,income:+20,adaptability:+12,resistance:-10}
-      },
-      {
-        icon:'🎨',
-        text:'Experiment with creative AI tools',
-        hint:'Use Midjourney or similar tools for new output',
-        costs:{hp:+2,income:+8,adaptability:+10,resistance:-6}
-      }
-    ]
+    {
+      icon:'💼',
+      text:'Ignore AI and continue current workflow',
+      hint:'Assume your role will remain stable',
+      costs:{hp:-15,income:0,adaptability:-12,resistance:+18}
+    },
+    {
+      icon:'🚀',
+      text:'Build a small AI-driven side project',
+      hint:'Launch something using APIs or tools like Cursor',
+      costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}
+    },
+    {
+      icon:'🎨',
+      text:'Experiment with creative AI tools',
+      hint:'Use Midjourney or similar tools for new output',
+      costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}
+    }
+  ]
   },
   {
     ev:{type:'crisis',icon:'⚡',
