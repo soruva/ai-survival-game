@@ -826,11 +826,6 @@ body::after{
       <button onclick="goHome()" class="nav-btn">Home</button>
       <button onclick="goBack()" class="nav-btn">Back</button>
     </div>
-
-    <div class="nav-bar">
-      <button onclick="goHome()" class="nav-btn">Home</button>
-      <button onclick="goBack()" class="nav-btn">Back</button>
-    </div>
   <div class="section-tag">// Mini Game</div>
 
   <h2 style="color:#00e5ff;">AI SKILL RUSH</h2>
@@ -892,6 +887,9 @@ body::after{
 </div>
 
 </div>
+
+
+
 
 <script>
 // ════════════════════════════════════════════
@@ -1143,12 +1141,7 @@ function cancelHome(){
   document.getElementById('home-modal').classList.remove('open');
 }
 
-function goHome(){
-  // Full reset
-  G={role:null,turn:0,maxTurns:6,hp:100,income:50,adaptability:50,resistance:50,pendingRandEvent:null};
-  setHomeBtn(false);
-  showScreen('screen-intro');
-}
+/* goHome is defined later in the unified navigation block. */
 
 // ════════════════════════════════════════════
 // FLOATING NUMBERS
@@ -1462,10 +1455,6 @@ function replayGame(){
   setTimeout(renderTurn,400);
 }
 
-function startMainGame(){
-  gotoRole();
-}  
-
 // ════════════════════════════════════════════
 // RESULT
 // ════════════════════════════════════════════
@@ -1583,127 +1572,170 @@ function handleCTA(btn){
   },2500);
 }
 
+const MINI={
+  playerY:300,
+  velocity:0,
+  items:[],
+  score:0,
+  hp:100,
+  running:false,
+  spawnTimer:null,
+  rafId:null,
+  canvas:null,
+  ctx:null
+};
+
+let screenHistory = [];
+
+function stopMiniGame(){
+  MINI.running=false;
+  if(MINI.spawnTimer){
+    clearInterval(MINI.spawnTimer);
+    MINI.spawnTimer=null;
+  }
+  if(MINI.rafId){
+    cancelAnimationFrame(MINI.rafId);
+    MINI.rafId=null;
+  }
+  document.onkeydown=null;
+  if(MINI.canvas) MINI.canvas.onclick=null;
+}
+
+function showScreen(id,{recordHistory=true}={}){
+  const next=document.getElementById(id);
+  if(!next) return;
+
+  const current=document.querySelector('.screen.active');
+  if(current && current.id!==id){
+    if(current.id==='screen-minigame') stopMiniGame();
+    if(recordHistory) screenHistory.push(current.id);
+    current.classList.remove('active');
+  }
+
+  next.classList.add('active');
+  if(id==='screen-intro') setHomeBtn(false);
+}
+
+function goBack(){
+  if(screenHistory.length===0) return;
+
+  const current=document.querySelector('.screen.active');
+  if(current && current.id==='screen-minigame') stopMiniGame();
+
+  const prev=screenHistory.pop();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const prevEl=document.getElementById(prev);
+  if(prevEl) prevEl.classList.add('active');
+  setHomeBtn(prev!=='screen-intro');
+}
+
+function goHome(){
+  stopMiniGame();
+  screenHistory = [];
+  G={role:null,turn:0,maxTurns:6,hp:100,income:50,adaptability:50,resistance:50,pendingRandEvent:null};
+  setHomeBtn(false);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-intro').classList.add('active');
+}
+
 function startMiniGameFlow(){
   showScreen('screen-minigame');
-
-  setTimeout(()=>{
-    initMiniGame();
-  },100);
+  setTimeout(initMiniGame,100);
 }
 
 function startMainGame(){
+  stopMiniGame();
   gotoRole();
 }
 
 // ======================
 // MINI GAME CORE
 // ======================
-
-let miniPlayerY, miniVelocity, miniItems, miniScore, miniHP, miniRunning;
-
 function initMiniGame(){
+  stopMiniGame();
 
-  const canvas=document.getElementById("miniCanvas");
-  const ctx=canvas.getContext("2d");
+  const canvas=document.getElementById('miniCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx) return;
 
-  miniPlayerY=300;
-  miniVelocity=0;
-  miniItems=[];
-  miniScore=0;
-  miniHP=100;
-  miniRunning=true;
+  MINI.canvas=canvas;
+  MINI.ctx=ctx;
+  MINI.playerY=300;
+  MINI.velocity=0;
+  MINI.items=[];
+  MINI.score=0;
+  MINI.hp=100;
+  MINI.running=true;
 
-  document.onkeydown=()=>miniVelocity=-9;
-  canvas.onclick=()=>miniVelocity=-9;
+  document.getElementById('miniScore').innerText='Score: 0';
+  document.getElementById('miniHP').innerText='HP: 100';
+
+  const jump=()=>{ MINI.velocity=-9; };
+  document.onkeydown=(e)=>{
+    if(e.code==='Space' || e.key===' ' || e.key==='ArrowUp'){
+      e.preventDefault();
+      jump();
+    }
+  };
+  canvas.onclick=jump;
 
   function spawn(){
-    miniItems.push({
+    MINI.items.push({
       x:400,
       y:Math.random()*500,
-      type:Math.random()>0.5?"good":"bad"
+      type:Math.random()>0.5?'good':'bad'
     });
   }
 
-  setInterval(spawn,1200);
+  MINI.spawnTimer=setInterval(spawn,1200);
 
   function loop(){
-    if(!miniRunning)return;
+    if(!MINI.running) return;
 
-    ctx.fillStyle="#020617";
+    ctx.fillStyle='#020617';
     ctx.fillRect(0,0,400,600);
 
-    // player
-    miniVelocity+=0.6;
-    miniPlayerY+=miniVelocity;
+    MINI.velocity+=0.6;
+    MINI.playerY+=MINI.velocity;
 
-    ctx.fillStyle="#00e5ff";
-    ctx.fillRect(180,miniPlayerY,20,20);
+    ctx.fillStyle='#00e5ff';
+    ctx.fillRect(180,MINI.playerY,20,20);
 
-    // items
-    miniItems.forEach((item,i)=>{
+    MINI.items=MINI.items.filter(item=>{
       item.x-=3;
-
-      ctx.fillStyle=item.type==="good"?"#39ff14":"#ff2244";
+      ctx.fillStyle=item.type==='good'?'#39ff14':'#ff2244';
       ctx.fillRect(item.x,item.y,20,20);
 
-      // collision
-      if(item.x<200 && item.x>160 && item.y<miniPlayerY+20 && item.y+20>miniPlayerY){
-
-        if(item.type==="good"){
-          miniScore+=10;
-        }else{
-          miniHP-=20;
-        }
-
-        miniItems.splice(i,1);
+      const hit=item.x<200 && item.x>160 && item.y<MINI.playerY+20 && item.y+20>MINI.playerY;
+      if(hit){
+        if(item.type==='good') MINI.score+=10;
+        else MINI.hp-=20;
+        return false;
       }
+      return item.x>-25;
     });
 
-    document.getElementById("miniScore").innerText="Score: "+miniScore;
-    document.getElementById("miniHP").innerText="HP: "+miniHP;
+    document.getElementById('miniScore').innerText='Score: '+MINI.score;
+    document.getElementById('miniHP').innerText='HP: '+MINI.hp;
 
-    if(miniHP<=0){
-      miniRunning=false;
-      setTimeout(()=>startMainGame(),800);
+    if(MINI.hp<=0){
+      stopMiniGame();
+      setTimeout(startMainGame,800);
       return;
     }
 
-    requestAnimationFrame(loop);
+    MINI.rafId=requestAnimationFrame(loop);
   }
 
   loop();
-} 
-
-let screenHistory = [];
-
-function showScreen(id){
-  const current = document.querySelector('.screen.active');
-  if(current){
-    screenHistory.push(current.id);
-    current.classList.remove('active');
-  }
-  document.getElementById(id).classList.add('active');
-}
-
-function goBack(){
-  if(screenHistory.length > 0){
-    const prev = screenHistory.pop();
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById(prev).classList.add('active');
-  }
-}
-
-function goHome(){
-  screenHistory = [];
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-intro').classList.add('active');
-}  
+}</script>
 
 <div style="text-align:center;font-size:12px;color:#6f89a8;margin-top:40px;">
   <a href="terms.html" style="color:#6f89a8;text-decoration:none;">Terms</a>
   &nbsp;|&nbsp;
   <a href="privacy.html" style="color:#6f89a8;text-decoration:none;">Privacy</a>
 </div>  
-</script>
+
 </body>
 </html>
