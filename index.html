@@ -1089,28 +1089,6 @@ function goHome(){
 }
 
 // ════════════════════════════════════════════
-// SCREEN TRANSITIONS
-// ════════════════════════════════════════════
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{
-    if(s.classList.contains('active')){
-      s.style.animation='screenOut .35s ease both';
-      setTimeout(()=>{s.classList.remove('active');s.style.animation='';},340);
-    }
-  });
-  setTimeout(()=>{
-    const el=document.getElementById(id);
-    el.classList.add('active');
-  },360);
-  // Scanline flash
-  const fl=document.createElement('div');
-  fl.className='screen-flash';
-  fl.style.background='rgba(0,229,255,.05)';
-  document.body.appendChild(fl);
-  setTimeout(()=>fl.remove(),500);
-}
-
-// ════════════════════════════════════════════
 // FLOATING NUMBERS
 // ════════════════════════════════════════════
 function spawnFloat(val, color, anchorEl, big){
