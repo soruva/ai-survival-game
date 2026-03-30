@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Survival Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg:       #04070d;
@@ -29,7 +29,7 @@ html,body{
   width:100%;min-height:100vh;
   background:var(--bg);
   color:var(--text);
-  font-family:'JetBrains Mono','JetBrains Mono',sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   overflow-x:hidden;
 }
 
@@ -55,7 +55,7 @@ html,body{
 @keyframes screenOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-18px) scale(.97);}}
 
 /* ── MONO FONT ── */
-.mono{font-family:'JetBrains Mono',monospace;}
+.mono{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
 
 /* ── SCANLINE OVERLAY ── */
 body::after{
@@ -73,18 +73,19 @@ body::after{
 #nav-overlay.visible{display:flex;}
 .nav-pill{
   display:inline-flex;align-items:center;gap:5px;
-  background:rgba(8,13,20,.82);
-  border:1px solid rgba(0,229,255,.22);
+  background:rgba(10,15,25,0.85);
+  border:1px solid rgba(0,229,255,.25);
   border-radius:3px;
   padding:6px 12px;
-  font-family:'JetBrains Mono',monospace;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:#6f89a8;cursor:pointer;
+  color:#8fb3d9;cursor:pointer;
   transition:all .2s;
   backdrop-filter:blur(8px);
 }
 .nav-pill:hover{
   color:#00e5ff;
+  background:rgba(10,15,25,0.95);
   border-color:rgba(0,229,255,.5);
   box-shadow:0 0 10px rgba(0,229,255,.18);
 }
@@ -112,19 +113,19 @@ body::after{
   border-radius:6px 6px 0 0;
 }
 .modal-icon{font-size:32px;margin-bottom:12px;display:block;}
-.modal-title{font-family:'Teko',sans-serif;font-size:17px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
+.modal-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:17px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
 .modal-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:22px;}
 .modal-btns{display:flex;flex-direction:column;gap:9px;}
 .modal-confirm{
   background:var(--bad);color:#04070d;border:none;border-radius:3px;
-  padding:12px;font-family:'Teko',sans-serif;font-size:13px;font-weight:700;
+  padding:12px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;font-weight:700;
   cursor:pointer;transition:all .2s;letter-spacing:.06em;
 }
 .modal-confirm:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(255,34,68,.45);}
 .modal-cancel{
   background:rgba(255,255,255,.04);color:var(--muted);
   border:1px solid var(--border);border-radius:3px;padding:10px;
-  font-family:'JetBrains Mono',sans-serif;font-size:14px;font-weight:600;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;font-weight:600;
   cursor:pointer;transition:all .2s;
 }
 .modal-cancel:hover{color:var(--text);border-color:var(--border2);}
@@ -136,7 +137,7 @@ body::after{
 .intro-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
   border:1px solid var(--hp);padding:5px 14px;border-radius:2px;
-  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--hp);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:11px;color:var(--hp);
   letter-spacing:.15em;text-transform:uppercase;margin-bottom:24px;
   box-shadow:var(--glow-hp);
 }
@@ -144,7 +145,7 @@ body::after{
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
 .intro-title{
-  font-family:'Teko',sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   font-size:clamp(36px,8vw,72px);
   font-weight:900;line-height:.95;
   letter-spacing:-.01em;
@@ -171,14 +172,14 @@ body::after{
   background:var(--panel);border:1px solid var(--border);
   padding:14px 16px;border-radius:3px;
 }
-.i-stat .v{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--hp);display:block;}
-.i-stat .l{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
+.i-stat .v{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:26px;color:var(--hp);display:block;}
+.i-stat .l{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
 
 /* ── BUTTONS ── */
 .btn{
   display:inline-flex;align-items:center;gap:10px;
   padding:15px 34px;border:none;border-radius:3px;
-  font-family:'Teko',sans-serif;font-size:14px;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;font-weight:700;
   cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);
   letter-spacing:.06em;text-transform:uppercase;
 }
@@ -189,13 +190,14 @@ body::after{
 .btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 38px rgba(0,229,255,.65);}
 .btn-primary:disabled{opacity:.3;transform:none;box-shadow:none;cursor:not-allowed;}
 .btn-ghost{
-  background:rgba(8,13,20,.9);
+  background:rgba(10,15,25,0.85);
   color:#8fb3d9;
   border:1px solid rgba(0,229,255,.25);
   font-size:13px;padding:11px 26px;
 }
 .btn-ghost:hover{
   color:#00e5ff;border-color:rgba(0,229,255,.55);
+  background:rgba(10,15,25,0.95);
   box-shadow:0 0 14px rgba(0,229,255,.22);
 }
 
@@ -203,12 +205,12 @@ body::after{
    ROLE SELECT
 ═══════════════════════════════════════ */
 .section-tag{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:11px;
   color:var(--hp);letter-spacing:.2em;text-transform:uppercase;
   margin-bottom:16px;opacity:.8;
 }
 .screen-title{
-  font-family:'Teko',sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   font-size:clamp(22px,4.5vw,34px);font-weight:700;
   color:var(--bright);margin-bottom:6px;letter-spacing:.02em;
 }
@@ -233,11 +235,11 @@ body::after{
 }
 .role-card.sel::before{opacity:1;}
 .role-em{font-size:28px;margin-bottom:10px;display:block;}
-.role-name{font-family:'Teko',sans-serif;font-size:14px;font-weight:700;color:var(--bright);margin-bottom:5px;letter-spacing:.02em;}
+.role-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;font-weight:700;color:var(--bright);margin-bottom:5px;letter-spacing:.02em;}
 .role-desc{font-size:13px;color:var(--muted);line-height:1.5;}
 .role-stats{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
 .rs-chip{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:10px;
   padding:3px 8px;border-radius:2px;border:1px solid;
 }
 .rs-hp{color:var(--hp);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.06);}
@@ -262,8 +264,8 @@ body::after{
 /* HP BAR */
 .hp-section{flex:2;min-width:200px;}
 .hp-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.hp-text{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.12em;}
-.hp-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:bold;}
+.hp-text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:10px;color:var(--muted);letter-spacing:.12em;}
+.hp-val{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:bold;}
 .hp-track{height:10px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;position:relative;}
 .hp-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.16,1,.3,1);position:relative;}
 .hp-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px;background:rgba(255,255,255,.65);filter:blur(2px);}
@@ -275,8 +277,8 @@ body::after{
 /* MINI STATS */
 .hud-stats{display:flex;gap:10px;flex:1;}
 .hud-s{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:3px;padding:8px 10px;text-align:center;min-width:70px;}
-.hud-s .sv{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:bold;display:block;}
-.hud-s .sl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
+.hud-s .sv{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;font-weight:bold;display:block;}
+.hud-s .sl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
 
 /* TURN INDICATOR */
 .turn-hud{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--panel);border:1px solid var(--border);border-top:none;border-bottom:none;}
@@ -285,7 +287,7 @@ body::after{
 .t-pip.done{background:var(--hp);box-shadow:0 0 6px rgba(0,229,255,.5);}
 .t-pip.active{background:var(--hp);animation:pipPulse 1s infinite;}
 @keyframes pipPulse{0%,100%{box-shadow:0 0 6px rgba(0,229,255,.5);}50%{box-shadow:0 0 14px rgba(0,229,255,.9);}}
-.turn-txt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto;}
+.turn-txt{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:11px;color:var(--muted);margin-left:auto;}
 
 /* ═══════════════════════════════════════
    EVENT CARD
@@ -302,7 +304,7 @@ body::after{
 @keyframes glowPulse{0%{box-shadow:0 0 0 rgba(57,255,20,0);}50%{box-shadow:0 0 30px rgba(57,255,20,.3);}100%{box-shadow:0 0 8px rgba(57,255,20,.1);}}
 @keyframes shake{0%,100%{transform:none;}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(3px);}}
 
-.ev-accent{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.ev-accent{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .ev-accent::before{content:'';flex:1;height:1px;}
 .ev-crisis .ev-accent{color:var(--bad);}
 .ev-crisis .ev-accent::before{background:rgba(255,34,68,.3);}
@@ -316,7 +318,7 @@ body::after{
 .ev-random-opp .ev-accent::before{background:rgba(57,255,20,.4);}
 
 .ev-icon{font-size:30px;margin-bottom:10px;display:block;}
-.ev-title{font-family:'Teko',sans-serif;font-size:18px;font-weight:700;color:var(--bright);margin-bottom:6px;line-height:1.25;letter-spacing:.01em;}
+.ev-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:18px;font-weight:700;color:var(--bright);margin-bottom:6px;line-height:1.25;letter-spacing:.01em;}
 .ev-desc{font-size:14px;color:#9fc2e6;line-height:1.6;}
 
 /* RANDOM EVENT BANNER */
@@ -325,7 +327,7 @@ body::after{
 .rand-banner.rb-bad{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.3);color:var(--bad);}
 .rand-banner.rb-good{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--good);}
 .rand-banner .rb-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-.rb-hp-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:2px 8px;border-radius:2px;margin-top:4px;}
+.rb-hp-tag{display:inline-block;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;font-weight:700;padding:2px 8px;border-radius:2px;margin-top:4px;}
 .rb-hp-neg{background:rgba(255,34,68,.15);color:var(--bad);border:1px solid rgba(255,34,68,.3);}
 .rb-hp-pos{background:rgba(57,255,20,.12);color:var(--good);border:1px solid rgba(57,255,20,.3);}
 
@@ -337,7 +339,7 @@ body::after{
   background:var(--card);border:1px solid var(--border);
   border-radius:4px;padding:16px 18px;cursor:pointer;
   text-align:left;color:var(--text);
-  font-family:'JetBrains Mono',sans-serif;font-size:15px;font-weight:600;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:600;
   display:flex;align-items:center;gap:14px;
   transition:all .2s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
   animation:choiceIn .4s both;
@@ -356,7 +358,7 @@ body::after{
 .c-text{display:block;margin-bottom:2px;font-size:15px;}
 .c-hint{font-size:12px;color:#8fb3d9;font-weight:400;}
 .c-costs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
-.c-cost{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid;}
+.c-cost{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid;}
 .cost-hp-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.07);}
 .cost-hp-neg{color:var(--bad);border-color:rgba(255,34,68,.3);background:rgba(255,34,68,.07);}
 .cost-inc-pos{color:var(--good);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.07);}
@@ -370,7 +372,7 @@ body::after{
 ═══════════════════════════════════════ */
 .float-num{
   position:fixed;pointer-events:none;z-index:9999;
-  font-family:'JetBrains Mono',monospace;font-weight:bold;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-weight:bold;
   animation:floatUp .95s cubic-bezier(.16,1,.3,1) both;
   text-shadow:0 2px 10px rgba(0,0,0,.8);
   white-space:nowrap;
@@ -395,18 +397,18 @@ body::after{
 #screen-gameover{text-align:center;padding:40px 20px;}
 .go-skull{font-size:88px;margin-bottom:20px;display:block;animation:skullIn .9s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 0 30px rgba(255,34,68,.5));}
 @keyframes skullIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}65%{transform:scale(1.15) rotate(6deg);}82%{transform:scale(.95) rotate(-2deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
-.go-title{font-family:'Teko',sans-serif;font-size:clamp(36px,8vw,58px);font-weight:900;color:var(--bad);letter-spacing:.02em;margin-bottom:8px;text-shadow:0 0 50px rgba(255,34,68,.7),0 0 100px rgba(255,34,68,.3);animation:goBlink 2s .8s infinite;}
+.go-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:clamp(36px,8vw,58px);font-weight:900;color:var(--bad);letter-spacing:.02em;margin-bottom:8px;text-shadow:0 0 50px rgba(255,34,68,.7),0 0 100px rgba(255,34,68,.3);animation:goBlink 2s .8s infinite;}
 @keyframes goBlink{0%,100%{opacity:1;}50%{opacity:.75;}}
-.go-replaced{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:.22em;text-transform:uppercase;margin-bottom:28px;animation:screenIn .5s .4s both;}
-.go-epitaph{background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);border-radius:4px;padding:20px 24px;margin:0 auto 30px;max-width:460px;font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(255,34,68,.85);line-height:1.8;font-style:italic;animation:screenIn .5s .5s both;}
+.go-replaced{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;color:var(--muted);letter-spacing:.22em;text-transform:uppercase;margin-bottom:28px;animation:screenIn .5s .4s both;}
+.go-epitaph{background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);border-radius:4px;padding:20px 24px;margin:0 auto 30px;max-width:460px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;color:rgba(255,34,68,.85);line-height:1.8;font-style:italic;animation:screenIn .5s .5s both;}
 .go-stats-row{display:flex;gap:12px;justify-content:center;margin-bottom:30px;flex-wrap:wrap;animation:screenIn .5s .55s both;}
 .go-stat{background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:10px 18px;text-align:center;}
-.go-stat .gsv{font-family:'JetBrains Mono',monospace;font-size:20px;display:block;color:var(--bad);margin-bottom:3px;}
-.go-stat .gsl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.go-stat .gsv{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:20px;display:block;color:var(--bad);margin-bottom:3px;}
+.go-stat .gsl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
 .go-btns{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;animation:screenIn .5s .65s both;}
-.go-try-again{background:var(--bad);color:#04070d;border:none;border-radius:3px;padding:15px;width:100%;font-family:'Teko',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 22px rgba(255,34,68,.38);}
+.go-try-again{background:var(--bad);color:#04070d;border:none;border-radius:3px;padding:15px;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 22px rgba(255,34,68,.38);}
 .go-try-again:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(255,34,68,.55);}
-.go-change-role{background:rgba(8,13,20,.9);color:var(--muted);border:1px solid rgba(0,229,255,.22);border-radius:3px;padding:12px;width:100%;font-family:'JetBrains Mono',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.go-change-role{background:rgba(10,15,25,0.85);color:#8fb3d9;border:1px solid rgba(0,229,255,.25);border-radius:3px;padding:12px;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
 .go-change-role:hover{color:#00e5ff;border-color:rgba(0,229,255,.5);}
 
 /* ═══════════════════════════════════════
@@ -419,18 +421,18 @@ body::after{
 .ring-bg{fill:none;stroke:var(--border2);stroke-width:10;}
 .ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-score{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:bold;line-height:1;}
-.ring-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:4px;}
-.ending-badge{display:inline-block;padding:8px 28px;border-radius:3px;font-family:'Teko',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+.ring-score{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:38px;font-weight:bold;line-height:1;}
+.ring-label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:4px;}
+.ending-badge{display:inline-block;padding:8px 28px;border-radius:3px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
 .end-replaced{background:rgba(255,34,68,.12);color:var(--bad);border:1px solid rgba(255,34,68,.3);box-shadow:var(--glow-bad);}
 .end-surviving{background:rgba(255,170,0,.12);color:var(--warn);border:1px solid rgba(255,170,0,.3);box-shadow:0 0 20px rgba(255,170,0,.3);}
 .end-thriving{background:rgba(57,255,20,.1);color:var(--good);border:1px solid rgba(57,255,20,.3);box-shadow:var(--glow-good);}
-.result-title{font-family:'Teko',sans-serif;font-size:clamp(20px,4vw,30px);font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
+.result-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:clamp(20px,4vw,30px);font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
 .result-expl{font-size:14px;color:#9fc2e6;max-width:500px;margin:0 auto;line-height:1.75;}
 .final-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0;}
 .fs-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center;}
-.fs-val{font-family:'JetBrains Mono',monospace;font-size:28px;display:block;margin-bottom:4px;}
-.fs-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.fs-val{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:28px;display:block;margin-bottom:4px;}
+.fs-lbl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
 .divider{height:1px;background:var(--border);margin:24px 0;}
 
 /* ═══════════════════════════════════════
@@ -438,30 +440,30 @@ body::after{
 ═══════════════════════════════════════ */
 .mono-panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
 .mono-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--hp),var(--good),var(--warn));}
-.mono-panel-title{font-family:'Teko',sans-serif;font-size:16px;font-weight:700;color:var(--bright);margin-bottom:4px;letter-spacing:.02em;}
+.mono-panel-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;font-weight:700;color:var(--bright);margin-bottom:4px;letter-spacing:.02em;}
 .mono-panel-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .strat-list{display:flex;flex-direction:column;gap:10px;}
 .strat-item{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
 .strat-item.s-unlocked{border-color:rgba(0,229,255,.2);}
 .strat-item.s-locked .strat-body{filter:blur(5px);user-select:none;}
-.strat-item.s-locked::after{content:'🔒  Locked — Unlock to reveal';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,13,20,.78);backdrop-filter:blur(2px);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--muted);border-radius:3px;}
-.strat-num{width:34px;height:34px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:bold;flex-shrink:0;}
+.strat-item.s-locked::after{content:'🔒  Locked — Unlock to reveal';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,13,20,.78);backdrop-filter:blur(2px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:12px;font-weight:700;color:var(--muted);border-radius:3px;}
+.strat-num{width:34px;height:34px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:bold;flex-shrink:0;}
 .n1{background:rgba(0,229,255,.1);color:var(--hp);}
 .n2{background:rgba(57,255,20,.08);color:var(--good);}
 .n3{background:rgba(255,170,0,.1);color:var(--warn);}
-.strat-name{font-family:'Teko',sans-serif;font-size:12px;font-weight:700;color:var(--bright);margin-bottom:3px;letter-spacing:.02em;}
+.strat-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:12px;font-weight:700;color:var(--bright);margin-bottom:3px;letter-spacing:.02em;}
 .strat-desc{font-size:12px;color:var(--muted);line-height:1.4;}
-.strat-inc{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--good);margin-top:5px;}
+.strat-inc{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:12px;color:var(--good);margin-top:5px;}
 .cta-panel{background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(57,255,20,.04));border:1px solid rgba(0,229,255,.2);border-radius:6px;padding:28px;text-align:center;}
-.cta-title{font-family:'Teko',sans-serif;font-size:19px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
+.cta-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:19px;font-weight:700;color:var(--bright);margin-bottom:8px;letter-spacing:.02em;}
 .cta-sub{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 22px;line-height:1.6;}
 .cta-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;}
 .cta-feat{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);}
 .cta-feat span{color:var(--hp);font-size:15px;}
-.cta-buy{background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;border:none;border-radius:3px;padding:18px 0;width:100%;font-family:'Teko',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:12px;}
+.cta-buy{background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;border:none;border-radius:3px;padding:18px 0;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:12px;}
 .cta-buy:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,229,255,.42);}
-.price-pill{background:rgba(0,0,0,.25);padding:4px 14px;border-radius:100px;font-size:14px;font-family:'JetBrains Mono',monospace;}
-.replay-btn{width:100%;background:rgba(8,13,20,.85);border:1px solid rgba(0,229,255,.2);color:var(--muted);border-radius:3px;padding:12px;margin-top:10px;font-family:'JetBrains Mono',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.price-pill{background:rgba(0,0,0,.25);padding:4px 14px;border-radius:100px;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+.replay-btn{width:100%;background:rgba(10,15,25,0.85);border:1px solid rgba(0,229,255,.25);color:#8fb3d9;border-radius:3px;padding:12px;margin-top:10px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
 .replay-btn:hover{border-color:rgba(0,229,255,.45);color:#00e5ff;}
 
 /* ═══════════════════════════════════════
@@ -476,7 +478,7 @@ body::after{
 }
 .mg-header .section-tag{margin-bottom:10px;}
 .mg-header h2{
-  font-family:'Teko',sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   font-size:clamp(26px,6vw,44px);
   font-weight:900;
   color:var(--hp);
@@ -486,7 +488,7 @@ body::after{
 }
 .mg-header p{
   font-size:15px;color:#8fb3d9;line-height:1.6;
-  font-family:'JetBrains Mono',sans-serif;font-weight:400;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-weight:400;
 }
 
 /* Mini HUD (above canvas) */
@@ -497,8 +499,8 @@ body::after{
   padding:10px 16px;
 }
 .mg-hud-stat{text-align:center;}
-.mg-hud-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:2px;}
-.mg-hud-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:bold;display:block;}
+.mg-hud-lbl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:2px;}
+.mg-hud-val{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:20px;font-weight:bold;display:block;}
 .mg-hp-wrap{flex:1;max-width:260px;}
 .mg-hp-track{height:8px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:4px;}
 .mg-hp-fill{height:100%;border-radius:2px;transition:width .35s cubic-bezier(.16,1,.3,1);}
@@ -527,7 +529,7 @@ body::after{
 }
 .mg-end-card.visible{display:block;animation:screenIn .35s cubic-bezier(.16,1,.3,1) both;}
 .mg-end-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--hp);opacity:.9;margin-bottom:6px;}
-.mg-end-title{font-family:'Teko',sans-serif;font-size:36px;line-height:.9;letter-spacing:.03em;color:var(--bright);margin-bottom:8px;}
+.mg-end-title{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:36px;line-height:.9;letter-spacing:.03em;color:var(--bright);margin-bottom:8px;}
 .mg-end-sub{font-size:13px;color:#9fc2e6;line-height:1.6;margin-bottom:12px;}
 .mg-end-stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
 .mg-end-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:10px 14px;min-width:92px;}
@@ -585,7 +587,7 @@ body::after{
   <div class="modal-box">
     <span class="modal-icon">⚠️</span>
     <div class="modal-title">Abandon Simulation?</div>
-    <p class="modal-sub">Your current run will be lost. All progress will be reset and you'll return to the intro screen.</p>
+    <p class="modal-sub">Progress will be lost.</p>
     <div class="modal-btns">
       <button class="modal-confirm" onclick="confirmHome()">YES, GO HOME</button>
       <button class="modal-cancel" onclick="cancelHome()">KEEP PLAYING</button>
@@ -604,8 +606,8 @@ body::after{
         <span class="t2">SIMULATOR</span>
       </h1>
       <p class="intro-sub">
-        100 HP. 6 turns. Random crises and opportunities. One brutal question:<br>
-        <strong style="color:var(--text)">Will AI end your career — or make you rich?</strong>
+        6 turns. No safety net.<br>
+        <strong style="color:var(--text)">Most don't make it out.</strong>
       </p>
       <div class="intro-stats">
         <div class="i-stat"><span class="v">100</span><span class="l">Starting HP</span></div>
@@ -621,7 +623,7 @@ body::after{
   <div id="screen-role" class="screen">
     <div class="section-tag">// Step 01 — Identity</div>
     <div class="screen-title">Choose Your Role</div>
-    <div class="screen-sub">Your career identity sets your starting stats and risk profile.</div>
+    <div class="screen-sub">Pick a role. Your odds follow.</div>
     <div class="role-grid" id="role-grid"></div>
     <button class="btn btn-primary" id="role-btn" onclick="confirmRole()" disabled>ENTER SIMULATION →</button>
   </div>
@@ -660,7 +662,11 @@ body::after{
     <div class="go-replaced">// You were replaced by AI</div>
     <div class="go-epitaph" id="go-epitaph">Loading final report...</div>
     <div class="go-stats-row" id="go-stats-row"></div>
+    <p style="font-size:14px;color:#6f89a8;max-width:360px;margin:0 auto 20px;line-height:1.65;">See what you missed.</p>
     <div class="go-btns">
+      <a href="unlock.html" style="display:block;width:100%;text-decoration:none;">
+        <button class="go-try-again" style="background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;box-shadow:0 0 22px rgba(0,229,255,.38);width:100%;">→ SEE WHAT TO DO NEXT — $5</button>
+      </a>
       <button class="go-try-again" onclick="replayGame()">⟳ TRY AGAIN</button>
       <button class="go-change-role" onclick="gotoRole()">↩ Change Role</button>
     </div>
@@ -670,11 +676,11 @@ body::after{
   <div id="screen-minigame" class="screen">
     <!-- Header -->
     <div class="mg-header">
-      <div class="section-tag">// Mini Game — Phase 01</div>
+      <div class="section-tag">// Phase 01</div>
       <h2>AI SKILL RUSH</h2>
       <p>
-        Jump to collect AI tools. Avoid outdated skills.<br>
-        <strong style="color:var(--bright)">SPACE</strong> or <strong style="color:var(--bright)">TAP</strong> to jump &nbsp;·&nbsp; Double-jump supported
+        Grab tools. Dodge obsolete.<br>
+        <strong style="color:var(--bright)">SPACE</strong> or <strong style="color:var(--bright)">TAP</strong> to jump &nbsp;·&nbsp; Double-jump on
       </p>
     </div>
 
@@ -704,7 +710,7 @@ body::after{
     <div class="mg-end-card" id="mg-end-card">
       <div class="mg-end-kicker mono">Phase Complete</div>
       <div class="mg-end-title" id="mg-end-title">SYSTEM CHECK</div>
-      <div class="mg-end-sub" id="mg-end-sub">You made it through the AI rush.</div>
+      <div class="mg-end-sub" id="mg-end-sub">Phase done.</div>
       <div class="mg-end-stats">
         <div class="mg-end-stat"><b id="mg-end-score">0</b><span>Score</span></div>
         <div class="mg-end-stat"><b id="mg-end-hp">0</b><span>HP Left</span></div>
@@ -721,11 +727,11 @@ body::after{
 
   <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen">
-    <div class="screen-title">Your AI Survival Result</div>
+    <div class="screen-title">Your Result</div>
     <div id="strategy-list"></div>
     <div class="cta-panel">
-      <div class="cta-title">Unlock Your AI Survival Strategy</div>
-      <div class="cta-sub">See exactly how to adapt, earn, and stay ahead in the AI economy.</div>
+      <div class="cta-title">See what you missed</div>
+      <div class="cta-sub">3 strategies. 30-day plan. Your role.</div>
       <div class="cta-feats">
         <div class="cta-feat"><span>✓</span> Personalized strategy</div>
         <div class="cta-feat"><span>✓</span> Income paths</div>
@@ -742,7 +748,7 @@ body::after{
 
 </div>
 
-<div style="text-align:center;font-size:11px;color:#4a6080;margin-top:40px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;">
+<div style="text-align:center;font-size:11px;color:#4a6080;margin-top:40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:.05em;">
   <a href="terms.html" style="color:#4a6080;text-decoration:none;">Terms</a>
   &nbsp;|&nbsp;
   <a href="privacy.html" style="color:#4a6080;text-decoration:none;">Privacy</a>
@@ -807,72 +813,72 @@ const ROLES=[
 const TURNS=[
   {
   ev:{type:'neutral',icon:'📊',title:'AI Tools Flood Your Industry',
-    desc:'Gemini, Claude, ChatGPT, Midjourney, Cursor — AI tools are rapidly replacing manual workflows. Some teams are already 2x faster. You can feel it. If you don\'t adapt now, you may not catch up.'},
+    desc:'Some teams are already 2× faster. You can feel it.'},
   choices:[
-    {icon:'🎓',text:'Learn modern AI tools (Gemini, Claude, ChatGPT)',hint:'Invest time to understand workflows and prompting',costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}},
-    {icon:'💼',text:'Ignore AI and continue current workflow',hint:'Assume your role will remain stable',costs:{hp:-15,income:0,adaptability:-12,resistance:+18}},
-    {icon:'🚀',text:'Build a small AI-driven side project',hint:'Launch something using APIs or tools like Cursor',costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}},
-    {icon:'🎨',text:'Experiment with creative AI tools',hint:'Use Midjourney or similar tools for new output',costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}}
+    {icon:'🎓',text:'Learn modern AI tools',hint:'Workflows, prompting, integration',costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}},
+    {icon:'💼',text:'Ignore it. Keep your workflow.',hint:'Assume nothing changes',costs:{hp:-15,income:0,adaptability:-12,resistance:+18}},
+    {icon:'🚀',text:'Build a small AI side project',hint:'Ship something. Anything.',costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}},
+    {icon:'🎨',text:'Experiment with AI creative tools',hint:'Midjourney, Runway, Canva AI',costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}}
   ]},
-  {ev:{type:'crisis',icon:'⚡',title:'Company-Wide Layoffs Announced',desc:'15% of staff will be cut. Managers are looking for reasons to keep or cut you. AI-literate employees are the obvious survivors.'},
+  {ev:{type:'crisis',icon:'⚡',title:'Company-Wide Layoffs Announced',desc:'15% cut. They\'re already deciding who stays.'},
    choices:[
-    {icon:'🤖',text:'Volunteer to lead AI transition',hint:'Become the team\'s AI champion',costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
-    {icon:'🤫',text:'Keep your head down',hint:'Stay invisible and hope for the best',costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
-    {icon:'📝',text:'Polish résumé & start networking',hint:'Prepare a safety net while you can',costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
+    {icon:'🤖',text:'Lead the AI transition',hint:'Step up before someone else does',costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
+    {icon:'🤫',text:'Keep your head down',hint:'Hope they don\'t notice you',costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
+    {icon:'📝',text:'Polish résumé. Start networking.',hint:'Build a safety net now',costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
   ]},
-  {ev:{type:'opportunity',icon:'💡',title:'AI Workers Get 40% Raises',desc:'Your colleague who mastered Cursor just got promoted and a $20k raise. The gap between AI-fluent and AI-ignorant is widening fast.'},
+  {ev:{type:'opportunity',icon:'💡',title:'AI Workers Get 40% Raises',desc:'Your colleague got a $20k raise. You watched.'},
    choices:[
-    {icon:'📚',text:'Deep-dive into AI prompting',hint:'Spend weekends on advanced techniques',costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
-    {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3x with AI-assisted output',costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
-    {icon:'😴',text:'Ignore it — wait and see',hint:'Maybe the market corrects itself',costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
+    {icon:'📚',text:'Go deep on AI prompting',hint:'Weekends. No shortcuts.',costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
+    {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3× with AI output',costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
+    {icon:'😴',text:'Wait and see',hint:'Maybe it corrects itself',costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
   ]},
-  {ev:{type:'crisis',icon:'🤖',title:'AI Replaces 40% of Your Job',desc:'A new model just automated the core of what you do. HR is "reviewing role structures." You have a week to adapt or become redundant.'},
+  {ev:{type:'crisis',icon:'🤖',title:'AI Replaces 40% of Your Job',desc:'Not a warning. It already happened.'},
    choices:[
-    {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Become the human-in-the-loop they need',costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
-    {icon:'🆕',text:'Rapidly reskill into new area',hint:'AI-proof niche skills are rising fast',costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
-    {icon:'😤',text:'Fight automation, file complaints',hint:'Resist the change and push back hard',costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
+    {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Be the human-in-the-loop',costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
+    {icon:'🆕',text:'Rapidly reskill',hint:'Find what AI can\'t do yet',costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
+    {icon:'😤',text:'Fight it. File complaints.',hint:'Push back hard',costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
   ]},
-  {ev:{type:'opportunity',icon:'🌐',title:'New AI Income Streams Emerge',desc:'Prompt engineering, AI consulting, and synthetic content creation are now $100k+ careers. The gap between movers and waiters is now a chasm.'},
+  {ev:{type:'opportunity',icon:'🌐',title:'New AI Income Streams Emerge',desc:'Real money. No degree required. Window is open right now.'},
    choices:[
-    {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, or AI micro-SaaS',costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
-    {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work from frontier companies',costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
-    {icon:'⏳',text:'Wait for the market to stabilize',hint:'Too risky right now',costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
+    {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, micro-SaaS',costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
+    {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work, top rates',costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
+    {icon:'⏳',text:'Wait for stability',hint:'It won\'t come',costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
   ]},
-  {ev:{type:'neutral',icon:'🏆',title:'FINAL TEST: The AI-First Economy',desc:'It\'s 2027. Every job posting requires AI fluency. Every company runs on LLMs. This is your defining moment — how do you position yourself?'},
+  {ev:{type:'neutral',icon:'🏆',title:'FINAL ROUND: AI-First Economy',desc:'2027. This is your last move. Make it count.'},
    choices:[
-    {icon:'🎯',text:'Launch your AI-powered personal brand',hint:'Become a recognized AI expert in your field',costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
-    {icon:'🔧',text:'Specialize as an AI integration expert',hint:'Companies pay huge to be "AI-fixed"',costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
-    {icon:'🏳️',text:'Accept defeat — let AI take over',hint:'Surrender and coast on basic income',costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
+    {icon:'🎯',text:'Launch your AI personal brand',hint:'Own a niche. Be the name.',costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
+    {icon:'🔧',text:'Become an AI integration specialist',hint:'Companies pay to be fixed',costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
+    {icon:'🏳️',text:'Accept it. Let AI take over.',hint:'That\'s a choice too',costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
   ]},
 ];
 
 const RANDOM_NEGATIVE=[
-  {icon:'📉',title:'MARKET CRASH: Mass industry layoffs hit overnight',desc:'10,000 jobs cut in your sector. Confidence in your field collapses.',hpDelta:-25},
-  {icon:'🦠',title:'CRISIS: Your main income source vanishes',desc:'Without warning, your largest client or employer disappears.',hpDelta:-20},
-  {icon:'⚠️',title:'DISRUPTION: A new AI model made your skill obsolete',desc:'GPT-Next just learned to do what took you years to master.',hpDelta:-15},
-  {icon:'💸',title:'SETBACK: Unexpected expenses drain your runway',desc:'Emergency costs hit hard. Your ability to invest in growth is cut.',hpDelta:-20},
+  {icon:'📉',title:'MARKET CRASH: Mass layoffs hit overnight',desc:'10,000 jobs gone. Your sector is next.',hpDelta:-25},
+  {icon:'🦠',title:'CRISIS: Main income source gone',desc:'No warning. Just gone.',hpDelta:-20},
+  {icon:'⚠️',title:'DISRUPTION: Your skill is obsolete',desc:'A model does it now. Better. Faster.',hpDelta:-15},
+  {icon:'💸',title:'SETBACK: Expenses wipe your runway',desc:'Growth plans shelved. Back to zero.',hpDelta:-20},
 ];
 
 const RANDOM_POSITIVE=[
-  {icon:'🌟',title:'VIRAL: Your AI demo blows up online',desc:'A post you shared explodes. Inbound opportunities flood in.',hpDelta:+15},
-  {icon:'💼',title:'OPPORTUNITY: Premium contract offer arrives',desc:'An AI-first company wants your skills. Top-tier rates.',hpDelta:+15},
-  {icon:'🎓',title:'LUCK: Free AI bootcamp scholarship awarded',desc:'You\'re accepted to an elite 2-week AI intensive — at no cost.',hpDelta:+20},
-  {icon:'🤝',title:'NETWORK: A mentor connects you to top AI firms',desc:'A chance encounter opens three high-value doors.',hpDelta:+15},
+  {icon:'🌟',title:'VIRAL: Your AI demo blows up',desc:'Didn\'t expect it. Inbound won\'t stop.',hpDelta:+15},
+  {icon:'💼',title:'OPPORTUNITY: Premium contract lands',desc:'Right place. Right time.',hpDelta:+15},
+  {icon:'🎓',title:'LUCK: AI bootcamp scholarship',desc:'Free. 2 weeks. No excuses now.',hpDelta:+20},
+  {icon:'🤝',title:'NETWORK: One intro. Three doors.',desc:'Someone believed in you.',hpDelta:+15},
 ];
 
 const EPITAPHS=[
-  '"They kept saying \'AI is just a tool.\' The tool replaced them."',
-  '"Chose comfort over adaptation. The market chose efficiency."',
-  '"Waited for the dust to settle. The dust was a tornado."',
-  '"Resistant to the end. The AI never noticed."',
-  '"10 years of experience. 0 years of AI fluency. The math was brutal."',
-  '"The safest choice was the most dangerous one."',
+  '"They said it was just a tool."',
+  '"Chose comfort. The market didn\'t."',
+  '"Waited too long."',
+  '"Resistant to the end."',
+  '"Ten years of experience. Zero AI fluency."',
+  '"The safe choice was the fatal one."',
 ];
 
 const STRATEGIES=[
-  {name:'AI-Enhanced Freelancing',desc:'Use AI to deliver 10× faster, charge premium rates. Clients pay for results, not hours.',income:'$4,000 – $12,000/mo',icon:'💼'},
-  {name:'Prompt Engineering & Consulting',desc:'Train companies to use AI tools effectively. High demand, almost no certified competition yet.',income:'$6,000 – $20,000/mo',icon:'🧠'},
-  {name:'AI Micro-SaaS / Digital Products',desc:'Build and sell AI templates, agents, or tools with no-code platforms. Passive income at scale.',income:'$2,000 – $50,000/mo',icon:'⚙️'},
+  {name:'AI-Enhanced Freelancing',desc:'Same work. AI does the heavy lifting. You charge more.',income:'$4,000 – $12,000/mo',icon:'💼'},
+  {name:'Prompt Engineering & Consulting',desc:'Teach teams what they can\'t figure out alone.',income:'$6,000 – $20,000/mo',icon:'🧠'},
+  {name:'AI Micro-SaaS / Digital Products',desc:'Build it once. It pays while you sleep.',income:'$2,000 – $50,000/mo',icon:'⚙️'},
 ];
 
 // ════════════════════════════════════════════
@@ -1097,9 +1103,9 @@ function showResult(){
   const survScore=Math.round((G.income*.40)+(G.adaptability*.35)+(Math.max(0,100-G.resistance)*.15)+(G.hp*.10));
   const score=clamp(survScore,5,99);
   let ending,endClass,endTitle,endExpl,ringColor;
-  if(score>=70){ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';endTitle='You Mastered the AI Era';endExpl=`With a survival score of ${score}%, you didn't just survive — you leveraged AI to outpace every colleague who resisted. You're in the top 15% of AI-era earners. The market rewards the adaptive.`;}
-  else if(score>=42){ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';endTitle='You\'re Holding On — Barely';endExpl=`Score: ${score}%. You made smart moves but left income on the table. Your AI resistance is the invisible ceiling. One bold pivot away from thriving.`;}
-  else{ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';endTitle='AI Claimed Your Career';endExpl=`Score: ${score}%. Your choices kept you in the comfort zone while the economy transformed. Without intervention, automation will complete its takeover. The window is still open — barely.`;}
+  if(score>=70){ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';endTitle='You Mastered the AI Era';endExpl=`${score}%. You moved. Others waited. Top 15%.`;}
+  else if(score>=42){ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';endTitle='Holding On — Barely';endExpl=`${score}%. Stable. But not safe.`;}
+  else{ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';endTitle='AI Claimed Your Career';endExpl=`${score}%. Too slow. The window is closing.`;}
 
   const circ=2*Math.PI*70,offset=circ-(score/100)*circ;
   const role=ROLES.find(x=>x.id===G.role);
@@ -1120,19 +1126,19 @@ function showResult(){
     </div>
     <div class="divider"></div>
     <div class="mono-panel">
-      <div class="mono-panel-title">Your AI Income Strategies</div>
-      <div class="mono-panel-sub">Strategy #1 is unlocked based on your ${score}% score. Strategies #2 and #3 require your full plan.</div>
+      <div class="mono-panel-title">AI Income Strategies</div>
+      <div class="mono-panel-sub">#1 unlocked. #2 and #3 in your plan.</div>
       <div class="strat-list">${stratsHTML}</div>
     </div>
     <div class="cta-panel">
-      <div class="cta-title">🔓 Unlock My Survival Plan</div>
-      <div class="cta-sub">Get all 3 income strategies + a personalized 30-day action roadmap for your specific role in the AI economy.</div>
+      <div class="cta-title">🔓 Your Next Move</div>
+      <div class="cta-sub">All 3 strategies + 30-day roadmap for your role.</div>
       <div class="cta-feats">
-        <div class="cta-feat"><span>✓</span> All 3 income strategies — detailed, actionable</div>
-        <div class="cta-feat"><span>✓</span> 30-day AI reskilling roadmap for your current role</div>
-        <div class="cta-feat"><span>✓</span> Top 10 AI tools ranked for your field</div>
-        <div class="cta-feat"><span>✓</span> Prompt template library ($40 value)</div>
-        <div class="cta-feat"><span>✓</span> Private community + weekly AI briefings</div>
+        <div class="cta-feat"><span>✓</span> 3 income strategies</div>
+        <div class="cta-feat"><span>✓</span> 30-day action plan</div>
+        <div class="cta-feat"><span>✓</span> Top 10 tools for your field</div>
+        <div class="cta-feat"><span>✓</span> Prompt templates</div>
+        <div class="cta-feat"><span>✓</span> Weekly AI briefings</div>
       </div>
       <button class="cta-buy" onclick="handleCTA(this)">UNLOCK MY SURVIVAL PLAN<span class="price-pill">$5</span></button>
       <button class="replay-btn" onclick="replayGame()">↩ Replay with Same Role</button>
@@ -1164,7 +1170,7 @@ function buildUnlockContent(){
     unemployed:'Given my current background, create a 30-day reskilling plan to reach my first AI-assisted income online.'
   };
   const roadmap={
-    office:['Audit your repetitive work and list 10 tasks AI can shorten.','Build 2 automation workflows using ChatGPT + Zapier/Sheets.','Create one measurable “AI saved us time” win at work.','Package your AI workflow knowledge into a promotion case or freelance offer.'],
+    office:['Audit your repetitive work and list 10 tasks AI can shorten.','Build 2 automation workflows using ChatGPT + Zapier/Sheets.','Create one measurable "AI saved us time" win at work.','Package your AI workflow knowledge into a promotion case or freelance offer.'],
     engineer:['Master one coding assistant workflow end to end.','Ship a tiny AI-assisted tool or internal productivity script.','Practice reviewing AI output faster than peers.','Turn your workflow into a portfolio case study and outbound pitch.'],
     creator:['Choose one niche and one repeatable offer.','Use AI to produce 3x more output without lowering quality.','Package content into a service, template, or mini-product.','Test one paid offer and collect first revenue or testimonials.'],
     unemployed:['Pick one AI income path and one niche market.','Learn the core tools daily and complete 2 tiny projects.','Create a simple portfolio and outreach message.','Start pitching, freelancing, or selling a first AI-assisted service.']
@@ -1174,8 +1180,8 @@ function buildUnlockContent(){
   return `
     <div class="divider unlock-divider"></div>
     <div id="unlock-content" class="mono-panel" style="margin-top:18px;">
-      <div class="mono-panel-title">Your Full Survival Plan — ${roleName}</div>
-      <div class="mono-panel-sub">This is what the paid unlock is meant to contain for your current role in the AI economy.</div>
+      <div class="mono-panel-title">Your Full Plan — ${roleName}</div>
+      <div class="mono-panel-sub">Everything you need to move in the AI economy.</div>
 
       <div class="strat-list" style="margin-bottom:18px;">
         <div class="strat-item s-unlocked"><div class="strat-num n1">1</div><div class="strat-body"><div class="strat-name">Income Strategy #1 — AI-Enhanced Freelancing</div><div class="strat-desc">Offer faster delivery, research, writing, design, analysis, or operations help using AI-assisted workflows.</div><div class="strat-inc">$4,000 – $12,000/mo</div></div></div>
@@ -1194,16 +1200,16 @@ function buildUnlockContent(){
         <div class="strat-num n1">★</div>
         <div class="strat-body">
           <div class="strat-name">Use this as your first template</div>
-          <div class="strat-desc" style="font-family:'JetBrains Mono',monospace;white-space:pre-wrap;">${rolePrompts[G.role]||rolePrompts.unemployed}</div>
+          <div class="strat-desc" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;white-space:pre-wrap;">${rolePrompts[G.role]||rolePrompts.unemployed}</div>
         </div>
       </div>
 
-      <div class="mono-panel-title">Private Community + Weekly AI Briefings</div>
+      <div class="mono-panel-title">Weekly AI Briefings</div>
       <div class="strat-item s-unlocked">
         <div class="strat-num n2">→</div>
         <div class="strat-body">
-          <div class="strat-name">What members would get</div>
-          <div class="strat-desc">A weekly breakdown of what changed in AI, what tools matter now, and what income opportunities are becoming easier to enter.</div>
+          <div class="strat-name">What's inside</div>
+          <div class="strat-desc">What changed in AI this week, which tools matter now, and which income opportunities are easiest to enter.</div>
         </div>
       </div>
     </div>`;
@@ -1563,10 +1569,10 @@ function mgDraw(){
     ctx.fillStyle='#ffffff';
     ctx.fillText(item.emoji||'',x+w/2,y+11);
     ctx.fillStyle=gc;
-    ctx.font=`bold 12px "JetBrains Mono",monospace`;
+    ctx.font=`bold 12px "Segoe UI",Roboto,sans-serif`;
     ctx.fillText(item.label,x+w/2,y+h/2+5);
     // type indicator
-    ctx.font=`10px "JetBrains Mono",monospace`;
+    ctx.font=`10px "Segoe UI",Roboto,sans-serif`;
     ctx.fillStyle=item.isGood?'rgba(57,255,20,0.78)':'rgba(255,34,68,0.78)';
     ctx.fillText(item.isGood?'+ TOOL':'– RISK',x+w/2,y+h+12);
   });
@@ -1576,7 +1582,7 @@ function mgDraw(){
     ctx.save();
     ctx.globalAlpha=Math.min(1,f.life*1.5);
     ctx.fillStyle=f.color;
-    ctx.font=`bold 16px "JetBrains Mono",monospace`;
+    ctx.font=`bold 16px "Segoe UI",Roboto,sans-serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor=f.color;ctx.shadowBlur=10;
     ctx.fillText(f.text,f.x,f.y);
