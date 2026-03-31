@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Survival Simulator</title>
+<title>AI Survival — Will you make it?</title>
 
 <style>
 :root {
@@ -587,7 +587,7 @@ body::after{
   <div class="modal-box">
     <span class="modal-icon">⚠️</span>
     <div class="modal-title">Abandon Simulation?</div>
-    <p class="modal-sub">Progress will be lost.</p>
+    <p class="modal-sub">Your current run will be lost. All progress will be reset and you'll return to the intro screen.</p>
     <div class="modal-btns">
       <button class="modal-confirm" onclick="confirmHome()">YES, GO HOME</button>
       <button class="modal-cancel" onclick="cancelHome()">KEEP PLAYING</button>
@@ -600,32 +600,32 @@ body::after{
   <!-- ══════════ INTRO ══════════ -->
   <div id="screen-intro" class="screen active">
     <div class="intro-wrap">
-      <div class="intro-eyebrow"><i></i> 2026 Career Simulation</div>
+      <div class="intro-eyebrow"><i></i> 2026 · Career Simulator</div>
       <h1 class="intro-title">
         <span class="t1">AI SURVIVAL</span>
         <span class="t2">SIMULATOR</span>
       </h1>
       <p class="intro-sub">
-        6 turns. No safety net.<br>
-        <strong style="color:var(--text)">Most don't make it out.</strong>
+        6 turns. Real decisions. No right answers.<br>
+        <strong style="color:var(--text)">Most people don't make it through turn 3.</strong>
       </p>
       <div class="intro-stats">
         <div class="i-stat"><span class="v">100</span><span class="l">Starting HP</span></div>
-        <div class="i-stat"><span class="v">6</span><span class="l">Turns</span></div>
+        <div class="i-stat"><span class="v">6</span><span class="l">Rounds</span></div>
         <div class="i-stat"><span class="v">3</span><span class="l">Endings</span></div>
-        <div class="i-stat"><span class="v">38%</span><span class="l">Avg Survival</span></div>
+        <div class="i-stat"><span class="v">38%</span><span class="l">Survive</span></div>
       </div>
-      <button class="btn btn-primary" onclick="initGameAudio(); startMiniGameFlow()">LAUNCH SIMULATION →</button>
+      <button class="btn btn-primary" onclick="initGameAudio(); startMiniGameFlow()">START →</button>
     </div>
   </div>
 
   <!-- ══════════ ROLE SELECT ══════════ -->
   <div id="screen-role" class="screen">
-    <div class="section-tag">// Step 01 — Identity</div>
-    <div class="screen-title">Choose Your Role</div>
-    <div class="screen-sub">Pick a role. Your odds follow.</div>
+    <div class="section-tag">// Who are you?</div>
+    <div class="screen-title">Pick your role</div>
+    <div class="screen-sub">Your starting position. Choose honestly.</div>
     <div class="role-grid" id="role-grid"></div>
-    <button class="btn btn-primary" id="role-btn" onclick="confirmRole()" disabled>ENTER SIMULATION →</button>
+    <button class="btn btn-primary" id="role-btn" onclick="confirmRole()" disabled>BEGIN →</button>
   </div>
 
   <!-- ══════════ GAME ══════════ -->
@@ -633,7 +633,7 @@ body::after{
     <div class="hud" id="hud">
       <div class="hp-section hp-high" id="hp-section">
         <div class="hp-label">
-          <span class="hp-text mono">// SURVIVAL HP</span>
+          <span class="hp-text mono">// HP</span>
           <span class="hp-val mono" id="hp-val">100</span>
         </div>
         <div class="hp-track"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
@@ -658,14 +658,14 @@ body::after{
   <!-- ══════════ GAME OVER ══════════ -->
   <div id="screen-gameover" class="screen">
     <span class="go-skull">💀</span>
-    <div class="go-title">GAME OVER</div>
-    <div class="go-replaced">// You were replaced by AI</div>
+    <div class="go-title">REPLACED</div>
+    <div class="go-replaced">// The machine took your job</div>
     <div class="go-epitaph" id="go-epitaph">Loading final report...</div>
     <div class="go-stats-row" id="go-stats-row"></div>
-    <p style="font-size:14px;color:#6f89a8;max-width:360px;margin:0 auto 20px;line-height:1.65;">See what you missed.</p>
+    <p style="font-size:14px;color:#6f89a8;max-width:340px;margin:0 auto 20px;line-height:1.65;">You moved too slow. Most people do.<br>The plan exists. You just don't have it yet.</p>
     <div class="go-btns">
       <a href="unlock.html" style="display:block;width:100%;text-decoration:none;">
-        <button class="go-try-again" style="background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;box-shadow:0 0 22px rgba(0,229,255,.38);width:100%;">→ SEE WHAT TO DO NEXT — $5</button>
+        <button class="go-try-again" style="background:linear-gradient(135deg,var(--hp),#0099cc);color:#04070d;box-shadow:0 0 22px rgba(0,229,255,.38);width:100%;">GET THE PLAN — $5</button>
       </a>
       <button class="go-try-again" onclick="replayGame()">⟳ TRY AGAIN</button>
       <button class="go-change-role" onclick="gotoRole()">↩ Change Role</button>
@@ -676,11 +676,11 @@ body::after{
   <div id="screen-minigame" class="screen">
     <!-- Header -->
     <div class="mg-header">
-      <div class="section-tag">// Phase 01</div>
-      <h2>AI SKILL RUSH</h2>
+      <div class="section-tag">// Warm-up</div>
+      <h2>SKILL RUSH</h2>
       <p>
-        Grab tools. Dodge obsolete.<br>
-        <strong style="color:var(--bright)">SPACE</strong> or <strong style="color:var(--bright)">TAP</strong> to jump &nbsp;·&nbsp; Double-jump on
+        Grab AI tools. Dodge the dead weight.<br>
+        <strong style="color:var(--bright)">SPACE</strong> or <strong style="color:var(--bright)">TAP</strong> to jump &nbsp;·&nbsp; Double-jump OK
       </p>
     </div>
 
@@ -708,9 +708,9 @@ body::after{
     <canvas id="miniCanvas"></canvas>
 
     <div class="mg-end-card" id="mg-end-card">
-      <div class="mg-end-kicker mono">Phase Complete</div>
-      <div class="mg-end-title" id="mg-end-title">SYSTEM CHECK</div>
-      <div class="mg-end-sub" id="mg-end-sub">Phase done.</div>
+      <div class="mg-end-kicker mono">Clear</div>
+      <div class="mg-end-title" id="mg-end-title">DONE</div>
+      <div class="mg-end-sub" id="mg-end-sub">Warm-up complete.</div>
       <div class="mg-end-stats">
         <div class="mg-end-stat"><b id="mg-end-score">0</b><span>Score</span></div>
         <div class="mg-end-stat"><b id="mg-end-hp">0</b><span>HP Left</span></div>
@@ -720,27 +720,27 @@ body::after{
 
     <div class="mg-continue-wrap">
       <button onclick="startMainGame()" class="btn btn-primary">
-        Skip &amp; Continue →
+        Skip →
       </button>
     </div>
   </div>
 
   <!-- ══════════ RESULT ══════════ -->
   <div id="screen-result" class="screen">
-    <div class="screen-title">Your Result</div>
+    <div class="screen-title">Your AI Survival Result</div>
     <div id="strategy-list"></div>
     <div class="cta-panel">
-      <div class="cta-title">See what you missed</div>
-      <div class="cta-sub">3 strategies. 30-day plan. Your role.</div>
+      <div class="cta-title">The actual plan. Not a summary.</div>
+      <div class="cta-sub">3 income strategies mapped to your role. 30-day roadmap. Tools ranked. Prompts included.</div>
       <div class="cta-feats">
-        <div class="cta-feat"><span>✓</span> Personalized strategy</div>
-        <div class="cta-feat"><span>✓</span> Income paths</div>
-        <div class="cta-feat"><span>✓</span> Next steps</div>
+        <div class="cta-feat"><span>✓</span> All 3 strategies unlocked</div>
+        <div class="cta-feat"><span>✓</span> 30-day action roadmap</div>
+        <div class="cta-feat"><span>✓</span> Next steps, ranked</div>
       </div>
-      <a href="https://buy.stripe.com/5kQdR80ZD6GS8dCbtTb3q05" target="_blank">
+      <a href="https://buy.stripe.com/XXXX" target="_blank">
         <button class="cta-buy">
-          UNLOCK MY SURVIVAL PLAN
-          <span class="price-pill">$5</span>
+          UNLOCK — $5
+          <span class="price-pill">one time</span>
         </button>
       </a>
     </div>
@@ -748,7 +748,7 @@ body::after{
 
 </div>
 
-<div style="text-align:center;font-size:11px;color:#4a6080;margin-top:40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:.05em;">
+<div style="text-align:center;font-size:11px;color:#4a6080;margin-top:40px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.05em;">
   <a href="terms.html" style="color:#4a6080;text-decoration:none;">Terms</a>
   &nbsp;|&nbsp;
   <a href="privacy.html" style="color:#4a6080;text-decoration:none;">Privacy</a>
@@ -793,92 +793,92 @@ body::after{
 // ════════════════════════════════════════════
 const ROLES=[
   {id:'office',emoji:'🏢',name:'Office Worker',
-   desc:'Admin, HR, operations — the automation bullseye.',
+   desc:'Admin, ops, HR. High exposure. The easy target.',
    stats:{hp:100,income:30,adaptability:35,resistance:65},
    chips:['HP 100','INC 30','ADP 35']},
   {id:'engineer',emoji:'⚙️',name:'Engineer',
-   desc:'Coder, analyst, builder. AI is tool AND rival.',
+   desc:'Coder or analyst. AI is both your edge and your competition.',
    stats:{hp:100,income:60,adaptability:65,resistance:45},
    chips:['HP 100','INC 60','ADP 65']},
   {id:'creator',emoji:'🎨',name:'Creator',
-   desc:'Freelancer, designer, writer. High variance future.',
+   desc:'Freelancer, designer, writer. High variance. You adapt or you disappear.',
    stats:{hp:100,income:45,adaptability:80,resistance:40},
    chips:['HP 100','INC 45','ADP 80']},
   {id:'unemployed',emoji:'🔍',name:'Unemployed',
-   desc:'No income, clean slate. Every choice is survival.',
+   desc:'No income. No cushion. Every turn counts.',
    stats:{hp:80,income:10,adaptability:55,resistance:25},
    chips:['HP 80','INC 10','ADP 55']},
 ];
 
 const TURNS=[
   {
-  ev:{type:'neutral',icon:'📊',title:'AI Tools Flood Your Industry',
-    desc:'Some teams are already 2× faster. You can feel it.'},
+  ev:{type:'neutral',icon:'📊',title:'AI is eating your industry',
+    desc:'ChatGPT, Cursor, Claude — teams using these are shipping twice as fast. Your manager noticed. So did HR.'},
   choices:[
-    {icon:'🎓',text:'Learn modern AI tools',hint:'Workflows, prompting, integration',costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}},
-    {icon:'💼',text:'Ignore it. Keep your workflow.',hint:'Assume nothing changes',costs:{hp:-15,income:0,adaptability:-12,resistance:+18}},
-    {icon:'🚀',text:'Build a small AI side project',hint:'Ship something. Anything.',costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}},
-    {icon:'🎨',text:'Experiment with AI creative tools',hint:'Midjourney, Runway, Canva AI',costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}}
+    {icon:'🎓',text:'Learn the tools',hint:'Spend a few hours a week. It compounds fast.',costs:{hp:-3,income:+14,adaptability:+18,resistance:-12}},
+    {icon:'💼',text:'Keep doing what you\'re doing',hint:'Maybe it blows over.',costs:{hp:-15,income:0,adaptability:-12,resistance:+18}},
+    {icon:'🚀',text:'Build something with AI on the side',hint:'Small project. Real output. Beats another course.',costs:{hp:-8,income:+20,adaptability:+12,resistance:-10}},
+    {icon:'🎨',text:'Try one AI tool this week',hint:'Low commitment. See what the fuss is about.',costs:{hp:-2,income:+8,adaptability:+10,resistance:-6}}
   ]},
-  {ev:{type:'crisis',icon:'⚡',title:'Company-Wide Layoffs Announced',desc:'15% cut. They\'re already deciding who stays.'},
+  {ev:{type:'crisis',icon:'⚡',title:'Layoffs announced',desc:'15% of the company. The list isn\'t public yet. People who can\'t demonstrate value are first.'},
    choices:[
-    {icon:'🤖',text:'Lead the AI transition',hint:'Step up before someone else does',costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
-    {icon:'🤫',text:'Keep your head down',hint:'Hope they don\'t notice you',costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
-    {icon:'📝',text:'Polish résumé. Start networking.',hint:'Build a safety net now',costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
+    {icon:'🤖',text:'Offer to lead the AI transition',hint:'Risky. But it makes you hard to cut.',costs:{hp:+15,income:+10,adaptability:+20,resistance:-18}},
+    {icon:'🤫',text:'Say nothing and hope',hint:'Works until it doesn\'t.',costs:{hp:-20,income:-5,adaptability:-8,resistance:+12}},
+    {icon:'📝',text:'Update your résumé and start talking to people',hint:'Hedge. You don\'t have to leave to be prepared.',costs:{hp:-5,income:+5,adaptability:+8,resistance:-5}},
   ]},
-  {ev:{type:'opportunity',icon:'💡',title:'AI Workers Get 40% Raises',desc:'Your colleague got a $20k raise. You watched.'},
+  {ev:{type:'opportunity',icon:'💡',title:'Your coworker just got a 40% raise',desc:'He learned Cursor three months ago. His output tripled. Management noticed. You didn\'t move.'},
    choices:[
-    {icon:'📚',text:'Go deep on AI prompting',hint:'Weekends. No shortcuts.',costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
-    {icon:'💰',text:'Sell AI-enhanced freelance work',hint:'Charge 3× with AI output',costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
-    {icon:'😴',text:'Wait and see',hint:'Maybe it corrects itself',costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
+    {icon:'📚',text:'Go deep on prompting',hint:'Not just surface level. Actually learn how it works.',costs:{hp:+5,income:+16,adaptability:+14,resistance:-12}},
+    {icon:'💰',text:'Start selling AI-assisted work',hint:'Same time. Better output. Charge accordingly.',costs:{hp:+8,income:+26,adaptability:+5,resistance:-8}},
+    {icon:'😴',text:'Wait and see',hint:'You\'ve been saying that for six months.',costs:{hp:-15,income:-10,adaptability:-12,resistance:+10}},
   ]},
-  {ev:{type:'crisis',icon:'🤖',title:'AI Replaces 40% of Your Job',desc:'Not a warning. It already happened.'},
+  {ev:{type:'crisis',icon:'🤖',title:'A model just automated your core tasks',desc:'Not a rumour. The demo is on YouTube. HR is "reviewing headcount." You have maybe two weeks.'},
    choices:[
-    {icon:'🔄',text:'Pivot to managing AI outputs',hint:'Be the human-in-the-loop',costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
-    {icon:'🆕',text:'Rapidly reskill',hint:'Find what AI can\'t do yet',costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
-    {icon:'😤',text:'Fight it. File complaints.',hint:'Push back hard',costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
+    {icon:'🔄',text:'Shift to managing AI output',hint:'Someone still needs to review, prompt, and edit.',costs:{hp:+10,income:+12,adaptability:+20,resistance:-20}},
+    {icon:'🆕',text:'Learn something adjacent that AI can\'t do yet',hint:'Niche skills have a longer runway.',costs:{hp:-5,income:+10,adaptability:+14,resistance:-12}},
+    {icon:'😤',text:'Push back. File a complaint.',hint:'Noted and ignored.',costs:{hp:-28,income:-15,adaptability:-15,resistance:+20}},
   ]},
-  {ev:{type:'opportunity',icon:'🌐',title:'New AI Income Streams Emerge',desc:'Real money. No degree required. Window is open right now.'},
+  {ev:{type:'opportunity',icon:'🌐',title:'New income categories that didn\'t exist last year',desc:'Prompt engineering. AI workflow consulting. Synthetic content. These are real jobs now. Early movers are setting the rates.'},
    choices:[
-    {icon:'📈',text:'Build an AI income stream',hint:'Templates, courses, micro-SaaS',costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
-    {icon:'🤝',text:'Partner with AI-native startups',hint:'Contract work, top rates',costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
-    {icon:'⏳',text:'Wait for stability',hint:'It won\'t come',costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
+    {icon:'📈',text:'Build a small income stream around AI',hint:'Template pack. Micro-SaaS. Consulting call. Pick one.',costs:{hp:+10,income:+32,adaptability:+8,resistance:-10}},
+    {icon:'🤝',text:'Partner with someone already doing it',hint:'Faster than going alone.',costs:{hp:+5,income:+18,adaptability:+10,resistance:-8}},
+    {icon:'⏳',text:'Not yet. Too crowded.',hint:'It\'s not too crowded. You\'re too late is different.',costs:{hp:-18,income:-8,adaptability:-10,resistance:+8}},
   ]},
-  {ev:{type:'neutral',icon:'🏆',title:'FINAL ROUND: AI-First Economy',desc:'2027. This is your last move. Make it count.'},
+  {ev:{type:'neutral',icon:'🏆',title:'2027. Every job listing says "AI fluency required."',desc:'The companies that moved early are 3x the size. The ones that didn\'t are gone. This is your last decision.'},
    choices:[
-    {icon:'🎯',text:'Launch your AI personal brand',hint:'Own a niche. Be the name.',costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
-    {icon:'🔧',text:'Become an AI integration specialist',hint:'Companies pay to be fixed',costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
-    {icon:'🏳️',text:'Accept it. Let AI take over.',hint:'That\'s a choice too',costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
+    {icon:'🎯',text:'Own a specific niche as an AI-powered expert',hint:'Not "AI consultant." Something specific. In demand.',costs:{hp:+15,income:+38,adaptability:+15,resistance:-20}},
+    {icon:'🔧',text:'Become the person companies call to fix their AI setup',hint:'Integration, ops, tooling. Real skill. Undercrowded.',costs:{hp:+10,income:+26,adaptability:+10,resistance:-15}},
+    {icon:'🏳️',text:'Let it happen',hint:'The baseline income exists. It\'s not comfortable.',costs:{hp:-30,income:-25,adaptability:-22,resistance:+25}},
   ]},
 ];
 
 const RANDOM_NEGATIVE=[
-  {icon:'📉',title:'MARKET CRASH: Mass layoffs hit overnight',desc:'10,000 jobs gone. Your sector is next.',hpDelta:-25},
-  {icon:'🦠',title:'CRISIS: Main income source gone',desc:'No warning. Just gone.',hpDelta:-20},
-  {icon:'⚠️',title:'DISRUPTION: Your skill is obsolete',desc:'A model does it now. Better. Faster.',hpDelta:-15},
-  {icon:'💸',title:'SETBACK: Expenses wipe your runway',desc:'Growth plans shelved. Back to zero.',hpDelta:-20},
+  {icon:'📉',title:'Mass layoffs, your sector',desc:'Overnight. No warning. 10,000 jobs. Yours might be next.',hpDelta:-25},
+  {icon:'🦠',title:'Your biggest client just went quiet',desc:'Emails stopped. Invoice unpaid. They\'re gone.',hpDelta:-20},
+  {icon:'⚠️',title:'A model just learned your job',desc:'Demo\'s on X. Comments say it\'s better than most humans. It is.',hpDelta:-15},
+  {icon:'💸',title:'Unexpected bill. Bad timing.',desc:'Emergency expense. Kills your runway to invest in yourself.',hpDelta:-20},
 ];
 
 const RANDOM_POSITIVE=[
-  {icon:'🌟',title:'VIRAL: Your AI demo blows up',desc:'Didn\'t expect it. Inbound won\'t stop.',hpDelta:+15},
-  {icon:'💼',title:'OPPORTUNITY: Premium contract lands',desc:'Right place. Right time.',hpDelta:+15},
-  {icon:'🎓',title:'LUCK: AI bootcamp scholarship',desc:'Free. 2 weeks. No excuses now.',hpDelta:+20},
-  {icon:'🤝',title:'NETWORK: One intro. Three doors.',desc:'Someone believed in you.',hpDelta:+15},
+  {icon:'🌟',title:'Something you posted went viral',desc:'Inbound messages. Three real leads. Didn\'t expect it.',hpDelta:+15},
+  {icon:'💼',title:'A recruiter wants to talk',desc:'AI-first company. Rates are serious. They reached out to you.',hpDelta:+15},
+  {icon:'🎓',title:'Free intensive. You got a spot.',desc:'Two weeks. Real curriculum. Costs nothing. Hard to get in.',hpDelta:+20},
+  {icon:'🤝',title:'Right conversation, right time',desc:'Someone introduced you. Three doors opened from one call.',hpDelta:+15},
 ];
 
 const EPITAPHS=[
-  '"They said it was just a tool."',
-  '"Chose comfort. The market didn\'t."',
-  '"Waited too long."',
-  '"Resistant to the end."',
-  '"Ten years of experience. Zero AI fluency."',
-  '"The safe choice was the fatal one."',
+  '"Waited too long. By the time it felt urgent, it was over."',
+  '"Assumed experience was enough. It wasn\'t."',
+  '"The plan was to figure it out later."',
+  '"Knew it was coming. Did nothing about it."',
+  '"Confused activity with progress. The machine didn\'t."',
+  '"Thought resistance was a strategy."',
 ];
 
 const STRATEGIES=[
-  {name:'AI-Enhanced Freelancing',desc:'Same work. AI does the heavy lifting. You charge more.',income:'$4,000 – $12,000/mo',icon:'💼'},
-  {name:'Prompt Engineering & Consulting',desc:'Teach teams what they can\'t figure out alone.',income:'$6,000 – $20,000/mo',icon:'🧠'},
-  {name:'AI Micro-SaaS / Digital Products',desc:'Build it once. It pays while you sleep.',income:'$2,000 – $50,000/mo',icon:'⚙️'},
+  {name:'AI-Assisted Freelancing',desc:'Same hours. Better output. Clients pay for results. Use AI to deliver faster and charge what your time is actually worth.',income:'$4k–$12k/mo',icon:'💼'},
+  {name:'Prompting & Workflow Consulting',desc:'Most companies have AI tools and no idea how to use them. You do. That gap pays well right now.',income:'$6k–$20k/mo',icon:'🧠'},
+  {name:'AI Products & Templates',desc:'Build something once. Sell it repeatedly. No-code tools make this accessible. The market is early.',income:'$2k–$50k/mo',icon:'⚙️'},
 ];
 
 // ════════════════════════════════════════════
@@ -1039,7 +1039,7 @@ function renderTurn(){
 
   const ea=document.getElementById('event-area');
   const evClass=ev.type==='crisis'?'ev-crisis':ev.type==='opportunity'?'ev-opportunity':'ev-neutral';
-  const evLabel=ev.type==='crisis'?'⚠ CRISIS EVENT':ev.type==='opportunity'?'✦ OPPORTUNITY':'◈ SITUATION';
+  const evLabel=ev.type==='crisis'?'⚠ Crisis':ev.type==='opportunity'?'✦ Opening':'◈ Situation';
   ea.innerHTML=`<div class="event-card ${evClass}" style="animation-delay:.05s"><div class="ev-accent">${evLabel}</div><span class="ev-icon">${ev.icon}</span><div class="ev-title">${ev.title}</div><div class="ev-desc">${ev.desc}</div></div>`;
 
   const ch=document.getElementById('choices');ch.innerHTML='';
@@ -1103,9 +1103,9 @@ function showResult(){
   const survScore=Math.round((G.income*.40)+(G.adaptability*.35)+(Math.max(0,100-G.resistance)*.15)+(G.hp*.10));
   const score=clamp(survScore,5,99);
   let ending,endClass,endTitle,endExpl,ringColor;
-  if(score>=70){ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';endTitle='You Mastered the AI Era';endExpl=`${score}%. You moved. Others waited. Top 15%.`;}
-  else if(score>=42){ending='◈ SURVIVING';endClass='end-surviving';ringColor='#ffaa00';endTitle='Holding On — Barely';endExpl=`${score}%. Stable. But not safe.`;}
-  else{ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';endTitle='AI Claimed Your Career';endExpl=`${score}%. Too slow. The window is closing.`;}
+  if(score>=70){ending='✦ THRIVING';endClass='end-thriving';ringColor='#39ff14';endTitle='You made it work';endExpl=`${score}% survival score. You adapted faster than most. That gap compounds — the people behind you are still figuring out what you already know.`;}
+  else if(score>=42){ending='◈ HOLDING ON';endClass='end-surviving';ringColor='#ffaa00';endTitle='Still in the game. Barely.';endExpl=`${score}%. You made enough right calls to survive. But you left income on the table and the margin is thin. One bad round from here ends it.`;}
+  else{ending='⚠ REPLACED';endClass='end-replaced';ringColor='#ff2244';endTitle='The machine won this one';endExpl=`${score}%. You played it safe. The market didn't. The window's not closed — but it's smaller than it was six months ago.`;}
 
   const circ=2*Math.PI*70,offset=circ-(score/100)*circ;
   const role=ROLES.find(x=>x.id===G.role);
@@ -1113,7 +1113,7 @@ function showResult(){
 
   document.getElementById('screen-result').innerHTML=`
     <div class="result-header">
-      <div class="section-tag">// Simulation Complete — ${role.emoji} ${role.name}</div>
+      <div class="section-tag">// Run complete — ${role.emoji} ${role.name}</div>
       <div class="ring-wrap"><svg viewBox="0 0 160 160"><circle class="ring-bg" cx="80" cy="80" r="70"/><circle class="ring-fill" id="ring-fill2" cx="80" cy="80" r="70" stroke="${ringColor}" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/></svg><div class="ring-center"><div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div><div class="ring-label">SURVIVAL</div></div></div>
       <div class="ending-badge ${endClass}">${ending}</div>
       <div class="result-title">${endTitle}</div>
@@ -1125,26 +1125,24 @@ function showResult(){
       <div class="fs-card"><span class="fs-val mono" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="fs-lbl">Adaptability</span></div>
     </div>
     <div class="divider"></div>
-    <div id="locked-content" style="display:none;">
     <div class="mono-panel">
-      <div class="mono-panel-title">AI Income Strategies</div>
-      <div class="mono-panel-sub">#1 unlocked. #2 and #3 in your plan.</div>
+      <div class="mono-panel-title">Income paths for your situation</div>
+      <div class="mono-panel-sub">Strategy #1 is visible. #2 and #3 unlock with the plan.</div>
       <div class="strat-list">${stratsHTML}</div>
     </div>
-    </div>
     <div class="cta-panel">
-      <div class="cta-title">🔓 Your Next Move</div>
-      <div class="cta-sub">All 3 strategies + 30-day roadmap for your role.</div>
+      <div class="cta-title">The actual plan. Not a summary.</div>
+      <div class="cta-sub">3 income strategies mapped to your role. 30-day roadmap. Tools ranked. Prompts included. One payment, yours to keep.</div>
       <div class="cta-feats">
-        <div class="cta-feat"><span>✓</span> 3 income strategies</div>
-        <div class="cta-feat"><span>✓</span> 30-day action plan</div>
-        <div class="cta-feat"><span>✓</span> Top 10 tools for your field</div>
-        <div class="cta-feat"><span>✓</span> Prompt templates</div>
+        <div class="cta-feat"><span>✓</span> All 3 strategies unlocked</div>
+        <div class="cta-feat"><span>✓</span> 30-day action roadmap</div>
+        <div class="cta-feat"><span>✓</span> Top tools ranked for your role</div>
+        <div class="cta-feat"><span>✓</span> Starter prompt library</div>
         <div class="cta-feat"><span>✓</span> Weekly AI briefings</div>
       </div>
-      <button class="cta-buy" onclick="handleCTA(this)">UNLOCK MY SURVIVAL PLAN<span class="price-pill">$5</span></button>
-      <button class="replay-btn" onclick="replayGame()">↩ Replay with Same Role</button>
-      <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Choose Different Role</button>
+      <button class="cta-buy" onclick="handleCTA(this)">UNLOCK — $5<span class="price-pill">one time</span></button>
+      <button class="replay-btn" onclick="replayGame()">↩ Play again</button>
+      <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Different role</button>
     </div>`;
 
   setHomeBtn(true);showScreen('screen-result');
@@ -1172,46 +1170,46 @@ function buildUnlockContent(){
     unemployed:'Given my current background, create a 30-day reskilling plan to reach my first AI-assisted income online.'
   };
   const roadmap={
-    office:['Audit your repetitive work and list 10 tasks AI can shorten.','Build 2 automation workflows using ChatGPT + Zapier/Sheets.','Create one measurable "AI saved us time" win at work.','Package your AI workflow knowledge into a promotion case or freelance offer.'],
+    office:['Audit your repetitive work and list 10 tasks AI can shorten.','Build 2 automation workflows using ChatGPT + Zapier/Sheets.','Create one measurable “AI saved us time” win at work.','Package your AI workflow knowledge into a promotion case or freelance offer.'],
     engineer:['Master one coding assistant workflow end to end.','Ship a tiny AI-assisted tool or internal productivity script.','Practice reviewing AI output faster than peers.','Turn your workflow into a portfolio case study and outbound pitch.'],
     creator:['Choose one niche and one repeatable offer.','Use AI to produce 3x more output without lowering quality.','Package content into a service, template, or mini-product.','Test one paid offer and collect first revenue or testimonials.'],
     unemployed:['Pick one AI income path and one niche market.','Learn the core tools daily and complete 2 tiny projects.','Create a simple portfolio and outreach message.','Start pitching, freelancing, or selling a first AI-assisted service.']
   };
   const tools=(topToolsByRole[G.role]||topToolsByRole.unemployed).map((t,i)=>`<div class="cta-feat"><span>${i+1}.</span> ${t}</div>`).join('');
-  const days=(roadmap[G.role]||roadmap.unemployed).map((t,i)=>`<div class="strat-item s-unlocked"><div class="strat-num n${(i%3)+1}">${i+1}</div><div class="strat-body"><div class="strat-name">Week ${i+1}</div><div class="strat-desc">${t}</div></div></div>`).join('');
+  const days=(roadmap[G.role]||roadmap.unemployed).map((t,i)=>`<div class="strat-item s-unlocked"><div class="strat-num n${(i%3)+1}">W${i+1}</div><div class="strat-body"><div class="strat-desc">${t}</div></div></div>`).join('');
   return `
     <div class="divider unlock-divider"></div>
     <div id="unlock-content" class="mono-panel" style="margin-top:18px;">
-      <div class="mono-panel-title">Your Full Plan — ${roleName}</div>
-      <div class="mono-panel-sub">Everything you need to move in the AI economy.</div>
+      <div class="mono-panel-title">Your plan — ${roleName}</div>
+      <div class="mono-panel-sub">Three income paths. A 30-day roadmap. Tools and prompts that work right now.</div>
 
       <div class="strat-list" style="margin-bottom:18px;">
-        <div class="strat-item s-unlocked"><div class="strat-num n1">1</div><div class="strat-body"><div class="strat-name">Income Strategy #1 — AI-Enhanced Freelancing</div><div class="strat-desc">Offer faster delivery, research, writing, design, analysis, or operations help using AI-assisted workflows.</div><div class="strat-inc">$4,000 – $12,000/mo</div></div></div>
-        <div class="strat-item s-unlocked"><div class="strat-num n2">2</div><div class="strat-body"><div class="strat-name">Income Strategy #2 — Prompting / Workflow Consulting</div><div class="strat-desc">Help individuals or teams adopt the exact AI workflows they are still confused about.</div><div class="strat-inc">$6,000 – $20,000/mo</div></div></div>
-        <div class="strat-item s-unlocked"><div class="strat-num n3">3</div><div class="strat-body"><div class="strat-name">Income Strategy #3 — AI Product / Template Layer</div><div class="strat-desc">Turn your repeated workflow into a template pack, agent setup, mini-tool, or digital product.</div><div class="strat-inc">$2,000 – $50,000/mo</div></div></div>
+        <div class="strat-item s-unlocked"><div class="strat-num n1">1</div><div class="strat-body"><div class="strat-name">AI-Assisted Freelancing</div><div class="strat-desc">Deliver faster. Charge for results, not hours. AI closes the gap between your current rate and what the market will pay.</div><div class="strat-inc">$4k–$12k/mo</div></div></div>
+        <div class="strat-item s-unlocked"><div class="strat-num n2">2</div><div class="strat-body"><div class="strat-name">Prompting & Workflow Consulting</div><div class="strat-desc">Companies have AI tools and no idea how to use them. You show them how. Short engagements. High margin.</div><div class="strat-inc">$6k–$20k/mo</div></div></div>
+        <div class="strat-item s-unlocked"><div class="strat-num n3">3</div><div class="strat-body"><div class="strat-name">AI Products & Templates</div><div class="strat-desc">Build something once. Sell it repeatedly. No-code tools make the technical part accessible. The window is still early.</div><div class="strat-inc">$2k–$50k/mo</div></div></div>
       </div>
 
-      <div class="mono-panel-title">30-Day Action Roadmap</div>
+      <div class="mono-panel-title">30-day roadmap</div>
       <div class="strat-list" style="margin-bottom:18px;">${days}</div>
 
-      <div class="mono-panel-title">Top 10 AI Tools Ranked for ${roleName}</div>
+      <div class="mono-panel-title">Top tools for ${roleName}s right now</div>
       <div class="cta-feats" style="margin-bottom:18px;">${tools}</div>
 
-      <div class="mono-panel-title">Prompt Template Starter</div>
+      <div class="mono-panel-title">Starter prompt</div>
       <div class="strat-item s-unlocked" style="margin-bottom:18px;">
         <div class="strat-num n1">★</div>
         <div class="strat-body">
-          <div class="strat-name">Use this as your first template</div>
+          <div class="strat-name">Use this first</div>
           <div class="strat-desc" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;white-space:pre-wrap;">${rolePrompts[G.role]||rolePrompts.unemployed}</div>
         </div>
       </div>
 
-      <div class="mono-panel-title">Weekly AI Briefings</div>
+      <div class="mono-panel-title">Weekly briefings</div>
       <div class="strat-item s-unlocked">
         <div class="strat-num n2">→</div>
         <div class="strat-body">
-          <div class="strat-name">What's inside</div>
-          <div class="strat-desc">What changed in AI this week, which tools matter now, and which income opportunities are easiest to enter.</div>
+          <div class="strat-name">What's included</div>
+          <div class="strat-desc">Every week: what changed in AI, which tools matter now, and which income paths are getting easier to enter. No noise.</div>
         </div>
       </div>
     </div>`;
@@ -1234,7 +1232,7 @@ function handleCTA(btn){
     }
   }
 
-  btn.innerHTML='✓ PLAN UNLOCKED <span class="price-pill">$5</span>';
+  btn.innerHTML='✓ Unlocked <span class="price-pill">one time</span>';
   btn.style.background='linear-gradient(135deg,var(--good),#16d66d)';
   btn.disabled=true;
 
@@ -1351,7 +1349,7 @@ function mgBeep(kind='good'){
   }catch(e){}
 }
 
-function showMiniEndCard(title,sub,kicker='Phase Complete'){
+function showMiniEndCard(title,sub,kicker='Clear'){
   const card=document.getElementById('mg-end-card');
   if(!card)return;
   document.getElementById('mg-end-title').textContent=title;
@@ -1359,19 +1357,19 @@ function showMiniEndCard(title,sub,kicker='Phase Complete'){
   document.querySelector('#mg-end-card .mg-end-kicker').textContent=kicker;
   document.getElementById('mg-end-score').textContent=MINI.score;
   document.getElementById('mg-end-hp').textContent=Math.max(0,MINI.hp);
-  document.getElementById('mg-end-reason').textContent=MINI.lastHitLabel||'Cleared';
+  document.getElementById('mg-end-reason').textContent=MINI.lastHitLabel||'Survived';
   card.classList.add('visible');
   const btn=document.querySelector('.mg-continue-wrap .btn');
-  if(btn){btn.innerHTML='ENTER MAIN SIMULATION →';btn.style.boxShadow='0 0 28px rgba(57,255,20,.35)';}
+  if(btn){btn.innerHTML='Continue →';btn.style.boxShadow='0 0 28px rgba(57,255,20,.35)';}
 }
 
-function endMiniGame(state,reason='Cleared'){
+function endMiniGame(state,reason='Survived'){
   if(!MINI.running)return;
   MINI.finishState=state;
   MINI.lastHitLabel=reason;
   stopMiniGame();
-  if(state==='failed'){screenFlash('bad');mgBeep('end');showMiniEndCard('SYSTEM OVERLOAD',reason,'Phase Failed');}
-  else{screenFlash('good');mgBeep('good');showMiniEndCard('PHASE COMPLETE',reason,'Phase Clear');}
+  if(state==='failed'){screenFlash('bad');mgBeep('end');showMiniEndCard('OVERLOADED',reason,'Failed');}
+  else{screenFlash('good');mgBeep('good');showMiniEndCard('CLEAR',reason,'Done');}
 }
 
 // ─── MINI-GAME INIT ───
@@ -1431,7 +1429,7 @@ function initMiniGame(){
     if(!MINI.running)return;
     MINI.timeLeft=Math.max(0,MINI.timeLeft-1);
     mgUpdateHUD();
-    if(MINI.timeLeft<=0){endMiniGame('cleared','You survived the AI rush');}
+    if(MINI.timeLeft<=0){endMiniGame('cleared','Time up');}
   },1000);
 
   if(MINI.rafId)cancelAnimationFrame(MINI.rafId);
@@ -1499,7 +1497,7 @@ function mgUpdate(dt){
         if(C.canvas){C.canvas.style.animation='shake .3s both';setTimeout(()=>{if(C.canvas)C.canvas.style.animation='';},350);}
       }
       mgUpdateHUD();
-      if(C.hp<=0){endMiniGame('failed',`Overtaken by ${item.label}`);}
+      if(C.hp<=0){endMiniGame('failed',`Hit by ${item.label}`);}
     }
   });
   C.items=C.items.filter(i=>i.alive&&i.x>-100);
