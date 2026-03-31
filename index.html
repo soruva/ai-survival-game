@@ -1109,55 +1109,84 @@ function showResult(){
   const role=ROLES.find(x=>x.id===G.role);
   const stratsHTML=STRATEGIES.map((s,i)=>`<div class="strat-item ${i===0?'s-unlocked':'s-locked'}"><div class="strat-num n${i+1}">${i+1}</div><div class="strat-body"><div class="strat-name">${s.icon} ${s.name}</div><div class="strat-desc">${s.desc}</div><div class="strat-inc">${s.income}</div></div></div>`).join('');
 
-  document.getElementById('screen-result').innerHTML=`
-    <div class="result-header">
-      <div class="section-tag">// Run complete — ${role.emoji} ${role.name}</div>
-      <div class="ring-wrap"><svg viewBox="0 0 160 160"><circle class="ring-bg" cx="80" cy="80" r="70"/><circle class="ring-fill" id="ring-fill2" cx="80" cy="80" r="70" stroke="${ringColor}" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/></svg><div class="ring-center"><div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div><div class="ring-label">SURVIVAL</div></div></div>
-      <div class="ending-badge ${endClass}">${ending}</div>
-      <div class="result-title">${endTitle}</div>
-      <p class="result-expl">${endExpl}</p>
+  document.getElementById('screen-result').innerHTML = `
+  <div class="result-header">
+    <div class="section-tag">// Run complete — ${role.emoji} ${role.name}</div>
+
+    <div class="ring-wrap">
+      <svg viewBox="0 0 160 160">
+        <circle class="ring-bg" cx="80" cy="80" r="70"/>
+        <circle class="ring-fill" id="ring-fill2"
+          cx="80" cy="80" r="70"
+          stroke="${ringColor}"
+          stroke-dasharray="${circ}"
+          stroke-dashoffset="${circ}"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-score mono" style="color:${ringColor}" id="score-num">0%</div>
+        <div class="ring-label">SURVIVAL</div>
+      </div>
     </div>
-    <div class="final-stats">
-      <div class="fs-card"><span class="fs-val mono" style="color:var(--hp)">${G.hp}</span><span class="fs-lbl">Final HP</span></div>
-      <div class="fs-card"><span class="fs-val mono" style="color:var(--good)">${clamp(G.income,0,100)}</span><span class="fs-lbl">Income</span></div>
-      <div class="fs-card"><span class="fs-val mono" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span><span class="fs-lbl">Adaptability</span></div>
-    </div>
-    <div class="divider"></div>
-  <div id="locked-content">  
-  <div class="mono-panel">
-    <div class="mono-panel-title">Income paths for your situation</div>
-    <div class="mono-panel-sub">Strategy #1 is visible. #2 and #3 unlock with the plan.</div>
-    <div class="strat-list">${stratsHTML}</div>
+
+    <div class="ending-badge ${endClass}">${ending}</div>
+    <div class="result-title">${endTitle}</div>
+    <p class="result-expl">${endExpl}</p>
   </div>
 
-  <div class="cta-panel">
-    <div class="cta-title">The actual plan. Not a summary.</div>
-    <div class="cta-sub">
-      3 income strategies mapped to your role. 30-day roadmap. Tools ranked. Prompts included. One payment, yours to keep.
+  <div class="final-stats">
+    <div class="fs-card">
+      <span class="fs-val mono" style="color:var(--hp)">${G.hp}</span>
+      <span class="fs-lbl">Final HP</span>
     </div>
-
-    <div class="cta-feats">
-      <div class="cta-feat"><span>✓</span> All 3 strategies unlocked</div>
-      <div class="cta-feat"><span>✓</span> 30-day action roadmap</div>
-      <div class="cta-feat"><span>✓</span> Top tools ranked for your role</div>
-      <div class="cta-feat"><span>✓</span> Starter prompt library</div>
-      <div class="cta-feat"><span>✓</span> Weekly AI briefings</div>
+    <div class="fs-card">
+      <span class="fs-val mono" style="color:var(--good)">${clamp(G.income,0,100)}</span>
+      <span class="fs-lbl">Income</span>
     </div>
-
-    <a href="https://buy.stripe.com/5kQdR80ZD6GS8dCbtTb3q05" target="_blank">
-      <button class="cta-buy">
-        UNLOCK — $5
-        <span class="price-pill">one time</span>
-      </button>
-    </a>
-
+    <div class="fs-card">
+      <span class="fs-val mono" style="color:var(--warn)">${clamp(G.adaptability,0,100)}</span>
+      <span class="fs-lbl">Adaptability</span>
+    </div>
   </div>
 
-</div>
-      <button class="replay-btn" onclick="replayGame()">↩ Play again</button>
-      <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Different role</button>
+  <div class="divider"></div>
+
+  <!-- 🔒 LOCKED CONTENT -->
+  <div id="locked-content">
+
+    <div class="mono-panel">
+      <div class="mono-panel-title">Income paths for your situation</div>
+      <div class="mono-panel-sub">Strategy #1 is visible. #2 and #3 unlock with the plan.</div>
+      <div class="strat-list">${stratsHTML}</div>
     </div>
-    `;
+
+    <div class="cta-panel">
+      <div class="cta-title">The actual plan. Not a summary.</div>
+      <div class="cta-sub">
+        3 income strategies mapped to your role. 30-day roadmap. Tools ranked. Prompts included. One payment, yours to keep.
+      </div>
+
+      <div class="cta-feats">
+        <div class="cta-feat"><span>✓</span> All 3 strategies unlocked</div>
+        <div class="cta-feat"><span>✓</span> 30-day action roadmap</div>
+        <div class="cta-feat"><span>✓</span> Top tools ranked for your role</div>
+        <div class="cta-feat"><span>✓</span> Starter prompt library</div>
+        <div class="cta-feat"><span>✓</span> Weekly AI briefings</div>
+      </div>
+
+      <a href="https://buy.stripe.com/5kQdR80ZD6GS8dCbtTb3q05" target="_blank">
+        <button class="cta-buy">
+          UNLOCK — $5
+          <span class="price-pill">one time</span>
+        </button>
+      </a>
+    </div>
+
+  </div> <!-- ✅ locked-content properly closed -->
+
+  <!-- 🎮 ACTION BUTTONS -->
+  <button class="replay-btn" onclick="replayGame()">↩ Play again</button>
+  <button class="replay-btn" onclick="gotoRole()" style="margin-top:6px;">↩ Different role</button>
+`;
 
   setHomeBtn(true);showScreen('screen-result');
   setTimeout(()=>{
