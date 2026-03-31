@@ -1214,14 +1214,6 @@ function buildUnlockContent(){
     </div>`;
 }
 
-function handleCTA(btn){
-  initGameAudio();
-  mgBeep('unlock');
-  document.querySelectorAll('.strat-item.s-locked').forEach(el=>{
-    el.classList.remove('s-locked');
-    el.classList.add('s-unlocked');
-  });
-
   let unlock=document.getElementById('unlock-content');
   if(!unlock){
     const result=document.getElementById('screen-result');
